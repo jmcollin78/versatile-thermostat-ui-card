@@ -59,10 +59,10 @@ const plugins = [
 
 export default [
     {
-        input: "src/better-thermostat-ui.ts",
+        input: "src/versatile-thermostat-ui.ts",
         output: {
             inlineDynamicImports: true,
-            file: "dist/better-thermostat-ui-card.js",
+            file: "dist/versatile-thermostat-ui-card.js",
             format: "es",
         },
         plugins,

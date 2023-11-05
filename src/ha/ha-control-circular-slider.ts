@@ -61,7 +61,7 @@ import {
   
   export type ControlCircularSliderMode = "start" | "end" | "full";
   
-  @customElement("bt-ha-control-circular-slider")
+  @customElement("vt-ha-control-circular-slider")
   export class BTHaControlCircularSlider extends LitElement {
     @property({ type: Boolean, reflect: true })
     public disabled = false;
@@ -744,6 +744,6 @@ import {
   
   declare global {
     interface HTMLElementTagNameMap {
-      "bt-ha-control-circular-slider": BTHaControlCircularSlider;
+      "vt-ha-control-circular-slider": BTHaControlCircularSlider;
     }
   }

@@ -1,12 +1,12 @@
 {
   "common": {
-      "version": "version",
-      "current": "nuværende"
+    "version": "version",
+    "current": "nuværende"
   },
   "extra_states": {
     "window_open": "Vindue åben",
     "night_mode": "Nattilstand",
     "eco": "Eco",
-    "summer": "Sommer"
+    "overpowering": "Overpowering"
   }
 }

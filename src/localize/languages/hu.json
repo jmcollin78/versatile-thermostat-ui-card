@@ -1,13 +1,13 @@
 {
   "common": {
-      "version": "Verzió",
-      "current": "Aktuális"
+    "version": "Verzió",
+    "current": "Aktuális"
   },
   "editor": {
     "card": {
       "climate": {
         "disable_window": "Ablak kikapcsolás",
-        "disable_summer": "Nyár kikapcsolás",
+        "disable_overpowering": "Nyár kikapcsolás",
         "disable_eco": "Eco kikapcsolás",
         "disable_heat": "Fűtés kikacsolás",
         "disable_off": "Kikapcsolás inaktiválás",
@@ -20,6 +20,6 @@
     "window_open": "Ablak nyitva",
     "night_mode": "Éjszakai mód",
     "eco": "Eco",
-    "summer": "Nyár"
+    "overpowering": "Nyár"
   }
 }

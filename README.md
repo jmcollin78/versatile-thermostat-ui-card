@@ -1,14 +1,14 @@
-[![Version - 2.2.0](https://img.shields.io/badge/Version-2.2.0-009688?style=for-the-badge)](https://github.com/KartoffelToby/better-thermostat-ui-card)
+[![Version - 2.2.0](https://img.shields.io/badge/Version-2.2.0-009688?style=for-the-badge)](https://github.com/KartoffelToby/versatile-thermostat-ui-card)
 [![Discord](https://img.shields.io/discord/925725316540923914.svg?style=for-the-badge)](https://discord.gg/9BUegWTG3K)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
-# UI Card for Better Thermostat
+# UI Card for versatile Thermostat
 
-This is a advanced climate card for HA, but with some improvements for the custom [better_thermostat](https://github.com/KartoffelToby/better_thermostat) integration. (you need at least 1.3.0)
+This is a advanced climate card for HA, but with some improvements for the custom [versatile_thermostat](https://github.com/KartoffelToby/versatile_thermostat) integration. (you need at least 1.3.0)
 
-As for now the main improvement is the ability to see the extra status from better_thermostat like if a window open is detected, or nightmode is on or summer mode.
+As for now the main improvement is the ability to see the extra status from versatile_thermostat like if a window open is detected, or nightmode is on or overpowering mode.
 
-![Better Thermostat UI Card](/assets/1.png)
+![versatile Thermostat UI Card](/assets/1.png)
 ![](/assets/2.png)
 ![](/assets/3.png)
 ![](/assets/4.png)
@@ -20,7 +20,7 @@ As for now the main improvement is the ability to see the extra status from bett
  
 ## Goals
 
-- [X] Add better_thermostat support for showing the extra status
+- [X] Add versatile_thermostat support for showing the extra status
 - [X] Improve the UI for Touch devices
 - [X] Show also the Humidity in the UI
 
@@ -28,11 +28,11 @@ As for now the main improvement is the ability to see the extra status from bett
 
 | Name                 | Type    | Default      | Description                                                                                            |
 | -------------------- | ------- | ------------ | ------------------------------------------------------------------------------------------------------ |
-| type                 | string  | **Required** | `custom:better-thermostat-ui-card`                                                                     |
-| entity               | string  | **Required** | The entity id of climate entity (must be a better_thermostat entity). Example: `climate.hvac`          |
+| type                 | string  | **Required** | `custom:versatile-thermostat-ui-card`                                                                     |
+| entity               | string  | **Required** | The entity id of climate entity (must be a versatile_thermostat entity). Example: `climate.hvac`          |
 | eco_temperature      | number  | **optional** | target temp for night/away/eco mode triggerd by ui button                                              |
 | disable_window      | boolean  | **optional** | turn off the window open indicator                                                                     |
-| disable_summer      | boolean  | **optional** | turn off the summer indicator                                                                          |
+| disable_overpowering      | boolean  | **optional** | turn off the overpowering indicator                                                                          |
 | disable_heat        | boolean  | **optional** | turn off the on/heat button                                                                          |
 | disable_eco         | boolean  | **optional** | turn off the eco button                                                                          |
 | disable_off         | boolean  | **optional** | turn off the off button                                                                         |
@@ -43,13 +43,13 @@ As for now the main improvement is the ability to see the extra status from bett
 
 It would be awsome if you help me to translate this card to other languages.
 
-Create a PR, the Translation is done in json files checkout the en translation [here](https://github.com/KartoffelToby/better-thermostat-ui-card/blob/master/src/localize/languages/en.json)
+Create a PR, the Translation is done in json files checkout the en translation [here](https://github.com/KartoffelToby/versatile-thermostat-ui-card/blob/master/src/localize/languages/en.json)
 
 Please add your language to this list as well while you are making your PR. Put it in alphabetical order and according to [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes).
 
 ## Translations
 
-[INLANG Editor](https://inlang.com/editor/github.com/KartoffelToby/better-thermostat-ui-card)
+[INLANG Editor](https://inlang.com/editor/github.com/KartoffelToby/versatile-thermostat-ui-card)
 
 What we have so far:
 - en - Reference 

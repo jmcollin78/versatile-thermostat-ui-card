@@ -29,12 +29,12 @@ export type ClimateCardConfig = LovelaceCardConfig &
     EntitySharedConfig &
     {
         disable_window?: boolean;
-        disable_summer?: boolean;
+        disable_overpowering?: boolean;
         disable_eco?: boolean;
         disable_heat?: boolean;
         disable_off?: boolean;
         disable_menu?: boolean;
-        disable_battery_warning?: boolean;
+        disable_security_warning?: boolean;
         set_current_as_main?: boolean;
         eco_temperature?: number;
         disable_buttons?: boolean;
@@ -45,11 +45,11 @@ export const climateCardConfigStruct = assign(
     entitySharedConfigStruct,
     object({
         disable_window: optional(boolean()),
-        disable_summer: optional(boolean()),
+        disable_overpowering: optional(boolean()),
         disable_eco: optional(boolean()),
         disable_heat: optional(boolean()),
         disable_off: optional(boolean()),
-        disable_battery_warning: optional(boolean()),
+        disable_security_warning: optional(boolean()),
         set_current_as_main: optional(boolean()),
         eco_temperature: optional(number()),
         disable_menu: optional(boolean()),

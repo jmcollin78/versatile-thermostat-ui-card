@@ -1,12 +1,12 @@
 {
   "common": {
-      "version": "versie",
-      "current": "huidig"
+    "version": "versie",
+    "current": "huidig"
   },
   "extra_states": {
     "window_open": "Raam open",
     "night_mode": "Nacht modus",
     "eco": "Eco",
-    "summer": "Zomer"
+    "overpowering": "Zomer"
   }
 }

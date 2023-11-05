@@ -1,13 +1,13 @@
 {
   "common": {
-      "version": "version",
-      "current": "Actuelle"
+    "version": "version",
+    "current": "Actuelle"
   },
   "editor": {
     "card": {
       "climate": {
         "disable_window": "Desactiver fenêtre",
-        "disable_summer": "Desactiver été",
+        "disable_overpowering": "Desactiver été",
         "disable_eco": "Desactiver mode eco",
         "disable_heat": "Desactiver mode chauffe",
         "disable_off": "Desactiver arret",
@@ -20,6 +20,6 @@
     "window_open": "Fenêtre ouverte",
     "night_mode": "Mode nuit",
     "eco": "Eco",
-    "summer": "Été"
+    "overpowering": "Sur-puissance"
   }
 }

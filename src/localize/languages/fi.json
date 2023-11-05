@@ -1,12 +1,12 @@
 {
   "common": {
-      "version": "version",
-      "current": "Nykyinen"
+    "version": "version",
+    "current": "Nykyinen"
   },
   "extra_states": {
     "window_open": "Ikkuna auki",
     "night_mode": "Yötila",
     "eco": "Eco",
-    "summer": "Kesä"
+    "overpowering": "Kesä"
   }
 }

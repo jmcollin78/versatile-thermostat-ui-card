@@ -32,7 +32,7 @@ const loadHaComponents = (version: string) => {
     }
 };
 
-const CLIMATE_LABELS = ["eco_temperature", "disable_window", "disable_summer", "disable_eco", "disable_heat", "disable_off", "disable_menu", "disable_battery_warning", "set_current_as_main", "disable_buttons"] as string[];
+const CLIMATE_LABELS = ["eco_temperature", "disable_window", "disable_overpowering", "disable_eco", "disable_heat", "disable_off", "disable_menu", "disable_security_warning", "set_current_as_main", "disable_buttons"] as string[];
 
 const computeSchema = memoizeOne(
     (): any[] => [
@@ -44,12 +44,12 @@ const computeSchema = memoizeOne(
             name: "",
             schema: [
                 { name: "disable_window", selector: { boolean: {} } },
-                { name: "disable_summer", selector: { boolean: {} } },
+                { name: "disable_overpowering", selector: { boolean: {} } },
                 { name: "disable_eco", selector: { boolean: {} } },
                 { name: "disable_heat", selector: { boolean: {} } },
                 { name: "disable_off", selector: { boolean: {} } },
                 { name: "disable_menu", selector: { boolean: {} } },
-                { name: "disable_battery_warning", selector: { boolean: {} } },
+                { name: "disable_security_warning", selector: { boolean: {} } },
                 { name: "set_current_as_main", selector: { boolean: {} } },
                 { name: "disable_buttons", selector: { boolean: {}}}
             ],
@@ -57,7 +57,7 @@ const computeSchema = memoizeOne(
     ]
 );
 
-@customElement("better-thermostat-ui-card-editor")
+@customElement("versatile-thermostat-ui-card-editor")
 export class ClimateCardEditor extends LitElement implements LovelaceCardEditor {
     @state() private _config?: ClimateCardConfig;
     @property({ attribute: false }) public hass!: HomeAssistant;

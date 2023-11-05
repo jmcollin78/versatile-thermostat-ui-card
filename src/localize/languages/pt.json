@@ -1,13 +1,13 @@
 {
   "common": {
-      "version": "versão",
-      "current": "actual"
+    "version": "versão",
+    "current": "actual"
   },
   "editor": {
     "card": {
       "climate": {
         "disable_window": "Desactivar Janela",
-        "disable_summer": "Desactivar Verão",
+        "disable_overpowering": "Desactivar Verão",
         "disable_eco": "Desactivar Eco",
         "disable_heat": "Desactivar Aquecimento",
         "disable_off": "Desactivar Off",
@@ -20,6 +20,6 @@
     "window_open": "Janela Aberta",
     "night_mode": "Modo Noturno",
     "eco": "Eco",
-    "summer": "Verão"
+    "overpowering": "Verão"
   }
 }
