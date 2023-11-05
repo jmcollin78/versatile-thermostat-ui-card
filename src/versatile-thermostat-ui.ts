@@ -34,6 +34,8 @@ import {
   mdiAirConditioner,
   mdiWeatherWindy,
   mdiSunSnowflakeVariant,
+  mdiHomeAccount,
+  mdiMotionSensor,
   mdiThermometerAlert,
   mdiFlashAlert
 } from "@mdi/js";
@@ -71,6 +73,8 @@ const modeIcons: {
   fan_only: mdiFan,
   dry: mdiWaterPercent,
   window_open: mdiWindowOpenVariant,
+  presence: mdiHomeAccount,
+  motion: mdiMotionSensor,
   eco: mdiLeaf, 
   flashAlert: mdiFlashAlert,
   temperature:  mdiThermometer,
@@ -156,6 +160,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: Number }) public max = 35;
   @property({ type: Number }) public step = 1;
   @property({ type: Boolean }) public window: boolean = false;
+  @property({ type: Boolean }) public presence: boolean = false;
+  @property({ type: Boolean }) public motion: boolean = false;
   @property({ type: Boolean }) public overpowering: boolean = false;
   @property({ type: String }) public status: string = "loading";
   @property({ type: String }) public mode: string = "off";
@@ -246,6 +252,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _firstRender: Boolean = true;
   private _ignore: Boolean = false;
   private _hasWindow: Boolean = false;
+  private _hasPresence: Boolean = false;
+  private _hasMotion: Boolean = false;
   private _hasOverpowering: Boolean = false;
   private _timeout: any;
   private _oldValueMin: number = 0;
@@ -443,7 +451,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         --mode-color: var(--state-climate-auto-color);
       }
       .cool {
-        --mode-color: var(--label-badge-red);
+        --mode-color: var(--label-badge-blue);
       }
       .heat, .heat_cool {
         --mode-color: var(--label-badge-red);
@@ -566,9 +574,21 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       .eco ha-icon-button[title="heat"], .window_open ha-icon-button[title="heat"], .overpowering ha-icon-button[title="heat"] {
         --mode-color: var(--disabled-text-color);
       }
-      .overpowering,.window {
+      .window {
         transition: fill 0.3s ease;
         fill: var(--disabled-text-color);
+      }
+      .overpowering {
+        transition: fill 0.3s ease;
+        fill: var(--label-badge-red);
+      }
+      .presence {
+        transition: fill 0.3s ease;
+        fill: var(--label-badge-blue);
+      }
+      .motion {
+        transition: fill 0.3s ease;
+        fill: var(--label-badge-green);
       }
       line {
         stroke: var(--disabled-text-color);
@@ -612,6 +632,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       if(changedProps.get("_config") !== undefined) {
         this._hasOverpowering = false;
         this._hasWindow = false;
+        this._hasMotion = false;
+        this._hasPresence = false;
         this.humidity = 0;
       }
     }
@@ -694,6 +716,24 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         else {
           this._hasOverpowering = false;
           this.overpowering = false;
+        }
+
+        if (attributes?.presence_state === 'on') {
+          this._hasPresence = true;
+          this.presence = attributes.presence_state;
+        }
+        else {
+          this._hasPresence = false;
+          this.presence = false;
+        }
+
+        if (attributes?.motion_state === 'on') {
+          this._hasMotion = true;
+          this.motion = attributes.motion_state;
+        }
+        else {
+          this._hasMotion = false;
+          this.motion = false;
         }
 
         if (attributes?.security_state && !this?._config?.disable_security_warning) {
@@ -878,7 +918,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.value.high != null &&
         this.stateObj.state !== UNAVAILABLE) ? html`
         <vt-ha-control-circular-slider
-          class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} "
+          class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''} "
           .inactive=${this.window}
           dual
           .low=${this.value.low}
@@ -894,7 +934,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         >
         ` : html`
         <vt-ha-control-circular-slider
-          class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} "
+          class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''} "
           .inactive=${this.window}
           .mode="start"
           @value-changed=${this._highChanged}
@@ -907,18 +947,25 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         >
         `
       }
-      <div class="content ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.overpowering ? 'overpowering': ''} ">
+      <div class="content ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''}" ${this.motion ? 'motion': ''} >
             <svg id="main" viewbox="0 0 125 100">
               <g transform="translate(57.5,37) scale(0.35)">
                 ${(this._hasWindow && !this._config?.disable_window) ? svg`
-                  <path title="${localize({ hass: this.hass, string: `extra_states.window_open` })}" class="window ${this.window ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-31.25,0)' :''}" id="window" d=${mdiWindowOpenVariant} />
+                  <path title="${localize({ hass: this.hass, string: `extra_states.window_open` })}" class="window ${this.window ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-50.25,0)' :''}" id="window" d=${mdiWindowOpenVariant} />
                 `: ``}
                 ${(this._hasOverpowering && !this._config?.disable_overpowering) ? svg`
-                  <path class="overpowering ${this.overpowering ? 'active': ''}" fill="none" transform="${(this._hasWindow && !this._config?.disable_window) ? 'translate(31.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
+                  <path class="overpowering ${this.overpowering ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
+                `: ``}
+                ${(this._hasPresence) ? svg`
+                  <path class="presence ${this.presence ? 'active': ''}" fill="none" transform="${(this._hasPresence) ? 'translate(0.25,0)' :''}" id="overpowering" d=${mdiHomeAccount} />
+                `: ``}
+                ${(this._hasMotion) ? svg`
+                  <path class="motion ${this.motion ? 'active': ''}" fill="none" transform="${(this._hasMotion) ? 'translate(25.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
+                `: ``}
+                ${(this._hasMotion) ? svg`
+                  <path class="motion ${this.motion ? 'active': ''}" fill="none" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
                 `: ``}
               </g>
-
-
 
               <text class="main-value" x="62.5" y="60%" dominant-baseline="middle" text-anchor="middle" style="font-size:15px;">
                 ${svg`${formatNumber(
