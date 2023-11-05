@@ -37,6 +37,7 @@ import {
   mdiHomeAccount,
   mdiMotionSensor,
   mdiThermometerAlert,
+  mdiWindowShutterAuto,
   mdiFlashAlert
 } from "@mdi/js";
 
@@ -73,6 +74,7 @@ const modeIcons: {
   fan_only: mdiFan,
   dry: mdiWaterPercent,
   window_open: mdiWindowOpenVariant,
+  windowBypass: mdiWindowShutterAuto,
   presence: mdiHomeAccount,
   motion: mdiMotionSensor,
   eco: mdiLeaf, 
@@ -160,6 +162,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: Number }) public max = 35;
   @property({ type: Number }) public step = 1;
   @property({ type: Boolean }) public window: boolean = false;
+  @property({ type: Boolean }) public windowByPass: boolean = false;
   @property({ type: Boolean }) public presence: boolean = false;
   @property({ type: Boolean }) public motion: boolean = false;
   @property({ type: Boolean }) public overpowering: boolean = false;
@@ -252,6 +255,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _firstRender: Boolean = true;
   private _ignore: Boolean = false;
   private _hasWindow: Boolean = false;
+  private _hasWindowByPass: Boolean = false;
   private _hasPresence: Boolean = false;
   private _hasMotion: Boolean = false;
   private _hasOverpowering: Boolean = false;
@@ -590,6 +594,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         transition: fill 0.3s ease;
         fill: var(--label-badge-green);
       }
+
+      .windowByPass {
+        transition: fill 0.3s ease;
+        fill: var(--label-badge-yellow);
+      }
+
       line {
         stroke: var(--disabled-text-color);
       }
@@ -632,6 +642,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       if(changedProps.get("_config") !== undefined) {
         this._hasOverpowering = false;
         this._hasWindow = false;
+        this._hasWindowByPass = false;
         this._hasMotion = false;
         this._hasPresence = false;
         this.humidity = 0;
@@ -734,6 +745,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         else {
           this._hasMotion = false;
           this.motion = false;
+        }
+
+        if (attributes?.window_bypass_state) {
+          this._hasWindowByPass = true;
+          this.windowByPass = attributes.window_bypass_state;
+        }
+        else {
+          this._hasWindowByPass = false;
+          this.windowByPass = false;
         }
 
         if (attributes?.security_state && !this?._config?.disable_security_warning) {
@@ -918,7 +938,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.value.high != null &&
         this.stateObj.state !== UNAVAILABLE) ? html`
         <vt-ha-control-circular-slider
-          class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''} "
+          class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
           .inactive=${this.window}
           dual
           .low=${this.value.low}
@@ -934,7 +954,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         >
         ` : html`
         <vt-ha-control-circular-slider
-          class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''} "
+          class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
           .inactive=${this.window}
           .mode="start"
           @value-changed=${this._highChanged}
@@ -947,133 +967,133 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         >
         `
       }
-      <div class="content ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''}" ${this.motion ? 'motion': ''} >
-            <svg id="main" viewbox="0 0 125 100">
-              <g transform="translate(57.5,37) scale(0.35)">
-                ${(this._hasWindow && !this._config?.disable_window) ? svg`
-                  <path title="${localize({ hass: this.hass, string: `extra_states.window_open` })}" class="window ${this.window ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-50.25,0)' :''}" id="window" d=${mdiWindowOpenVariant} />
-                `: ``}
-                ${(this._hasOverpowering && !this._config?.disable_overpowering) ? svg`
-                  <path class="overpowering ${this.overpowering ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
-                `: ``}
-                ${(this._hasPresence) ? svg`
-                  <path class="presence ${this.presence ? 'active': ''}" fill="none" transform="${(this._hasPresence) ? 'translate(0.25,0)' :''}" id="overpowering" d=${mdiHomeAccount} />
-                `: ``}
-                ${(this._hasMotion) ? svg`
-                  <path class="motion ${this.motion ? 'active': ''}" fill="none" transform="${(this._hasMotion) ? 'translate(25.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
-                `: ``}
-                ${(this._hasMotion) ? svg`
-                  <path class="motion ${this.motion ? 'active': ''}" fill="none" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
-                `: ``}
-              </g>
+      <div class="content ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} " >
+        <svg id="main" viewbox="0 0 125 100">
+          <g transform="translate(57.5,37) scale(0.35)">
+            ${(this._hasWindow && !this._config?.disable_window) ? svg`
+              <path title="${localize({ hass: this.hass, string: `extra_states.window_open` })}" class="window ${this.window ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-50.25,0)' :''}" id="window" d=${mdiWindowOpenVariant} />
+            `: ``}
+            ${(this._hasOverpowering && !this._config?.disable_overpowering) ? svg`
+              <path class="overpowering ${this.overpowering ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
+            `: ``}
+            ${(this._hasPresence) ? svg`
+              <path class="presence ${this.presence ? 'active': ''}" fill="none" transform="${(this._hasPresence) ? 'translate(0.25,0)' :''}" id="overpowering" d=${mdiHomeAccount} />
+            `: ``}
+            ${(this._hasWindowByPass) ? svg`
+              <path class="windowByPass ${this.windowByPass ? 'active': ''}" fill="none" transform="${(this._hasWindowByPass) ? 'translate(25.25,0)' :''}" id="window-by-pass" d=${mdiWindowShutterAuto} />
+            `: ``}
+            ${(this._hasMotion) ? svg`
+              <path class="motion ${this.motion ? 'active': ''}" fill="none" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
+            `: ``}
+          </g>
 
-              <text class="main-value" x="62.5" y="60%" dominant-baseline="middle" text-anchor="middle" style="font-size:15px;">
+          <text class="main-value" x="62.5" y="60%" dominant-baseline="middle" text-anchor="middle" style="font-size:15px;">
+            ${svg`${formatNumber(
+              this._display_top,
+              this.hass.locale,
+              { minimumFractionDigits: 1, maximumFractionDigits: 1 }
+            )}`}
+            <tspan dx="-2" dy="-5.5" style="font-size: 5px;">
+              ${svg`
+                ${this.hass.config.unit_system.temperature}
+              `}
+            </tspan>
+          </text>
+          ${(this?.stateObj?.state === UNAVAILABLE || this?.stateObj?.state === UNKNOWN) ? svg`
+          <text x="62.5" y="63%" dominant-baseline="middle" text-anchor="middle" style="font-size:6px;">${this.hass!.localize(
+            "state.default.unavailable"
+          )}</text>
+          ` : ''}
+          <line x1="35" y1="72" x2="90" y2="72" stroke="#e7e7e8" stroke-width="0.5" />
+          <g class="current-info" transform="translate(62.5,80)">
+            ${(this.humidity === 0) ? svg`
+                <text x="-5%" y="0%" dominant-baseline="middle" text-anchor="middle" style="font-size:6px;">
                 ${svg`${formatNumber(
-                  this._display_top,
+                  this._display_bottom,
                   this.hass.locale,
                   { minimumFractionDigits: 1, maximumFractionDigits: 1 }
                 )}`}
-                <tspan dx="-2" dy="-5.5" style="font-size: 5px;">
+                <tspan dx="-1" dy="-2" style="font-size: 3px;">
                   ${svg`
                     ${this.hass.config.unit_system.temperature}
                   `}
                 </tspan>
               </text>
-              ${(this?.stateObj?.state === UNAVAILABLE || this?.stateObj?.state === UNKNOWN) ? svg`
-              <text x="62.5" y="63%" dominant-baseline="middle" text-anchor="middle" style="font-size:6px;">${this.hass!.localize(
-                "state.default.unavailable"
-              )}</text>
-              ` : ''}
-              <line x1="35" y1="72" x2="90" y2="72" stroke="#e7e7e8" stroke-width="0.5" />
-              <g class="current-info" transform="translate(62.5,80)">
-                ${(this.humidity === 0) ? svg`
-                    <text x="-5%" y="0%" dominant-baseline="middle" text-anchor="middle" style="font-size:6px;">
-                    ${svg`${formatNumber(
-                      this._display_bottom,
-                      this.hass.locale,
-                      { minimumFractionDigits: 1, maximumFractionDigits: 1 }
-                    )}`}
-                    <tspan dx="-1" dy="-2" style="font-size: 3px;">
-                      ${svg`
-                        ${this.hass.config.unit_system.temperature}
-                      `}
-                    </tspan>
-                  </text>
-                  ${this._renderHVACAction()}
-                `: svg `
-                  <text x="-12.25%" y="0%" dominant-baseline="middle" text-anchor="middle" style="font-size:6px;">
-                    ${svg`${formatNumber(
-                      this._display_bottom,
-                      this.hass.locale,
-                      { minimumFractionDigits: 1, maximumFractionDigits: 1 }
-                    )}`}
-                    <tspan dx="-0.3" dy="-2" style="font-size: 3px;">
-                      ${svg`
-                        ${this.hass.config.unit_system.temperature}
-                      `}
-                    </tspan>
-                  </text>
-                  <text x="12.25%" y="0%" dominant-baseline="middle" text-anchor="middle" style="font-size:6px;">
-                    ${svg`${formatNumber(
-                      this.humidity,
-                      this.hass.locale,
-                      { minimumFractionDigits: 1, maximumFractionDigits: 1 }
-                    )}`}
-                    <tspan dx="-0.3" dy="-2" style="font-size: 3px;">
-                    %
-                    </tspan>
-                  </text>
-                  ${this._renderHVACAction(true)}
-                `}
-
-              </g>
-                </svg>
-            </div>
-            </vt-ha-control-circular-slider>
-            <div id="modes">
-              ${this?._hasOverpowering ? svg`
-                ${(this?._config?.disable_heat || !this.modes.includes('heat')) ? html `` : this._renderIcon("heat", this.mode)}
-                ${(this?._config?.disable_heat || !this.modes.includes('heat_cool')) ? html `` : this._renderHVACIcon(this.mode)}
-                ${this?._config?.disable_eco ? html `` :
-                  this?.stateObj?.attributes?.saved_temperature &&
-                  this?.stateObj?.attributes?.saved_temperature !== "none" &&
-                  this?.stateObj?.state !== UNAVAILABLE
-                    ? this._renderIcon("eco","eco"): this._renderIcon("eco", "none")}
-                ${this?._config?.disable_off ? html `` : this._renderIcon("off", this.mode)}
-              `:
-              svg`
-                ${this.modes.map((mode) => {
-                  if(this._config?.disable_heat && (mode === "heat" || mode === "heat_cool")) return html ``;
-                  if(this._config?.disable_eco && mode === "eco") return html ``;
-                  if(this._config?.disable_off && mode === "off") return html ``;
-                  return this._renderIcon(mode, this.mode);
-                })}
-              `}
-
-            </div>
-            ${this?._config?.disable_buttons ? html`` : html`
-            <div id="vt-control-buttons">
-                <div class="button">
-                  <vt-ha-outlined-icon-button
-                    .target=${this.target}
-                    .step=${-this.step}
-                    @click=${this._handleButton}
-                  >
-                    <ha-svg-icon .path=${mdiMinus}></ha-svg-icon>
-                  </vt-ha-outlined-icon-button>
-                </div>
-                <div class="button">
-                  <vt-ha-outlined-icon-button 
-                    .target=${this.target}
-                    .step=${this.step}
-                    @click=${this._handleButton}
-                  >
-                  <ha-svg-icon .path=${mdiPlus}></ha-svg-icon>
-                </vt-ha-outlined-icon-button>
-                </div>
-            </div>
+              ${this._renderHVACAction()}
+            `: svg `
+              <text x="-12.25%" y="0%" dominant-baseline="middle" text-anchor="middle" style="font-size:6px;">
+                ${svg`${formatNumber(
+                  this._display_bottom,
+                  this.hass.locale,
+                  { minimumFractionDigits: 1, maximumFractionDigits: 1 }
+                )}`}
+                <tspan dx="-0.3" dy="-2" style="font-size: 3px;">
+                  ${svg`
+                    ${this.hass.config.unit_system.temperature}
+                  `}
+                </tspan>
+              </text>
+              <text x="12.25%" y="0%" dominant-baseline="middle" text-anchor="middle" style="font-size:6px;">
+                ${svg`${formatNumber(
+                  this.humidity,
+                  this.hass.locale,
+                  { minimumFractionDigits: 1, maximumFractionDigits: 1 }
+                )}`}
+                <tspan dx="-0.3" dy="-2" style="font-size: 3px;">
+                %
+                </tspan>
+              </text>
+              ${this._renderHVACAction(true)}
             `}
-          </div>
+
+          </g>
+        </svg>
+        </div>
+      </vt-ha-control-circular-slider>
+      <div id="modes">
+        ${this?._hasOverpowering ? svg`
+          ${(this?._config?.disable_heat || !this.modes.includes('heat')) ? html `` : this._renderIcon("heat", this.mode)}
+          ${(this?._config?.disable_heat || !this.modes.includes('heat_cool')) ? html `` : this._renderHVACIcon(this.mode)}
+          ${this?._config?.disable_eco ? html `` :
+            this?.stateObj?.attributes?.saved_temperature &&
+            this?.stateObj?.attributes?.saved_temperature !== "none" &&
+            this?.stateObj?.state !== UNAVAILABLE
+              ? this._renderIcon("eco","eco"): this._renderIcon("eco", "none")}
+          ${this?._config?.disable_off ? html `` : this._renderIcon("off", this.mode)}
+        `:
+        svg`
+          ${this.modes.map((mode) => {
+            if(this._config?.disable_heat && (mode === "heat" || mode === "heat_cool")) return html ``;
+            if(this._config?.disable_eco && mode === "eco") return html ``;
+            if(this._config?.disable_off && mode === "off") return html ``;
+            return this._renderIcon(mode, this.mode);
+          })}
+        `}
+
+      </div>
+      ${this?._config?.disable_buttons ? html`` : html`
+        <div id="vt-control-buttons">
+            <div class="button">
+              <vt-ha-outlined-icon-button
+                .target=${this.target}
+                .step=${-this.step}
+                @click=${this._handleButton}
+              >
+                <ha-svg-icon .path=${mdiMinus}></ha-svg-icon>
+              </vt-ha-outlined-icon-button>
+            </div>
+            <div class="button">
+              <vt-ha-outlined-icon-button 
+                .target=${this.target}
+                .step=${this.step}
+                @click=${this._handleButton}
+              >
+              <ha-svg-icon .path=${mdiPlus}></ha-svg-icon>
+            </vt-ha-outlined-icon-button>
+            </div>
+        </div>
+        `}
+      </div>
   </ha-card>
   `;
   };
