@@ -6,19 +6,19 @@
   "editor": {
     "card": {
       "climate": {
-        "disable_window": "Desactiver fenêtre",
-        "disable_overpowering": "Desactiver été",
-        "disable_eco": "Desactiver mode eco",
-        "disable_heat": "Desactiver mode chauffe",
-        "disable_off": "Desactiver arret",
-        "eco_temperature": "Temperature Eco",
-        "set_current_as_main": "Echanger temperature cible avec temperature locale"
+        "disable_window": "Désactiver fenêtre status",
+        "disable_overpowering": "Désactiver sur-puissance status",
+        "disable_cool": "Désactiver mode clim",
+        "disable_heat": "Désactiver mode chauffe",
+        "disable_off": "Désactiver arret",
+        "set_current_as_main": "Echanger temperature cible avec temperature locale",
+        "disable_security_warning": "Désactiver sécurité messages",
+        "disable_buttons": "Désactiver les boutons +/-"
       }
     }
   },
   "extra_states": {
     "window_open": "Fenêtre ouverte",
-    "night_mode": "Mode nuit",
     "eco": "Eco",
     "overpowering": "Sur-puissance",
     "none": "Manuel",

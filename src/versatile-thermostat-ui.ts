@@ -817,25 +817,27 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         }
 
         if (attributes?.security_state && !this?._config?.disable_security_warning) {
-          this.security_state = [
-            {
-              name: 'Internal temp. timestamp',
-              security_msg:  attributes.last_temperature_datetime ? dateDifferenceInMinutes(new Date(attributes.last_temperature_datetime))+" min" :'no timestamp'
-            },
-            {
-              name: 'External temp. timestamp',
-              security_msg: attributes.last_ext_temperature_datetime ? dateDifferenceInMinutes(new Date(attributes.last_ext_temperature_datetime))+" min" :'no timestamp'
+          this.security_state = [];
+          if (attributes.last_temperature_datetime) {
+            let dif = dateDifferenceInMinutes(new Date(attributes.last_temperature_datetime));
+            if (dif > 0) {
+              this.security_state.push(
+              {
+                name: 'Internal temp.',
+                security_msg:  dif+" min"
+              });
             }
-          ];
-          /*
-          const batteries = Object.entries(JSON.parse(attributes.batteries));
-          const lowBatteries = batteries.filter((entity: any) => entity[1].battery < 10);
-          if (lowBatteries.length > 0) {
-            this.security_state = lowBatteries.map((data:any) => {return {"name": data[0], "battery": data[1].battery}})[0];
-          } else {
-            this.security_state = null;
           }
-          */
+          if (attributes.last_ext_emperature_datetime) {
+            let dif = dateDifferenceInMinutes(new Date(attributes.last_ext_temperature_datetime));
+            if (dif > 0) {
+              this.security_state.push(
+              {
+                name: 'External temp.',
+                security_msg:  dif+" min"
+              });
+            }
+          }
         } else {
           this.security_state = null;
         }
@@ -979,8 +981,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         <div class="security">
           <ha-icon-button class="alert" .path=${mdiThermometerAlert}>
           </ha-icon-button>
-          <span>${this.security_state[0].name}: ${this.security_state[0].security_msg}</span>
-          <span>${this.security_state[1].name}: ${this.security_state[1].security_msg}</span>
+          ${html`
+            ${this.security_state.map((sec_msg) => {
+              return html`<span>${sec_msg.name}: ${sec_msg.security_msg}</span>`;
+            })}
+           `}
         </div>
       ` : ``}
       ${this.error.length > 0 ? html`

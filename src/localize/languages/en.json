@@ -12,10 +12,9 @@
         "disable_heat": "Disable heat",
         "disable_off": "Disable off",
         "disable_menu": "Disable menu",
+        "set_current_as_main": "Exchange target temperature and room temperature",
         "disable_security_warning": "Disable battery warning",
-        "disable_buttons": "Disable plus/minus buttons",
-        "eco_temperature": "Eco temperature",
-        "set_current_as_main": "Swap target with current temperature places"
+        "disable_buttons": "Disable plus/minus buttons"
       }
     }
   },
@@ -23,6 +22,11 @@
     "window_open": "Window open",
     "night_mode": "Night mode",
     "eco": "Eco",
-    "overpowering": "Overpowering"
+    "overpowering": "Overpowering",
+    "none": "Manual",
+    "comfort": "Comfort",
+    "boost": "Boost",
+    "power": "Overpowering",
+    "activity": "Activity"
   }
 }

@@ -1,43 +1,84 @@
-[![Version - 2.2.0](https://img.shields.io/badge/Version-2.2.0-009688?style=for-the-badge)](https://github.com/KartoffelToby/versatile-thermostat-ui-card)
-[![Discord](https://img.shields.io/discord/925725316540923914.svg?style=for-the-badge)](https://discord.gg/9BUegWTG3K)
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+[![GitHub Release][releases-shield]][releases]
+[![GitHub Activity][commits-shield]][commits]
+[![License][license-shield]](LICENSE)
+[![hacs][hacs_badge]][hacs]
+[![BuyMeCoffee][buymecoffeebadge]][buymecoffee]
+
+![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/icon.png?raw=true)
 
 # UI Card for versatile Thermostat
 
-This is a advanced climate card for HA, but with some improvements for the custom [versatile_thermostat](https://github.com/KartoffelToby/versatile_thermostat) integration. (you need at least 1.3.0)
+> ![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/tips.png?raw=true) This card is dedicated to the Versatile Thermostat integration which is available in HACS also and [here](https://github.com/jmcollin78/versatile_thermostat). This card is based on the beautiful (Better Thermostat UI Card)[https://github.com/KartoffelToby/better-thermostat-ui-card]. It adds some feature so that you can use Versatile Thermostat directly from the card.
 
-As for now the main improvement is the ability to see the extra status from versatile_thermostat like if a window open is detected, or nightmode is on or overpowering mode.
+When presence is detected:
+![Versatile Thermostat UI Card with presence](/assets/1.png)
 
-![versatile Thermostat UI Card](/assets/1.png)
-![](/assets/2.png)
-![](/assets/3.png)
-![](/assets/4.png)
-![](/assets/5.png)
-![](/assets/6.png)
-![](/assets/7.png)
-![](/assets/8.png)
+When security is detected:
 
+![Versatile Thermostat UI Card with security](/assets/2.png)
+
+When activity is detected:
+![Versatile Thermostat UI Card with activity](/assets/3.png)
+
+When overpowering is detected:
+![Versatile Thermostat UI Card with overpowering](/assets/4.png)
+
+When window open is detected:
+![Versatile Thermostat UI Card with window open](/assets/5.png)
+
+When window bypass is activated:
+![Versatile Thermostat UI Card with window bypass](/assets/6.png)
+
+With all status icons:
+![Versatile Thermostat UI Card with all status icons](/assets/7.png)
+
+The card configuration:
+![Versatile Thermostat UI Card configuration](/assets/8.png)
  
 ## Goals
 
 - [X] Add versatile_thermostat support for showing the extra status
 - [X] Improve the UI for Touch devices
-- [X] Show also the Humidity in the UI
+
+# Installation
+
+For installation you should have [HACS](https://hacs.xyz/docs/setup/download/) installed. Then add this repository https://github.com/jmcollin78/versatile-thermostat-ui-card in HACS and install the card. You have to reload you browser after installation.
+
+Then you can add the new card into your dashboard.
 
 ## Options
 
+Note: those options should be improved with official release
 | Name                 | Type    | Default      | Description                                                                                            |
 | -------------------- | ------- | ------------ | ------------------------------------------------------------------------------------------------------ |
 | type                 | string  | **Required** | `custom:versatile-thermostat-ui-card`                                                                     |
 | entity               | string  | **Required** | The entity id of climate entity (must be a versatile_thermostat entity). Example: `climate.hvac`          |
-| eco_temperature      | number  | **optional** | target temp for night/away/eco mode triggerd by ui button                                              |
-| disable_window      | boolean  | **optional** | turn off the window open indicator                                                                     |
-| disable_overpowering      | boolean  | **optional** | turn off the overpowering indicator                                                                          |
+| disable_window       | boolean  | **optional** | turn off the window open indicator                                                                     |
+| disable_overpowering | boolean  | **optional** | turn off the overpowering indicator                                                                |
 | disable_heat        | boolean  | **optional** | turn off the on/heat button                                                                          |
-| disable_eco         | boolean  | **optional** | turn off the eco button                                                                          |
+| disable_cool        | boolean  | **optional** | turn off the on/cool button                                                                          |
 | disable_off         | boolean  | **optional** | turn off the off button                                                                         |
-| disable_buttons         | boolean  | **optional** | turn off the plus/minus buttons                                                                        |
-| name                | string/boolean  | **optional** | override the default entity name, us false to 
+| disable_buttons     | boolean  | **optional** | turn off the plus/minus buttons                                                                        |
+| disable_security_warning     | boolean  | **optional** | turn off the security warning (when a temperature sensor is out)                              |
+| name                | string/boolean  | **optional** | override the default entity name |
+| set_current_as_main | boolean | **optional** | Exchange target temperature and room temperature |
+
+
+Example:
+```
+type: custom:versatile-thermostat-ui-card
+entity: climate.thermostat_switch_1
+disable_window: false
+disable_overpowering: false
+disable_cool: false
+disable_heat: false
+disable_menu: false
+disable_off: false
+disable_security_warning: false
+set_current_as_main: true
+disable_buttons: false
+name: Chambre
+```
 
 ## Help wanted!
 
@@ -78,4 +119,20 @@ What we have so far:
 - uk
 
 ## Support me
-<a href="https://www.buymeacoffee.com/kartoffeltoby"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=kartoffeltoby&button_colour=0ac982&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff"></a>
+<a href="https://www.buymeacoffee.com/jmcollin78"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=jmcollin78&button_colour=0ac982&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff"></a>
+
+***
+
+[versatile_thermostat]: https://github.com/jmcollin78/versatile_thermostat
+[buymecoffee]: https://www.buymeacoffee.com/jmcollin78
+[buymecoffeebadge]: https://img.shields.io/badge/Buy%20me%20a%20beer-%245-orange?style=for-the-badge&logo=buy-me-a-beer
+[commits-shield]: https://img.shields.io/github/commit-activity/y/jmcollin78/versatile-thermostat-ui-card.svg?style=for-the-badge
+[commits]: https://github.com/jmcollin78/versatile-thermostat-ui-card/commits/master
+[hacs]: https://github.com/custom-components/hacs
+[hacs_badge]: https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge
+[forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg?style=for-the-badge
+[forum]: https://community.home-assistant.io/
+[license-shield]: https://img.shields.io/github/license/jmcollin78/versatile-thermostat-ui-card.svg?style=for-the-badge
+[maintenance-shield]: https://img.shields.io/badge/maintainer-Joakim%20Sørensen%20%40ludeeus-blue.svg?style=for-the-badge
+[releases-shield]: https://img.shields.io/github/release/jmcollin78/versatile-thermostat-ui-card.svg?style=for-the-badge
+[releases]: https://github.com/jmcollin78/versatile-thermostat-ui-card/releases

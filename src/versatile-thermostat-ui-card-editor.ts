@@ -32,26 +32,25 @@ const loadHaComponents = (version: string) => {
     }
 };
 
-const CLIMATE_LABELS = ["eco_temperature", "disable_window", "disable_overpowering", "disable_eco", "disable_heat", "disable_off", "disable_menu", "disable_security_warning", "set_current_as_main", "disable_buttons"] as string[];
+const CLIMATE_LABELS = ["disable_window", "disable_overpowering", "disable_heat", "disable_cool", "disable_off", "disable_menu", "disable_security_warning", "disable_buttons", "set_current_as_main"] as string[];
 
 const computeSchema = memoizeOne(
     (): any[] => [
         { name: "entity", selector: { entity: { domain: ["climate"] } } },
         { name: "name", selector: { text: {} } },
-        { name: "eco_temperature", selector: { number: {placeholder: 20, min: 5, max: 45, default: 20} } },
         {
             type: "grid",
             name: "",
             schema: [
                 { name: "disable_window", selector: { boolean: {} } },
                 { name: "disable_overpowering", selector: { boolean: {} } },
-                { name: "disable_eco", selector: { boolean: {} } },
                 { name: "disable_heat", selector: { boolean: {} } },
+                { name: "disable_cool", selector: { boolean: {} } },
                 { name: "disable_off", selector: { boolean: {} } },
                 { name: "disable_menu", selector: { boolean: {} } },
                 { name: "disable_security_warning", selector: { boolean: {} } },
-                { name: "set_current_as_main", selector: { boolean: {} } },
-                { name: "disable_buttons", selector: { boolean: {}}}
+                { name: "disable_buttons", selector: { boolean: {}}},
+                { name: "set_current_as_main", selector: { boolean: {}}}
             ],
         },
     ]
