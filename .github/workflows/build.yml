@@ -18,8 +18,7 @@ jobs:
               run: |
                   npm install --force
                   npm run build
-            # Comment temporay the HACS Action which doesn't work for fork
-            # - name: HACS Action
-            #   uses: "hacs/action@main"
-            #   with:
-            #     category: "plugin"
+            - name: HACS Action
+              uses: "hacs/action@main"
+              with:
+                  category: "plugin"

@@ -27,8 +27,7 @@ jobs:
                   asset_name: versatile-thermostat-ui-card.js
                   tag: ${{ github.ref }}
                   overwrite: true
-            # Waits for unfork
-            #- name: HACS Action
-            #  uses: "hacs/action@main"
-            #  with:
-            #      category: "plugin"
+            - name: HACS Action
+              uses: "hacs/action@main"
+              with:
+                  category: "plugin"
