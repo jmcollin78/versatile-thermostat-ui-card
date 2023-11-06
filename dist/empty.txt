@@ -1,0 +1,1 @@
+This file is empty and is needed to create the dist directory. Don't remove it.

@@ -17,7 +17,7 @@ jobs:
                   cd /home/runner/work/versatile-thermostat-ui-card/versatile-thermostat-ui-card
                   npm install --force
                   npm run build
-            # Upload build file to the releas as an asset.
+            # Upload build file to the release as an asset.
             - name: Upload zip to release
               uses: svenstaro/upload-release-action@v1-release
 
