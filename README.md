@@ -8,9 +8,12 @@
 
 # UI Card for versatile Thermostat
 
-> ![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/tips.png?raw=true) This card is dedicated to the Versatile Thermostat integration which is available in HACS also and [here](https://github.com/jmcollin78/versatile_thermostat). This card is based on the beautiful (Better Thermostat UI Card)[https://github.com/KartoffelToby/better-thermostat-ui-card]. It adds some feature so that you can use Versatile Thermostat directly from the card.
+> ![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/tips.png?raw=true) This card is dedicated to the Versatile Thermostat integration which is available in HACS also and [here](https://github.com/jmcollin78/versatile_thermostat).
+> 
+> This card is based on the beautiful (Better Thermostat UI Card)[https://github.com/KartoffelToby/better-thermostat-ui-card]. It adds some feature so that you can use Versatile Thermostat directly from the card. A big thanks to @KartoffelToby for this Better Thermostat UI Card.
 
 When presence is detected:
+
 ![Versatile Thermostat UI Card with presence](/assets/1.png)
 
 When security is detected:
@@ -18,21 +21,27 @@ When security is detected:
 ![Versatile Thermostat UI Card with security](/assets/2.png)
 
 When activity is detected:
+
 ![Versatile Thermostat UI Card with activity](/assets/3.png)
 
 When overpowering is detected:
+
 ![Versatile Thermostat UI Card with overpowering](/assets/4.png)
 
 When window open is detected:
+
 ![Versatile Thermostat UI Card with window open](/assets/5.png)
 
 When window bypass is activated:
+
 ![Versatile Thermostat UI Card with window bypass](/assets/6.png)
 
 With all status icons:
+
 ![Versatile Thermostat UI Card with all status icons](/assets/7.png)
 
 The card configuration:
+
 ![Versatile Thermostat UI Card configuration](/assets/8.png)
  
 ## Goals
