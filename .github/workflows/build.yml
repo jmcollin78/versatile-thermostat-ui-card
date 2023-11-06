@@ -1,24 +1,25 @@
-name: 'Build'
+name: "Build"
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+    push:
+        branches:
+            - master
+    pull_request:
+        branches:
+            - master
 
 jobs:
-  build:
-    name: Test build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Build
-        run: |
-          npm install --force
-          npm run build
-      - name: HACS Action
-        uses: "hacs/action@main"
-        with:
-          category: "plugin"
+    build:
+        name: Test build
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v1
+            - name: Build
+              run: |
+                  npm install --force
+                  npm run build
+            # Comment temporay the HACS Action which doesn't work for fork
+            # - name: HACS Action
+            #   uses: "hacs/action@main"
+            #   with:
+            #     category: "plugin"
