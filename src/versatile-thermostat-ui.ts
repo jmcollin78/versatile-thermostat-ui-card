@@ -38,7 +38,11 @@ import {
   mdiMotionSensor,
   mdiThermometerAlert,
   mdiWindowShutterAuto,
-  mdiFlashAlert
+  mdiFlashAlert,
+  mdiSofa,
+  mdiRocketLaunch,
+  mdiHandWave,
+  mdiHomeLightningBolt
 } from "@mdi/js";
 
 import {
@@ -77,12 +81,18 @@ const modeIcons: {
   windowBypass: mdiWindowShutterAuto,
   presence: mdiHomeAccount,
   motion: mdiMotionSensor,
-  eco: mdiLeaf, 
+  eco: mdiLeaf,
+  comfort: mdiSofa,
+  boost: mdiRocketLaunch,
+  activity: mdiMotionSensor,
+  power: mdiHomeLightningBolt,
   flashAlert: mdiFlashAlert,
   temperature:  mdiThermometer,
   humidity: mdiWaterPercent,
   ok: mdiAirConditioner,
-  thermometerAlert: mdiThermometerAlert
+  thermometerAlert: mdiThermometerAlert,
+  none: mdiHandWave
+
 };
 type Target = "value" | "low" | "high";
 
@@ -168,6 +178,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: Boolean }) public overpowering: boolean = false;
   @property({ type: String }) public status: string = "loading";
   @property({ type: String }) public mode: string = "off";
+  @property({ type: String }) public preset: string = "manual";
   @property({ type: Boolean, reflect: true }) public dragging = false;
   @state()
   private changingHigh?: number;
@@ -266,6 +277,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _display_bottom: number = 0;
   private _display_top: number = 0;
   private modes: any = [];
+  private presets: any = [];
   private security_state: any = {};
   private error: any = [];
 
@@ -489,13 +501,52 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         margin-bottom: 1em;
       }
 
-      #vt-control-buttons {
+      #presets {
         z-index: 3;
         position: relative;
         display: flex;
+        width: 100%;
+        justify-content: center;
+        margin-top: -1em;
+        margin-bottom: 1em;
+      }
+
+      #presets > * {
+        color: var(--disabled-text-color);
+      }
+      #presets .selected-icon {
+        color: var(--label-badge-yellow);
+      }
+
+      .preset-label {
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        display: flex;
+        position: relative;
+        align-items: center;
+        justify-content: flex-start;
+        overflow: hidden;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        padding-left: 5px;
+        padding-right: 5px;
+        outline: 0px;
+        height: 48px;
+        color: var(--mdc-theme-text-primary-on-background,rgba(0,0,0,.87));
+        margin-left: 5px;
+        margin-right: 5px;
+      }
+
+      #vt-control-buttons {
+        z-index: 3;
+        position: absolute;
+        display: block;
         width: auto;
         justify-content: center;
         padding-bottom: 0.2em;
+        left: 80%;
+        top: 35%;
       }
 
       #vt-control-buttons .button {
@@ -516,7 +567,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       #modes .selected-icon {
         color: var(--mode-color);
       }
-      
+
       #shadowpath {
         stroke: #e7e7e8;
       }
@@ -588,11 +639,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
       .presence {
         transition: fill 0.3s ease;
-        fill: var(--label-badge-blue);
+        fill: var(--label-badge-green);
       }
       .motion {
         transition: fill 0.3s ease;
-        fill: var(--label-badge-green);
+        fill: var(--label-badge-blue);
       }
 
       .windowByPass {
@@ -620,6 +671,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       @container vt-card (max-width: 255px) {
         #modes {
           margin-top: -2em;
+        }
+        #presets {
+          margin-top: -1em;
         }
         ha-card {
           padding-top: 2em;
@@ -690,6 +744,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         if (attributes.hvac_modes) {
           this.modes = Object.values(attributes.hvac_modes);
         }
+
+        if (attributes.preset_modes) {
+          this.presets = Object.values(attributes.preset_modes);
+        }
+
+        this.preset = attributes.preset_mode;
   
         this.value = {
           value: attributes?.temperature || 0,
@@ -805,30 +865,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _handleAction(e: MouseEvent): void {
-    if ((e.currentTarget as any).mode === "eco") {
-        const saved_temp = this?.stateObj?.attributes?.saved_temperature || null;
-        if (saved_temp === null) {
-          this.hass!.callService("versatile_thermostat", "set_temp_target_temperature", {
-              entity_id: this._config!.entity,
-              temperature: this._config?.eco_temperature || 18,
-          });
-        } else {
-          this.hass!.callService("versatile_thermostat", "restore_saved_target_temperature", {
-              entity_id: this._config!.entity,
-          });
-        }
-    } else {
-      const saved_temp = this?.stateObj?.attributes?.saved_temperature || null;
-      if (saved_temp !== null) {
-        this.hass!.callService("versatile_thermostat", "restore_saved_target_temperature", {
-            entity_id: this._config!.entity,
-        });
-      }
-      this.hass!.callService("climate", "set_hvac_mode", {
-        entity_id: this._config!.entity,
-        hvac_mode: (e.currentTarget as any).mode,
-      });
-    }
+    this.hass!.callService("climate", "set_hvac_mode", {
+      entity_id: this._config!.entity,
+      hvac_mode: (e.currentTarget as any).mode,
+    });
+  }
+
+  private _handlePreset(e: MouseEvent): void {
+    this.hass!.callService("climate", "set_preset_mode", {
+      entity_id: this._config!.entity,
+      preset_mode: (e.currentTarget as any).preset,
+    });
   }
 
   private _setTemperature(): void {
@@ -837,7 +884,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           temperature: this.value,
       });
   }
-
 
   private _getCurrentSetpoint(): number {
     if(this?.value?.high !== null && this?.value?.low !== null) {
@@ -866,12 +912,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
   }
 
-  private _renderHVACIcon(currentMode: string): TemplateResult {
-    if ((this?.value?.low || 0) >= this.current) return this._renderIcon("heat", currentMode);
-    else if ((this?.value?.high || 0) <= this.current) return this._renderIcon("cool", currentMode);
-    return this._renderIcon("ok", currentMode);
-  }
-
   private _renderIcon(mode: string, currentMode: string): TemplateResult {
     if (!modeIcons[mode]) {
         return html ``;
@@ -888,6 +928,24 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         .label=${localizeMode}
       >
       </ha-icon-button>
+    `;
+  }
+
+  private _renderPreset(preset: string, currentPreset: string): TemplateResult {
+    const localizePreset = this.hass!.localize(`component.climate.state._.${preset}`) || localize({ hass: this.hass, string: `extra_states.${preset}` });
+    return html `
+      <div class="preset-label">
+          <ha-icon-button
+            title="${currentPreset === preset ? preset : ''}"
+            class=${classMap({ "selected-icon": currentPreset === preset })}
+            .preset=${preset}
+            @click=${this._handlePreset}
+            tabindex="0"
+            .path=${modeIcons[preset]}
+            .label=${localizePreset}
+          >
+        </ha-icon-button>
+      </div>
     `;
   }
 
@@ -1045,34 +1103,32 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
               </text>
               ${this._renderHVACAction(true)}
             `}
-
           </g>
         </svg>
         </div>
       </vt-ha-control-circular-slider>
       <div id="modes">
-        ${this?._hasOverpowering ? svg`
-          ${(this?._config?.disable_heat || !this.modes.includes('heat')) ? html `` : this._renderIcon("heat", this.mode)}
-          ${(this?._config?.disable_heat || !this.modes.includes('heat_cool')) ? html `` : this._renderHVACIcon(this.mode)}
-          ${this?._config?.disable_eco ? html `` :
-            this?.stateObj?.attributes?.saved_temperature &&
-            this?.stateObj?.attributes?.saved_temperature !== "none" &&
-            this?.stateObj?.state !== UNAVAILABLE
-              ? this._renderIcon("eco","eco"): this._renderIcon("eco", "none")}
-          ${this?._config?.disable_off ? html `` : this._renderIcon("off", this.mode)}
-        `:
-        svg`
+        ${svg`
           ${this.modes.map((mode) => {
             if(this._config?.disable_heat && (mode === "heat" || mode === "heat_cool")) return html ``;
-            if(this._config?.disable_eco && mode === "eco") return html ``;
+            if(this._config?.disable_eco && mode === "cool") return html ``;
+            if(this._config?.disable_cool && mode === "eco") return html ``;
             if(this._config?.disable_off && mode === "off") return html ``;
             return this._renderIcon(mode, this.mode);
           })}
         `}
-
       </div>
       ${this?._config?.disable_buttons ? html`` : html`
         <div id="vt-control-buttons">
+            <div class="button">
+              <vt-ha-outlined-icon-button 
+                .target=${this.target}
+                .step=${this.step}
+                @click=${this._handleButton}
+              >
+                <ha-svg-icon .path=${mdiPlus}></ha-svg-icon>
+              </vt-ha-outlined-icon-button>
+            </div>
             <div class="button">
               <vt-ha-outlined-icon-button
                 .target=${this.target}
@@ -1082,19 +1138,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
                 <ha-svg-icon .path=${mdiMinus}></ha-svg-icon>
               </vt-ha-outlined-icon-button>
             </div>
-            <div class="button">
-              <vt-ha-outlined-icon-button 
-                .target=${this.target}
-                .step=${this.step}
-                @click=${this._handleButton}
-              >
-              <ha-svg-icon .path=${mdiPlus}></ha-svg-icon>
-            </vt-ha-outlined-icon-button>
-            </div>
         </div>
+      `}
+      
+      <div id="presets">
+        ${svg`
+          ${this.presets.map((preset) => {
+            return this._renderPreset(preset, this.preset);
+          })}
         `}
       </div>
-  </ha-card>
+    </ha-card>
   `;
   };
 }

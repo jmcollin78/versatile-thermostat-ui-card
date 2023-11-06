@@ -20,6 +20,11 @@
     "window_open": "Fenêtre ouverte",
     "night_mode": "Mode nuit",
     "eco": "Eco",
-    "overpowering": "Sur-puissance"
+    "overpowering": "Sur-puissance",
+    "none": "Manuel",
+    "comfort": "Confort",
+    "boost": "Boost",
+    "power": "Délestage",
+    "activity": "Activité"
   }
 }
