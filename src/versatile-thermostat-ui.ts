@@ -42,7 +42,10 @@ import {
   mdiSofa,
   mdiRocketLaunch,
   mdiHandWave,
-  mdiHomeLightningBolt
+  mdiHomeLightningBolt,
+  mdiFlash,
+  mdiMeterElectric,
+  mdiThermometerAuto
 } from "@mdi/js";
 
 import {
@@ -91,8 +94,12 @@ const modeIcons: {
   humidity: mdiWaterPercent,
   ok: mdiAirConditioner,
   thermometerAlert: mdiThermometerAlert,
-  none: mdiHandWave
-
+  none: mdiHandWave,
+  auto_regulation_mode: mdiThermometerAuto,
+  power_percent: mdiMeterElectric,
+  mean_power_cycle: mdiFlash,
+  valve_open_percent: mdiMeterElectric,
+  regulated_target_temp: mdiMeterElectric
 };
 type Target = "value" | "low" | "high";
 
@@ -180,6 +187,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: String }) public mode: string = "off";
   @property({ type: String }) public preset: string = "manual";
   @property({ type: Boolean, reflect: true }) public dragging = false;
+
   @state()
   private changingHigh?: number;
 
@@ -279,6 +287,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private modes: any = [];
   private presets: any = [];
   private security_state: any = {};
+  private power_infos: any = {};
   private error: any = [];
 
   @state() private _config?: ClimateCardConfig;
@@ -519,6 +528,41 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       .preset-label {
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        display: flex;
+        position: relative;
+        align-items: center;
+        justify-content: flex-start;
+        overflow: hidden;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        padding-left: 5px;
+        padding-right: 5px;
+        outline: 0px;
+        height: 48px;
+        color: var(--mdc-theme-text-primary-on-background,rgba(0,0,0,.87));
+        margin-left: 5px;
+        margin-right: 5px;
+      }
+
+      #power-infos {
+        z-index: 3;
+        position: absolute;
+        display: block;
+        width: auto;
+        justify-content: center;
+        padding-bottom: 0.2em;
+        left: 0%;
+        top: 30%;
+      }
+
+      #power-infos > * {
+        color: var(--disabled-text-color);
+      }
+
+      .power-info-label {
         cursor: pointer;
         user-select: none;
         -webkit-tap-highlight-color: transparent;
@@ -816,6 +860,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           this.windowByPass = false;
         }
 
+        // Build Security state
         if (attributes?.security_state && !this?._config?.disable_security_warning) {
           this.security_state = [];
           if (attributes.last_temperature_datetime) {
@@ -842,6 +887,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           this.security_state = null;
         }
 
+        // Build Errors
         if (attributes?.errors !== undefined) {
           const errors = JSON.parse(attributes.errors);
           if (errors.length > 0) {
@@ -852,6 +898,58 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         } else {
           this.error = [];
         }
+
+        // Build Power Infos 
+        this.power_infos = [];
+        if (!this?._config?.disable_power_infos) {
+          if (attributes?.is_over_switch) {
+            this.power_infos.push({
+              name: "mean_power_cycle",
+              value: attributes?.mean_cycle_power,
+              unit: attributes?.mean_cycle_power < 20 ? "kW" : "W",
+              class: "vt-power-color"
+            });
+            this.power_infos.push({
+              name: "power_percent",
+              value: attributes?.power_percent,
+              unit: "%",
+              class: "vt-power-color"
+            });
+          }
+
+          if (attributes?.is_over_valve) {
+            this.power_infos.push({
+              name: "valve_open_percent",
+              value: attributes?.valve_open_percent,
+              unit: "%",
+              class: "vt-power-color"
+            });
+          }
+
+          if (attributes?.is_over_climate) {
+            this.power_infos.push({
+              name: "mean_power_cycle",
+              value: attributes?.mean_cycle_power,
+              unit:  attributes?.mean_cycle_power < 20 ? "kW" : "W",
+              class: "vt-power-color"
+            });
+            if (attributes?.is_regulated) {
+              this.power_infos.push({
+                name: "regulated_target_temp",
+                value: attributes?.regulated_target_temp,
+                unit: attributes?.temperature_unit,
+                class: "vt-temp-color"
+              });
+              this.power_infos.push({
+                name: "auto_regulation_mode",
+                value: attributes?.auto_regulation_mode,
+                unit: "",
+                class: "vt-label-color"
+              });
+            }
+          }
+        }
+
         this._updateDisplay();
       }
   }
@@ -875,6 +973,14 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   private _handlePreset(e: MouseEvent): void {
     this.hass!.callService("climate", "set_preset_mode", {
+      entity_id: this._config!.entity,
+      preset_mode: (e.currentTarget as any).preset,
+    });
+  }
+
+  private _handleClickInfo(e: MouseEvent): void {
+    // TODO removes this or complete thie
+    this.hass!.callService("versatile_thermostat", "set_device_power", {
       entity_id: this._config!.entity,
       preset_mode: (e.currentTarget as any).preset,
     });
@@ -947,6 +1053,27 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             .label=${localizePreset}
           >
         </ha-icon-button>
+      </div>
+    `;
+  }
+
+  private _renderPowerInfo(info: any): TemplateResult {
+    const localizeInfo = this.hass!.localize(`component.climate.state._.${info.name}`) || localize({ hass: this.hass, string: `extra_states.${info.name}` });
+    return html `
+      <div class="power-info-label">
+        <span>
+          <ha-icon-button
+            title="${localizeInfo}"
+            class=${info.class} 
+            .name=${info.name}
+            @click=${this._handleClickInfo}
+            tabindex="0"
+            .path=${modeIcons[info.name]}
+            .label=${localizeInfo}
+          >
+        </ha-icon-button>
+        </span>
+        <span>${info.value} ${info.unit}</span>
       </div>
     `;
   }
@@ -1153,6 +1280,16 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           })}
         `}
       </div>
+
+      <div id="power-infos">
+      ${svg`
+        ${this.power_infos.map((infos) => {
+          return this._renderPowerInfo(infos);
+        })}
+      `}
+    </div>
+      
+
     </ha-card>
   `;
   };

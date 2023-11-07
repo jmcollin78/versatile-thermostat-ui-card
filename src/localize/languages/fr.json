@@ -13,7 +13,8 @@
         "disable_off": "Désactiver arret",
         "set_current_as_main": "Echanger temperature cible avec temperature locale",
         "disable_security_warning": "Désactiver sécurité messages",
-        "disable_buttons": "Désactiver les boutons +/-"
+        "disable_buttons": "Désactiver les boutons +/-",
+        "disable_power_infos": "Désactiver les infos de puissance"
       }
     }
   },
