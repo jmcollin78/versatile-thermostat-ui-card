@@ -188,6 +188,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: String }) public mode: string = "off";
   @property({ type: String }) public preset: string = "manual";
   @property({ type: Boolean, reflect: true }) public dragging = false;
+  @property({ type: String}) public name: string = "";
 
   @state()
   private changingHigh?: number;
@@ -412,7 +413,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         box-sizing: border-box;
         border-radius: 100%;
         left: 50%;
-        top: calc(50% - 20px);
+        top: calc(50% - 40px);
         text-align: center;
         overflow-wrap: break-word;
         pointer-events: none;
@@ -423,10 +424,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         z-index: 0;
         transform: translate(-50%,-50%);
         max-width: 155px;
-      }
-
-      #expand .content {
-        top: calc(50% - 40px);
       }
 
       #main {
@@ -570,11 +567,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         align-items: center;
         justify-content: flex-start;
         overflow: hidden;
-        padding-top: 0px;
-        padding-bottom: 0px;
-        padding-left: 5px;
-        padding-right: 5px;
-        height: 48px;
+        padding: 0px 0px;
+        height: 30px;
       }
 
       #vt-control-buttons {
@@ -777,6 +771,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.stateObj = stateObj;
         const attributes = this.stateObj.attributes;
         const stateMode = this.stateObj.state;
+
+        this.name = "";
+        if (!this._config.disable_name) {
+          this.name = this._config.name ? this._config.name : attributes.friendly_name;
+        }
   
         this.mode = stateMode || "off";
 
@@ -785,7 +784,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         }
 
         if (attributes.preset_modes) {
-          this.presets = Object.values(attributes.preset_modes);
+          this.presets = Object.values(attributes.preset_modes.filter((preset: string) => { return preset != "none";  }));
         }
 
         this.preset = attributes.preset_mode;
@@ -1085,7 +1084,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   public render: () => TemplateResult = (): TemplateResult => {
     return html `
-    <ha-card id="${this?._config?.disable_buttons ? '' : 'expand'}" class=${classMap({
+    <ha-card class=${classMap({
       [this.mode]: true,
     })}
     >
@@ -1100,9 +1099,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         tabindex="0"
       ></ha-icon-button>
       `}
-      ${this?._config?.name?.length || 0 > 0 ? html`
-        <div class="name">${this._config?.name}</div>
-        ` : html`<div class="name">&nbsp;</div>`}
+
+      ${this.name.length > 0 ? html`
+        <div class="name">${this.name}</div>
+        ` : ``}
+
       ${this.security_state !== null ? html`
         <div class="security">
           <ha-icon-button class="alert" .path=${mdiThermometerAlert}>
@@ -1156,7 +1157,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         >
         `
       }
-      <div class="content ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} " >
+      <div class="content ${this.name.length == 0 ? 'noname':''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} " >
         <svg id="main" viewbox="0 0 125 100">
           <g transform="translate(57.5,37) scale(0.35)">
             ${(this._hasWindow && !this._config?.disable_window) ? svg`

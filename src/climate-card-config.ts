@@ -28,6 +28,7 @@ export const HVAC_MODES: HvacMode[] = [
 export type ClimateCardConfig = LovelaceCardConfig &
     EntitySharedConfig &
     {
+        disable_name?: boolean;
         disable_window?: boolean;
         disable_overpowering?: boolean;
         disable_eco?: boolean;
@@ -36,6 +37,7 @@ export type ClimateCardConfig = LovelaceCardConfig &
         disable_off?: boolean;
         disable_menu?: boolean;
         disable_security_warning?: boolean;
+        disable_power_infos?: boolean;
         set_current_as_main?: boolean;
         eco_temperature?: number;
         disable_buttons?: boolean;
@@ -45,6 +47,7 @@ export const climateCardConfigStruct = assign(
     lovelaceCardConfigStruct,
     entitySharedConfigStruct,
     object({
+        disable_name: optional(boolean()),
         disable_window: optional(boolean()),
         disable_overpowering: optional(boolean()),
         disable_eco: optional(boolean()),
@@ -52,6 +55,7 @@ export const climateCardConfigStruct = assign(
         disable_cool: optional(boolean()),
         disable_off: optional(boolean()),
         disable_security_warning: optional(boolean()),
+        disable_power_infos: optional(boolean()),
         set_current_as_main: optional(boolean()),
         eco_temperature: optional(number()),
         disable_menu: optional(boolean()),

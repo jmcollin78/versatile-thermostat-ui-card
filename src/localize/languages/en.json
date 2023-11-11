@@ -15,7 +15,8 @@
         "set_current_as_main": "Exchange target temperature and room temperature",
         "disable_security_warning": "Disable battery warning",
         "disable_buttons": "Disable plus/minus buttons",
-        "disable_power_infos": "Disable power infos"
+        "disable_power_infos": "Disable power infos",
+        "disable_name": "Disable name"
       }
     }
   },
