@@ -45,7 +45,8 @@ import {
   mdiHomeLightningBolt,
   mdiFlash,
   mdiMeterElectric,
-  mdiThermometerAuto
+  mdiThermometerAuto,
+  mdiPipeValve
 } from "@mdi/js";
 
 import {
@@ -95,11 +96,11 @@ const modeIcons: {
   ok: mdiAirConditioner,
   thermometerAlert: mdiThermometerAlert,
   none: mdiHandWave,
-  auto_regulation_mode: mdiThermometerAuto,
+  auto_regulation_mode: mdiMeterElectric,
   power_percent: mdiMeterElectric,
   mean_power_cycle: mdiFlash,
-  valve_open_percent: mdiMeterElectric,
-  regulated_target_temp: mdiMeterElectric
+  valve_open_percent: mdiPipeValve,
+  regulated_target_temperature: mdiThermometerAuto
 };
 type Target = "value" | "low" | "high";
 
@@ -559,12 +560,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       #power-infos > * {
-        color: var(--disabled-text-color);
+        color: var(--enabled-text-color);
       }
 
       .power-info-label {
-        cursor: pointer;
-        user-select: none;
         -webkit-tap-highlight-color: transparent;
         display: flex;
         position: relative;
@@ -575,11 +574,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         padding-bottom: 0px;
         padding-left: 5px;
         padding-right: 5px;
-        outline: 0px;
         height: 48px;
-        color: var(--mdc-theme-text-primary-on-background,rgba(0,0,0,.87));
-        margin-left: 5px;
-        margin-right: 5px;
       }
 
       #vt-control-buttons {
@@ -589,7 +584,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         width: auto;
         justify-content: center;
         padding-bottom: 0.2em;
-        left: 80%;
+        left: 90%;
         top: 35%;
       }
 
@@ -599,8 +594,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         display: flex;
         width: auto;
         justify-content: center;
-        padding: 1em;
-        padding-top: 0.2em;
+        margin-bottom: 15px;
+        margin-left: -5px;
       }
 
       #modes > * {
@@ -901,14 +896,16 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
         // Build Power Infos 
         this.power_infos = [];
-        if (!this?._config?.disable_power_infos) {
+        if (!this?._config?.disable_power_infos && attributes?.is_on) {
           if (attributes?.is_over_switch) {
-            this.power_infos.push({
-              name: "mean_power_cycle",
-              value: attributes?.mean_cycle_power,
-              unit: attributes?.mean_cycle_power < 20 ? "kW" : "W",
-              class: "vt-power-color"
-            });
+            if (attributes?.mean_cycle_power) {
+              this.power_infos.push({
+                name: "mean_power_cycle",
+                value: attributes?.mean_cycle_power,
+                unit: attributes?.mean_cycle_power < 20 ? "kW" : "W",
+                class: "vt-power-color"
+              });
+            }
             this.power_infos.push({
               name: "power_percent",
               value: attributes?.power_percent,
@@ -927,22 +924,24 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           }
 
           if (attributes?.is_over_climate) {
-            this.power_infos.push({
-              name: "mean_power_cycle",
-              value: attributes?.mean_cycle_power,
-              unit:  attributes?.mean_cycle_power < 20 ? "kW" : "W",
-              class: "vt-power-color"
-            });
+            if (attributes?.device_power) {
+              this.power_infos.push({
+                name: "mean_power_cycle",
+                value: attributes?.device_power,
+                unit:  attributes?.device_power < 20 ? "kW" : "W",
+                class: "vt-power-color"
+              });
+            }
             if (attributes?.is_regulated) {
               this.power_infos.push({
-                name: "regulated_target_temp",
-                value: attributes?.regulated_target_temp,
+                name: "regulated_target_temperature",
+                value: attributes?.regulated_target_temperature,
                 unit: attributes?.temperature_unit,
                 class: "vt-temp-color"
               });
               this.power_infos.push({
                 name: "auto_regulation_mode",
-                value: attributes?.auto_regulation_mode,
+                value: localize({ hass: this.hass, string: `extra_states.${attributes?.auto_regulation_mode}` }),
                 unit: "",
                 class: "vt-label-color"
               });

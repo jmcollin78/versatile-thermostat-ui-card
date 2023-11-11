@@ -28,6 +28,10 @@
     "comfort": "Comfort",
     "boost": "Boost",
     "power": "Overpowering",
-    "activity": "Activity"
+    "activity": "Activity",
+    "auto_regulation_light": "Light",
+    "auto_regulation_medium": "Medium",
+    "auto_regulation_strong": "Strong",
+    "auto_regulation_slow": "Slow"
   }
 }

@@ -26,6 +26,10 @@
     "comfort": "Confort",
     "boost": "Boost",
     "power": "Délestage",
-    "activity": "Activité"
+    "activity": "Activité",
+    "auto_regulation_light": "Légère",
+    "auto_regulation_medium": "Moyenne",
+    "auto_regulation_strong": "Forte",
+    "auto_regulation_slow": "Lente"
   }
 }
