@@ -46,7 +46,8 @@ import {
   mdiFlash,
   mdiMeterElectric,
   mdiThermometerAuto,
-  mdiPipeValve
+  mdiPipeValve,
+  mdiClose
 } from "@mdi/js";
 
 import {
@@ -184,6 +185,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: Boolean }) public presence: boolean = false;
   @property({ type: Boolean }) public motion: boolean = false;
   @property({ type: Boolean }) public overpowering: boolean = false;
+  @property({ type: Boolean }) public is_device_active: boolean = false;
   @property({ type: String }) public status: string = "loading";
   @property({ type: String }) public mode: string = "off";
   @property({ type: String }) public preset: string = "manual";
@@ -664,35 +666,30 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
       .window {
         transition: fill 0.3s ease;
-        fill: var(--disabled-text-color);
+        fill: var(--warning-color);
       }
       .overpowering {
         transition: fill 0.3s ease;
-        fill: var(--label-badge-red);
+        fill: var(--error-color);
       }
       .presence {
         transition: fill 0.3s ease;
-        fill: var(--label-badge-green);
+        fill: var(--success-color);
       }
       .motion {
         transition: fill 0.3s ease;
-        fill: var(--label-badge-blue);
+        fill: var(--info-color);
       }
 
       .windowByPass {
         transition: fill 0.3s ease;
-        fill: var(--label-badge-yellow);
+        fill: var(--accent-color);
       }
 
       line {
         stroke: var(--disabled-text-color);
       }
-      .overpowering.active {
-        fill: var(--label-badge-red);
-      }
-      .window.active {
-        fill: #80a7c4;
-      }
+      
       ha-icon-button[title="eco"] {
         --mode-color: var(--energy-non-fossil-color) !important;
       }
@@ -810,7 +807,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         if (attributes?.humidity !== undefined) {
           this.humidity = parseFloat(attributes.humidity);
         }
-        if (attributes?.window_state === 'on' || attributes?.window_auto_state === true) {
+        if (attributes?.window_state === 'on' || attributes?.window_auto_state === 'on') {
           this._hasWindow = true;
           this.window = true;
         }
@@ -880,6 +877,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         } else {
           this.security_state = null;
         }
+
+        // handle is_device_active
+        this.is_device_active = (attributes?.is_device_active === true)
 
         // Build Errors
         if (attributes?.errors !== undefined) {
@@ -1000,22 +1000,33 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     return this?.value?.value || 0;
   }
 
-  private _renderHVACAction(full = false): TemplateResult {
-    if (full) {
-      if (this?.value?.low === null && this?.value?.high === null) {
-        return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(-3,-3.5) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
-      }
-      if ((this?.value?.low || 0) >= this.current) return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(-3,-3.5) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
-      else if ((this?.value?.high || 0) <= this.current) return svg`<path class="status cooler ${(this.stateObj.attributes.hvac_action === 'cooling' && this.mode !== 'off') ? 'active': ''}"  transform="translate(-3,-3.5) scale(0.25)" fill="#9d9d9d"  d="${mdiWeatherWindy}" />`;
-      else return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(-3,-3.5) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
-    } else {
-      if (this?.value?.low === null && this?.value?.high === null) {
-        return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
-      }
-      if ((this?.value?.low || 0) >= this.current) return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
-      else if ((this?.value?.high || 0) <= this.current) return svg`<path class="status cooler ${(this.stateObj.attributes.hvac_action === 'cooling' && this.mode !== 'off') ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiWeatherWindy}" />`;
-      else return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
+  private _renderHVACAction(): TemplateResult {
+    if (this.stateObj.attributes.hvac_action === 'heating' ||
+        this.stateObj.attributes.hvac_mode == "heat" ||
+        this.stateObj.attributes.hvac_mode == "heat_cool") {
+      return svg`<path class="status ${(this.is_device_active) ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
     }
+    else if (this.stateObj.attributes.hvac_action === 'cooling' ||
+        this.stateObj.attributes.hvac_mode == "cool") {
+      return svg`<path class="status cooler ${(this.is_device_active) ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiAirConditioner}" />`;
+    }
+    else return svg`<path class="status" transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiClose}" />`;
+
+    // if (full) {
+      // if (this?.value?.low === null && this?.value?.high === null) {
+        // return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(-3,-3.5) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
+      // }
+      // if ((this?.value?.low || 0) >= this.current) return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(-3,-3.5) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
+      // else if ((this?.value?.high || 0) <= this.current) return svg`<path class="status cooler ${(this.stateObj.attributes.hvac_action === 'cooling' && this.mode !== 'off') ? 'active': ''}"  transform="translate(-3,-3.5) scale(0.25)" fill="#9d9d9d"  d="${mdiWeatherWindy}" />`;
+      // else return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(-3,-3.5) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
+    // } else {
+      // if (this?.value?.low === null && this?.value?.high === null) {
+        // return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
+      // }
+      // if ((this?.value?.low || 0) >= this.current) return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
+      // else if ((this?.value?.high || 0) <= this.current) return svg`<path class="status cooler ${(this.stateObj.attributes.hvac_action === 'cooling' && this.mode !== 'off') ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiWeatherWindy}" />`;
+      // else return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
+    // }
   }
 
   private _renderIcon(mode: string, currentMode: string): TemplateResult {
@@ -1161,7 +1172,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         <svg id="main" viewbox="0 0 125 100">
           <g transform="translate(57.5,37) scale(0.35)">
             ${(this._hasWindow && !this._config?.disable_window) ? svg`
-              <path title="${localize({ hass: this.hass, string: `extra_states.window_open` })}" class="window ${this.window ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-50.25,0)' :''}" id="window" d=${mdiWindowOpenVariant} />
+              <path title="${localize({ hass: this.hass, string: `extra_states.window_open` })}" class="window ${this.window ? 'active': ''}" fill="none" transform="${(this._hasWindow && !this._config?.disable_window) ? 'translate(-50.25,0)' :''}" id="window" d=${mdiWindowOpenVariant} />
             `: ``}
             ${(this._hasOverpowering && !this._config?.disable_overpowering) ? svg`
               <path class="overpowering ${this.overpowering ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
@@ -1233,7 +1244,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
                 %
                 </tspan>
               </text>
-              ${this._renderHVACAction(true)}
+              ${this._renderHVACAction()}
             `}
           </g>
         </svg>
