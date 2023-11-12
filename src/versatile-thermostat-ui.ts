@@ -177,9 +177,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @state() private _selectTargetTemperature: Target = "low";
   @property({ type: Number }) public current: number = 0;
   @property({ type: Number }) public humidity: number = 0;
-  @property({ type: Number }) public min = 0;
+  @property({ type: Number }) public min = 7;
   @property({ type: Number }) public max = 35;
-  @property({ type: Number }) public step = 1;
+  @property({ type: Number }) public step = 0.5;
   @property({ type: Boolean }) public window: boolean = false;
   @property({ type: Boolean }) public windowByPass: boolean = false;
   @property({ type: Boolean }) public presence: boolean = false;
@@ -689,7 +689,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       line {
         stroke: var(--disabled-text-color);
       }
-      
+
       ha-icon-button[title="eco"] {
         --mode-color: var(--energy-non-fossil-color) !important;
       }
@@ -792,8 +792,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           high: attributes?.target_temp_high || null,
         };
         
-        if (attributes.target_temp_step) {
-          this.step = attributes.target_temp_step;
+        if (attributes.target_temperature_step) {
+          this.step = attributes.target_temperature_step;
         }
         if (attributes.min_temp) {
           this.min = attributes.min_temp;
