@@ -140,6 +140,12 @@ function dateDifferenceInMinutes(date) {
   return Math.floor(differenceEnMilliseconds / (1000 * 60));
 }
 
+function roundNumber(nb, precision) {
+  const coefficientMultiplicateur = 10 ** precision;
+  const nombreArrondi = Math.round(nb * precision) / precision;
+  return parseFloat(nombreArrondi.toFixed(precision));
+}
+
 @customElement('versatile-thermostat-ui-card')
 export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   constructor() {
@@ -900,7 +906,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             if (attributes?.mean_cycle_power) {
               this.power_infos.push({
                 name: "mean_power_cycle",
-                value: attributes?.mean_cycle_power,
+                value: roundNumber(attributes?.mean_cycle_power, 1),
                 unit: attributes?.mean_cycle_power < 20 ? "kW" : "W",
                 class: "vt-power-color"
               });
