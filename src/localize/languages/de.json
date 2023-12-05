@@ -8,6 +8,7 @@
       "climate": {
         "disable_window": "Fenster-offen-Anzeige deaktivieren",
         "disable_overpowering": "Sommer-Anzeige deaktivieren",
+        "disable_cool": "Kühl-Anzeige deaktivieren",
         "disable_auto": "Auto-Anzeige deaktivieren",
         "disable_heat": "Heiz-Anzeige deaktivieren",
         "disable_off": "Aus-Anzeige deaktivieren",
