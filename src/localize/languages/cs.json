@@ -12,6 +12,8 @@
         "disable_cool": "Zakázat chlazení",
         "disable_heat_cool": "Zakázat topení/chlazení",
         "disable_auto": "Zakázať automatic",
+        "disable_fan_only": "Zakázat pouze ventilátor",
+        "disable_dry": "Zakázat sušení",
         "disable_off": "Zakázat vypnuto",
         "disable_menu": "Zakázat menu",
         "disable_security_warning": "Zakázat upozornění baterie",

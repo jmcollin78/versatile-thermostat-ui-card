@@ -12,6 +12,8 @@
         "disable_cool": "Désactiver mode clim",
         "disable_heat_cool": "Désactiver mode chauffe/clim",
         "disable_auto": "Désactiver mode auto",
+        "disable_fan_only": "Désactiver mode ventilation",
+        "disable_dry": "Désactiver mode déshumidification",
         "disable_off": "Désactiver arret",
         "set_current_as_main": "Echanger temperature cible avec temperature locale",
         "disable_security_warning": "Désactiver sécurité messages",
