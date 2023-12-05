@@ -32,31 +32,30 @@ const loadHaComponents = (version: string) => {
     }
 };
 
-const CLIMATE_LABELS = ["disable_name", "disable_window", "disable_overpowering", "disable_heat", "disable_cool", "disable_off", "disable_menu", "disable_security_warning", "disable_buttons", "set_current_as_main", "disable_power_infos"] as string[];
+const CLIMATE_LABELS = ["disable_name", "disable_window", "disable_overpowering", "disable_heat", "disable_cool", "disable_auto", "disable_off", "disable_menu", "disable_security_warning", "disable_buttons", "set_current_as_main", "disable_power_infos"] as string[];
 
-const computeSchema = memoizeOne(
-    (): any[] => [
-        { name: "entity", selector: { entity: { domain: ["climate"] } } },
-        { name: "name", selector: { text: {} } },
-        {
-            type: "grid",
-            name: "",
-            schema: [
-                { name: "disable_name", selector: { boolean: {} } },
-                { name: "disable_window", selector: { boolean: {} } },
-                { name: "disable_overpowering", selector: { boolean: {} } },
-                { name: "disable_heat", selector: { boolean: {} } },
-                { name: "disable_cool", selector: { boolean: {} } },
-                { name: "disable_off", selector: { boolean: {} } },
-                { name: "disable_menu", selector: { boolean: {} } },
-                { name: "disable_security_warning", selector: { boolean: {} } },
-                { name: "disable_buttons", selector: { boolean: {}}},
-                { name: "set_current_as_main", selector: { boolean: {}}},
-                { name: "disable_power_infos", selector: { Boolean: {}}}
-            ],
-        },
-    ]
-);
+const computeSchema = memoizeOne((): any[] => [
+  { name: "entity", selector: { entity: { domain: ["climate"] } } },
+  { name: "name", selector: { text: {} } },
+  {
+    type: "grid",
+    name: "",
+    schema: [
+      { name: "disable_name", selector: { boolean: {} } },
+      { name: "disable_window", selector: { boolean: {} } },
+      { name: "disable_overpowering", selector: { boolean: {} } },
+      { name: "disable_heat", selector: { boolean: {} } },
+      { name: "disable_cool", selector: { boolean: {} } },
+      { name: "disable_auto", selector: { boolean: {} } },
+      { name: "disable_off", selector: { boolean: {} } },
+      { name: "disable_menu", selector: { boolean: {} } },
+      { name: "disable_security_warning", selector: { boolean: {} } },
+      { name: "disable_buttons", selector: { boolean: {} } },
+      { name: "set_current_as_main", selector: { boolean: {} } },
+      { name: "disable_power_infos", selector: { Boolean: {} } },
+    ],
+  },
+]);
 
 @customElement("versatile-thermostat-ui-card-editor")
 export class ClimateCardEditor extends LitElement implements LovelaceCardEditor {
