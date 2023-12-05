@@ -8,6 +8,7 @@
       "climate": {
         "disable_window": "Disable window",
         "disable_overpowering": "Disable overpowering",
+        "disable_cool": "Disable cool",
         "disable_auto": "Disable auto",
         "disable_heat": "Disable heat",
         "disable_off": "Disable off",
