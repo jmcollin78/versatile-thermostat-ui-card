@@ -8,7 +8,7 @@
       "climate": {
         "disable_window": "Desactivar Janela",
         "disable_overpowering": "Desactivar Verão",
-        "disable_eco": "Desactivar Eco",
+        "disable_auto": "Desactivar Auto",
         "disable_heat": "Desactivar Aquecimento",
         "disable_off": "Desactivar Off",
         "eco_temperature": "Modo Eco",

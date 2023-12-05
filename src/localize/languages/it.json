@@ -8,7 +8,7 @@
       "climate": {
         "disable_window": "Disabilita indicatore Finestra",
         "disable_overpowering": "Disabilita indicatore Estate",
-        "disable_eco": "Disabilita tasto eco",
+        "disable_auto": "Disabilita tasto auto",
         "disable_heat": "Disabilita tasto heat",
         "disable_off": "Disabililita tasto off",
         "eco_temperature": "Temperatura target",

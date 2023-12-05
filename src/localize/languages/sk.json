@@ -8,7 +8,7 @@
       "climate": {
         "disable_window": "Zakázať okno",
         "disable_overpowering": "Zakázať leto",
-        "disable_eco": "Zakázať eco",
+        "disable_auto": "Zakázat automatic",
         "disable_heat": "Zakázať kúrenie",
         "disable_off": "Vypnúť",
         "disable_menu": "Zakázať menu",
