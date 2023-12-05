@@ -8,9 +8,10 @@
       "climate": {
         "disable_window": "Ablak kikapcsolás",
         "disable_overpowering": "Nyár kikapcsolás",
-        "disable_cool": "Hűtés kikapcsolás",
-        "disable_auto": "Auto kikapcsolás",
         "disable_heat": "Fűtés kikacsolás",
+        "disable_cool": "Hűtés kikapcsolás",
+        "disable_heat_cool": "Fűtés/Hűtés kikapcsolás",
+        "disable_auto": "Auto kikapcsolás",
         "disable_off": "Kikapcsolás inaktiválás",
         "eco_temperature": "Eco hőmérséklet",
         "set_current_as_main": "Aktuális hőmérséklet használata"

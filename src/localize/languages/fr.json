@@ -8,9 +8,10 @@
       "climate": {
         "disable_window": "Désactiver fenêtre status",
         "disable_overpowering": "Désactiver sur-puissance status",
-        "disable_cool": "Désactiver mode clim",
-        "disable_auto": "Désactiver mode auto",
         "disable_heat": "Désactiver mode chauffe",
+        "disable_cool": "Désactiver mode clim",
+        "disable_heat_cool": "Désactiver mode chauffe/clim",
+        "disable_auto": "Désactiver mode auto",
         "disable_off": "Désactiver arret",
         "set_current_as_main": "Echanger temperature cible avec temperature locale",
         "disable_security_warning": "Désactiver sécurité messages",

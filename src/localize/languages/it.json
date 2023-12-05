@@ -8,9 +8,10 @@
       "climate": {
         "disable_window": "Disabilita indicatore Finestra",
         "disable_overpowering": "Disabilita indicatore Estate",
-        "disable_cool": "Disabilita tasto cool",
-        "disable_auto": "Disabilita tasto auto",
         "disable_heat": "Disabilita tasto heat",
+        "disable_cool": "Disabilita tasto cool",
+        "disable_heat_cool": "Disabilita tasto heat/cool",
+        "disable_auto": "Disabilita tasto auto",
         "disable_off": "Disabililita tasto off",
         "eco_temperature": "Temperatura target",
         "set_current_as_main": "Imposta la temperatura attuale come target"

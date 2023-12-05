@@ -34,6 +34,7 @@ export type ClimateCardConfig = LovelaceCardConfig &
         disable_auto?: boolean;
         disable_heat?: boolean;
         disable_cool?: boolean;
+        disable_heat_cool?: boolean;
         disable_off?: boolean;
         disable_menu?: boolean;
         disable_security_warning?: boolean;
@@ -53,6 +54,7 @@ export const climateCardConfigStruct = assign(
         disable_auto: optional(boolean()),
         disable_heat: optional(boolean()),
         disable_cool: optional(boolean()),
+        disable_heat_cool: optional(boolean()),
         disable_off: optional(boolean()),
         disable_security_warning: optional(boolean()),
         disable_power_infos: optional(boolean()),
