@@ -865,12 +865,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             if (dif > 0) {
               this.security_state.push(
               {
-                name: 'Internal temp.',
+                name: 'Room temp.',
                 security_msg:  dif+" min"
               });
             }
           }
-          if (attributes.last_ext_emperature_datetime) {
+          if (attributes.last_ext_temperature_datetime) {
             let dif = dateDifferenceInMinutes(new Date(attributes.last_ext_temperature_datetime));
             if (dif > 0) {
               this.security_state.push(
