@@ -8,8 +8,12 @@
       "climate": {
         "disable_window": "Disable window",
         "disable_overpowering": "Disable overpowering",
-        "disable_eco": "Disable eco",
         "disable_heat": "Disable heat",
+        "disable_cool": "Disable cool",
+        "disable_heat_cool": "Disable heat/cool",
+        "disable_auto": "Disable auto",
+        "disable_fan_only": "Disable fan only",
+        "disable_dry": "Disable dry",
         "disable_off": "Disable off",
         "disable_menu": "Disable menu",
         "set_current_as_main": "Exchange target temperature and room temperature",
