@@ -40,6 +40,7 @@
     "auto_regulation_slow": "Lente",
     "auto_regulation_expert": "Expert",
     "auto_fan_mode": "Auto-fan",
+    "auto_fan_mode_off": "Aucun",
     "auto_fan_none": "Aucun",
     "auto_fan_low": "Bas",
     "auto_fan_medium": "Moyen",
@@ -53,6 +54,7 @@
     "fan_mute": "Silence",
     "fan_turbo": "Turbo",
     "fan_none": "Aucun",
-    "change_message": "Double clic pour changer le preset"
+    "change_message": "Double clic pour changer le preset",
+    "toggle_message": "Clic pour basculer"
   }
 }

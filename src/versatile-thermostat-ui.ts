@@ -1187,7 +1187,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderAutoFanInfo(info: any): TemplateResult {
-    const localizeInfo = this.hass!.localize(`component.climate.state._.${info.name}`) || localize({ hass: this.hass, string: `extra_states.${info.name}` });
+    const localizeInfo =
+      (this.hass!.localize(`component.climate.state._.${info.name}`) ||
+       localize({ hass: this.hass, string: `extra_states.${info.name}` }))
+      + "\n" + localize({ hass: this.hass, string: `extra_states.toggle_message` });
+      
     return html `
       <div class="left-info-label">
         <span>

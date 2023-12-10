@@ -73,6 +73,8 @@ Note: those options should be improved with official release
 | disable_off         | boolean  | **optional** | turn off the off button                                                                         |
 | disable_buttons     | boolean  | **optional** | turn off the plus/minus buttons                                                                        |
 | disable_security_warning     | boolean  | **optional** | turn off the security warning (when a temperature sensor is out)                              |
+| disable_power_infos | boolean  | **optional** | turn off the power informations                                                                        |
+| disable_auto_fan_infos | boolean  | **optional** | turn off the auto-fan informations                                                                  |
 | name                | string/boolean  | **optional** | override the default entity name |
 | set_current_as_main | boolean | **optional** | Exchange target temperature and room temperature |
 
@@ -94,8 +96,33 @@ disable_off: false
 disable_security_warning: false
 set_current_as_main: true
 disable_buttons: false
+disable_power_infos: false
+disable_auto_fan_infos: false
 name: Chambre
 ```
+
+# Actions
+Some actions are available directly on the card.
+
+__Note:__ all actions done on the card and resetted if the VTherm integration restarts. If you want persistant change, you must edit the configuration of the VTherm itself on the Versatile Thermostat integration.
+
+## Change the preset temperature
+Preset temperature cann be changed directly from the card with the following actions:
+1. select the preset, you want to change,
+2. select the temperature you want to set with the selector or the +/- buttons,
+3. double click on the preset you want to change. When this action occurs, the preset rapidly change to the previous value and then to the new value to indicate that it is stored.
+
+You can do this operations for all displayed presets but not on the `Activity` preset because this preset uses the temperature values of the others preset. See documentation of [versatile_thermostat README](https://github.com/jmcollin78/versatile_thermostat/blob/main/README.md#configure-the-activity-mode-or-motion-detection).
+
+Of course you should have displayed the presets to be able to do so.
+
+## Disable the auto-fan mode
+For `over_climate` you have the possibility to configure the `auto-fan` mode feature. See [versatile_thermostat README](https://github.com/jmcollin78/versatile_thermostat/blob/main/README.md#auto-fan-mode).
+
+If the `auto-fan` mode is configured, you can toggle between the configured `auto_fan_mode` configured for the VTherm and the None mode (which disable the auto-fan mode).
+
+To toggle the auto-fan mode you must:
+1. click on the `Auto-fan` icon at the left of the Thermostat.
 
 ## Help wanted!
 

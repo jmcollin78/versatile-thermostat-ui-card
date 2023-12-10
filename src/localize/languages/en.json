@@ -36,12 +36,14 @@
     "frost": "Frost",
     "power": "Overpowering",
     "activity": "Activity",
+    "undefined": "None",
     "auto_regulation_light": "Light",
     "auto_regulation_medium": "Medium",
     "auto_regulation_strong": "Strong",
     "auto_regulation_slow": "Slow",
     "auto_regulation_expert": "Expert",
     "auto_fan_mode": "Auto-fan",
+    "auto_fan_mode_off": "None",
     "auto_fan_none": "None",
     "auto_fan_low": "Low",
     "auto_fan_medium": "Medium",
@@ -55,6 +57,7 @@
     "fan_mute": "Mute",
     "fan_turbo": "Turbo",
     "fan_none": "None",
-    "change_message": "Double click to change preset"
+    "change_message": "Double click to change preset",
+    "toggle_message": "Click to toggle"
   }
 }
