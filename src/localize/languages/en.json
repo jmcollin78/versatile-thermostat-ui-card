@@ -20,6 +20,7 @@
         "disable_security_warning": "Disable battery warning",
         "disable_buttons": "Disable plus/minus buttons",
         "disable_power_infos": "Disable power infos",
+        "disable_auto_fan_infos": "Disable auto-fan infos",
         "disable_name": "Disable name"
       }
     }
@@ -53,6 +54,7 @@
     "fan_high": "High",
     "fan_mute": "Mute",
     "fan_turbo": "Turbo",
-    "fan_none": "None"
+    "fan_none": "None",
+    "change_message": "Double click to change preset"
   }
 }

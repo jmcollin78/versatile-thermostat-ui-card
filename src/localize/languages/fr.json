@@ -19,6 +19,7 @@
         "disable_security_warning": "Désactiver sécurité messages",
         "disable_buttons": "Désactiver les boutons +/-",
         "disable_power_infos": "Désactiver les infos de puissance",
+        "disable_auto_fan_infos": "Désactiver les infos auto-ventilation",
         "disable_name": "Désactiver le nom"
       }
     }
@@ -51,6 +52,7 @@
     "fan_high": "Haut",
     "fan_mute": "Silence",
     "fan_turbo": "Turbo",
-    "fan_none": "Aucun"
+    "fan_none": "Aucun",
+    "change_message": "Double clic pour changer le preset"
   }
 }

@@ -1025,11 +1025,30 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     });
   }
 
+  private last_target_temperature;
+
   private _handlePreset(e: MouseEvent): void {
+    this.last_target_temperature = this.stateObj.attributes.temperature
     this.hass!.callService("climate", "set_preset_mode", {
       entity_id: this._config!.entity,
       preset_mode: (e.currentTarget as any).preset,
     });
+  }
+
+  private _recordPreset(e: MouseEvent): void {
+    this.hass!.callService("versatile_thermostat", "set_preset_temperature", {
+      entity_id: this._config!.entity,
+      preset: (e.currentTarget as any).preset,
+      temperature: this.last_target_temperature
+    });
+  }
+
+  private _handleClickOrDoubleClick(e: MouseEvent): void {
+    if (e.detail === 1) {
+      this._handlePreset(e);
+    } else if (e.detail === 2) {
+      this._recordPreset(e);
+    }
   }
 
   private _handleClickInfo(e: MouseEvent): void {
@@ -1123,14 +1142,21 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderPreset(preset: string, currentPreset: string): TemplateResult {
-    const localizePreset = this.hass!.localize(`component.climate.state._.${preset}`) || localize({ hass: this.hass, string: `extra_states.${preset}` });
+    const localizePreset =
+      ( this.hass!.localize(`component.climate.state._.${preset}`) ||
+        localize({ hass: this.hass, string: `extra_states.${preset}` }))
+      + "\n" + localize({ hass: this.hass, string: `extra_states.change_message` });
+
+    // title="${currentPreset === preset ? preset : ''}"
+
     return html `
       <div class="preset-label">
           <ha-icon-button
             title="${currentPreset === preset ? preset : ''}"
             class=${classMap({ "selected-icon": currentPreset === preset })}
             .preset=${preset}
-            @click=${this._handlePreset}
+            @click=${this._handleClickOrDoubleClick}
+            @dblclick=${this._handleClickOrDoubleClick}
             tabindex="0"
             .path=${modeIcons[preset]}
             .label=${localizePreset}
@@ -1149,7 +1175,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             title="${localizeInfo}"
             class=${info.class} 
             .name=${info.name}
-            @click=${this._handleClickInfo}
             tabindex="0"
             .path=${modeIcons[info.name]}
             .label=${localizeInfo}
