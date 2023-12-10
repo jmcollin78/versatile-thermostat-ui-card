@@ -26,11 +26,27 @@
     "none": "Manuel",
     "comfort": "Confort",
     "boost": "Boost",
+    "frost": "Hors-gel",
     "power": "Délestage",
     "activity": "Activité",
     "auto_regulation_light": "Légère",
     "auto_regulation_medium": "Moyenne",
     "auto_regulation_strong": "Forte",
-    "auto_regulation_slow": "Lente"
+    "auto_regulation_slow": "Lente",
+    "auto_regulation_expert": "Expert",
+    "auto_fan_mode": "Auto-fan",
+    "auto_fan_none": "Aucun",
+    "auto_fan_low": "Bas",
+    "auto_fan_medium": "Moyen",
+    "auto_fan_high": "Haut",
+    "auto_fan_turbo": "Turbo",
+    "fan_low": "Bas",
+    "fan_low_mid": "Bas-moyen",
+    "fan_mid": "Moyen",
+    "fan_mid_high": "Moyen-haut",
+    "fan_high": "Haut",
+    "fan_mute": "Silence",
+    "fan_turbo": "Turbo",
+    "fan_none": "Aucun"
   }
 }

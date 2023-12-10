@@ -47,7 +47,10 @@ import {
   mdiMeterElectric,
   mdiThermometerAuto,
   mdiPipeValve,
-  mdiClose
+  mdiClose,
+  mdiSnowflakeThermometer,
+  mdiFanAuto,
+  mdiFanOff,
 } from "@mdi/js";
 
 import {
@@ -89,6 +92,7 @@ const modeIcons: {
   eco: mdiLeaf,
   comfort: mdiSofa,
   boost: mdiRocketLaunch,
+  frost: mdiSnowflakeThermometer,
   activity: mdiMotionSensor,
   power: mdiHomeLightningBolt,
   flashAlert: mdiFlashAlert,
@@ -101,9 +105,26 @@ const modeIcons: {
   power_percent: mdiMeterElectric,
   mean_power_cycle: mdiFlash,
   valve_open_percent: mdiPipeValve,
-  regulated_target_temperature: mdiThermometerAuto
+  regulated_target_temperature: mdiThermometerAuto,
+  auto_fan_mode: mdiFanAuto,
+  auto_fan_mode_off: mdiFanOff,
+  fan_mode: mdiFan,
 };
 type Target = "value" | "low" | "high";
+
+const preset_manual="none",
+  preset_frost="frost",
+  hvac_mode_OFF="off",
+  hvac_mode_COOL="cool",
+  auto_fan_none="auto_fan_none";
+
+const autoFanModeMapping={
+  "auto_fan_none": "None",
+  "auto_fan_low": "Low",
+  "auto_fan_mid": "Medium",
+  "auto_fan_high": "High",
+  "auto_fan_turbo": "Turbo"
+};
 
 interface RegisterCardParams {
   type: string;
@@ -193,8 +214,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: Boolean }) public overpowering: boolean = false;
   @property({ type: Boolean }) public is_device_active: boolean = false;
   @property({ type: String }) public status: string = "loading";
-  @property({ type: String }) public mode: string = "off";
-  @property({ type: String }) public preset: string = "manual";
+  @property({ type: String }) public mode: string = hvac_mode_OFF;
+  @property({ type: String }) public preset: string = preset_manual;
   @property({ type: Boolean, reflect: true }) public dragging = false;
   @property({ type: String}) public name: string = "";
 
@@ -298,6 +319,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private presets: any = [];
   private security_state: any = {};
   private power_infos: any = {};
+  private auto_fan_infos: any = {};
   private error: any = [];
 
   @state() private _config?: ClimateCardConfig;
@@ -553,7 +575,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         margin-right: 5px;
       }
 
-      #power-infos {
+      #left-infos {
         z-index: 3;
         position: absolute;
         display: block;
@@ -564,11 +586,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         top: 30%;
       }
 
-      #power-infos > * {
+      #left-infos > * {
         color: var(--enabled-text-color);
       }
 
-      .power-info-label {
+      .left-info-label {
         -webkit-tap-highlight-color: transparent;
         display: flex;
         position: relative;
@@ -780,14 +802,18 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           this.name = this._config.name ? this._config.name : attributes.friendly_name;
         }
   
-        this.mode = stateMode || "off";
+        this.mode = stateMode || hvac_mode_OFF;
 
         if (attributes.hvac_modes) {
           this.modes = Object.values(attributes.hvac_modes);
         }
 
+        // Reads preset modes
         if (attributes.preset_modes) {
-          this.presets = Object.values(attributes.preset_modes.filter((preset: string) => { return preset != "none";  }));
+          this.presets = Object.values(attributes.preset_modes.filter((preset: string) => {
+            return preset != preset_manual &&
+                   (stateMode != hvac_mode_COOL || preset != preset_frost);
+          }));
         }
 
         this.preset = attributes.preset_mode;
@@ -954,6 +980,30 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           }
         }
 
+        // Build auto-fan infos
+        this.auto_fan_infos = [];
+        if (!this?._config?.disable_auto_fan_infos && attributes?.is_over_climate) {
+          const name=attributes?.current_auto_fan_mode != auto_fan_none ? "auto_fan_mode" : "auto_fan_mode_off";
+          console.log(`VersatileThermostat UI : auto_fan icon name ${name}`);
+          
+          this.auto_fan_infos.push({
+            name: name,
+            value: localize({ hass: this.hass, string: `extra_states.${attributes?.current_auto_fan_mode}` }),
+            unit: "",
+            class: "vt-label-color"
+          });
+
+          if (attributes?.fan_mode) {
+            this.auto_fan_infos.push({
+              name: "fan_mode",
+              value: localize({ hass: this.hass, string: `extra_states.fan_${attributes?.fan_mode}` }), 
+              unit: "",
+              class: "vt-label-color"
+            })
+          }
+
+        }
+
         this._updateDisplay();
       }
   }
@@ -987,6 +1037,24 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     this.hass!.callService("versatile_thermostat", "set_device_power", {
       entity_id: this._config!.entity,
       preset_mode: (e.currentTarget as any).preset,
+    });
+  }
+
+  private _handleClickAutoFanInfo(/*e: MouseEvent*/): void {
+    // Activate or deactivate the auto-fan mode
+    let newMode=auto_fan_none;
+    if (this.stateObj.attributes.current_auto_fan_mode == auto_fan_none) {
+      newMode = this.stateObj.attributes.auto_fan_mode;
+    }
+    const mappedNewMode=autoFanModeMapping[newMode];
+
+    console.info(
+      `VersatileThermostatUI-CARD changing auto_fan_mode to ${newMode} (mapped=$${mappedNewMode}`
+    );
+    
+    this.hass!.callService("versatile_thermostat", "set_auto_fan_mode", {
+      entity_id: this._config!.entity,
+      auto_fan_mode: mappedNewMode,
     });
   }
 
@@ -1075,13 +1143,34 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _renderPowerInfo(info: any): TemplateResult {
     const localizeInfo = this.hass!.localize(`component.climate.state._.${info.name}`) || localize({ hass: this.hass, string: `extra_states.${info.name}` });
     return html `
-      <div class="power-info-label">
+      <div class="left-info-label">
         <span>
           <ha-icon-button
             title="${localizeInfo}"
             class=${info.class} 
             .name=${info.name}
             @click=${this._handleClickInfo}
+            tabindex="0"
+            .path=${modeIcons[info.name]}
+            .label=${localizeInfo}
+          >
+        </ha-icon-button>
+        </span>
+        <span>${info.value} ${info.unit}</span>
+      </div>
+    `;
+  }
+
+  private _renderAutoFanInfo(info: any): TemplateResult {
+    const localizeInfo = this.hass!.localize(`component.climate.state._.${info.name}`) || localize({ hass: this.hass, string: `extra_states.${info.name}` });
+    return html `
+      <div class="left-info-label">
+        <span>
+          <ha-icon-button
+            title="${localizeInfo}"
+            class=${info.class} 
+            .name=${info.name}
+            @click=${this._handleClickAutoFanInfo}
             tabindex="0"
             .path=${modeIcons[info.name]}
             .label=${localizeInfo}
@@ -1298,15 +1387,18 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         `}
       </div>
 
-      <div id="power-infos">
+      <div id="left-infos">
       ${svg`
         ${this.power_infos.map((infos) => {
           return this._renderPowerInfo(infos);
         })}
       `}
+      ${svg`
+        ${this.auto_fan_infos.map((infos) => {
+          return this._renderAutoFanInfo(infos);
+        })}
+      `}
     </div>
-      
-
     </ha-card>
   `;
   };
