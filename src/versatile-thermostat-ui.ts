@@ -1348,9 +1348,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       <div id="modes">
         ${svg`
           ${this.modes.map((mode) => {
-            if(this._config?.disable_heat && (mode === "heat" || mode === "heat_cool")) return html ``;
-            if(this._config?.disable_eco && mode === "cool") return html ``;
-            if(this._config?.disable_cool && mode === "eco") return html ``;
+            if(this._config?.disable_heat && mode === "heat") return html ``;
+            if(this._config?.disable_auto && mode === "auto") return html ``;
+            if(this._config?.disable_cool && mode === "cool") return html ``;
+            if(this._config?.disable_heat_cool && mode === "heat_cool") return html ``;
+            if(this._config?.disable_dry && mode === "dry") return html ``;
+            if(this._config?.disable_fan_only && mode === "fan_only") return html ``;
             if(this._config?.disable_off && mode === "off") return html ``;
             return this._renderIcon(mode, this.mode);
           })}

@@ -8,8 +8,12 @@
       "climate": {
         "disable_window": "Fenster-offen-Anzeige deaktivieren",
         "disable_overpowering": "Sommer-Anzeige deaktivieren",
-        "disable_eco": "Eco-Anzeige deaktivieren",
         "disable_heat": "Heiz-Anzeige deaktivieren",
+        "disable_cool": "Kühl-Anzeige deaktivieren",
+        "disable_heat_cool": "Heiz-/Kühl-Anzeige deaktivieren",
+        "disable_auto": "Auto-Anzeige deaktivieren",
+        "disable_fan_only": "Nur-Lüften-Anzeige deaktivieren",
+        "disable_dry": "Trocknen-Anzeige deaktivieren",
         "disable_off": "Aus-Anzeige deaktivieren",
         "disable_menu": "Menü deaktivieren",
         "disable_security_warning": "Batterie-Warnung deaktivieren",

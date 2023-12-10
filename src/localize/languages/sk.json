@@ -8,8 +8,12 @@
       "climate": {
         "disable_window": "Zakázať okno",
         "disable_overpowering": "Zakázať leto",
-        "disable_eco": "Zakázať eco",
         "disable_heat": "Zakázať kúrenie",
+        "disable_cool": "Zakázať chladenie",
+        "disable_heat_cool": "Zakázať kúrenie/chladenie",
+        "disable_auto": "Zakázat automatic",
+        "disable_fan_only": "Zakázať režim ventilátora",
+        "disable_dry": "Zakázať sušenie",
         "disable_off": "Vypnúť",
         "disable_menu": "Zakázať menu",
         "disable_security_warning": "Zakázať upozornenie na batériu",

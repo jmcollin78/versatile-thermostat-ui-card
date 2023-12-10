@@ -66,6 +66,10 @@ Note: those options should be improved with official release
 | disable_overpowering | boolean  | **optional** | turn off the overpowering indicator                                                                |
 | disable_heat        | boolean  | **optional** | turn off the on/heat button                                                                          |
 | disable_cool        | boolean  | **optional** | turn off the on/cool button                                                                          |
+| disable_heat_cool   | boolean  | **optional** | turn off the on/heat_cool button                                                                     |
+| disable_auto        | boolean  | **optional** | turn off the on/auto button                                                                          |
+| disable_dry         | boolean  | **optional** | turn off the on/dry button                                                                           |
+| disable_fan_only    | boolean  | **optional** | turn off the on/fan_only button                                                                      |
 | disable_off         | boolean  | **optional** | turn off the off button                                                                         |
 | disable_buttons     | boolean  | **optional** | turn off the plus/minus buttons                                                                        |
 | disable_security_warning     | boolean  | **optional** | turn off the security warning (when a temperature sensor is out)                              |
@@ -79,8 +83,12 @@ type: custom:versatile-thermostat-ui-card
 entity: climate.thermostat_switch_1
 disable_window: false
 disable_overpowering: false
-disable_cool: false
 disable_heat: false
+disable_cool: false
+disable_heat_cool: false
+disable_auto: false
+disable_dry: false
+disable_fan_only: false
 disable_menu: false
 disable_off: false
 disable_security_warning: false

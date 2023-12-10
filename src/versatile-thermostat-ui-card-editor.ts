@@ -32,7 +32,7 @@ const loadHaComponents = (version: string) => {
     }
 };
 
-const CLIMATE_LABELS = ["disable_name", "disable_window", "disable_overpowering", "disable_heat", "disable_cool", "disable_off", "disable_menu", "disable_security_warning", "disable_buttons", "set_current_as_main", "disable_power_infos", "disable_auto_fan_infos"] as string[];
+const CLIMATE_LABELS = ["disable_name", "disable_window", "disable_overpowering", "disable_heat", "disable_cool", "disable_heat_cool", "disable_auto", "disable_dry", "disable_fan_only", "disable_off", "disable_menu", "disable_security_warning", "disable_buttons", "set_current_as_main", "disable_power_infos", "disable_auto_fan_infos"] as string[];
 
 const computeSchema = memoizeOne(
     (): any[] => [
@@ -47,6 +47,10 @@ const computeSchema = memoizeOne(
                 { name: "disable_overpowering", selector: { boolean: {} } },
                 { name: "disable_heat", selector: { boolean: {} } },
                 { name: "disable_cool", selector: { boolean: {} } },
+                { name: "disable_heat_cool", selector: { boolean: {} } },
+                { name: "disable_auto", selector: { boolean: {} } },
+                { name: "disable_dry", selector: { boolean: {} } },
+                { name: "disable_fan_only", selector: { boolean: {} } },          
                 { name: "disable_off", selector: { boolean: {} } },
                 { name: "disable_menu", selector: { boolean: {} } },
                 { name: "disable_security_warning", selector: { boolean: {} } },
