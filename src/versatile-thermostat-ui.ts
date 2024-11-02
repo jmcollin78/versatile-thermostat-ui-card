@@ -51,6 +51,7 @@ import {
   mdiSnowflakeThermometer,
   mdiFanAuto,
   mdiFanOff,
+  mdiPowerSleep,
 } from "@mdi/js";
 
 import {
@@ -72,9 +73,10 @@ import {
 
 import { ClimateCardConfig } from './climate-card-config';
 import './ha/ha-control-circular-slider';
+import { SensorEntity } from './ha/data/sensor';
 
 const UNAVAILABLE = "unavailable";
-const UNKNOWN = "unknown";
+const DEBUG=false;
 const modeIcons: {
   [mode in any]: string
 } = {
@@ -109,6 +111,7 @@ const modeIcons: {
   auto_fan_mode: mdiFanAuto,
   auto_fan_mode_off: mdiFanOff,
   fan_mode: mdiFan,
+  power_sleep: mdiPowerSleep
 };
 type Target = "value" | "low" | "high";
 
@@ -125,6 +128,9 @@ const autoFanModeMapping={
   "auto_fan_high": "High",
   "auto_fan_turbo": "Turbo"
 };
+
+const hvacOffReasonAutoStartStop="auto_start_stop";
+const autoStartStopLevels=["auto_start_stop_slow", "auto_start_stop_medium", "auto_start_stop_fast"];
 
 interface RegisterCardParams {
   type: string;
@@ -309,6 +315,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _hasPresence: Boolean = false;
   private _hasMotion: Boolean = false;
   private _hasOverpowering: Boolean = false;
+  private _hasAutoStartStop: Boolean = false;
+  private _isAutoStartStopEnabled:Boolean = false;
   private _timeout: any;
   private _oldValueMin: number = 0;
   private _oldValueMax: number = 0;
@@ -366,6 +374,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         align-content: center;
         justify-content: center;
         align-items: center;
+      }
+
+      .disabled-circle-container{
+          height: 145px;
+          width: 100%;
       }
 
       vt-ha-outlined-icon-button {
@@ -583,7 +596,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         justify-content: center;
         padding-bottom: 0.2em;
         left: 0%;
-        top: 30%;
+        top: 15%;
       }
 
       #left-infos > * {
@@ -599,6 +612,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         overflow: hidden;
         padding: 0px 0px;
         height: 30px;
+      }
+
+      .left-info-label input {
+        width: 40px;
       }
 
       #vt-control-buttons {
@@ -696,6 +713,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         transition: fill 0.3s ease;
         fill: var(--warning-color);
       }
+
+      .auto-start-stop {
+        transition: fill 0.3s ease;
+        fill: var(--state-icon-color);
+      }
+
       .overpowering {
         transition: fill 0.3s ease;
         fill: var(--error-color);
@@ -757,6 +780,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this._hasWindowByPass = false;
         this._hasMotion = false;
         this._hasPresence = false;
+        this._hasAutoStartStop = false;
+        this._isAutoStartStopEnabled = false;
         this.humidity = 0;
       }
     }
@@ -782,24 +807,25 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           return;
       }
 
-      const entity_id:any = this._config.entity;
+      const entity_id:any = this._config!.entity;
 
       const stateObj = this.hass.states[entity_id] as ClimateEntity;
       if (!stateObj) {
           return;
       }
+
       const oldHass = changedProps.get("hass") as HomeAssistant | undefined;
 
       if (!oldHass || oldHass.states[entity_id] !== stateObj) {
-        if (!this._config || !this.hass || !this._config.entity) return;
+        if (!this._config || !this.hass || !this._config!.entity) return;
   
         this.stateObj = stateObj;
         const attributes = this.stateObj.attributes;
         const stateMode = this.stateObj.state;
 
         this.name = "";
-        if (!this._config.disable_name) {
-          this.name = this._config.name ? this._config.name : attributes.friendly_name;
+        if (!this._config?.disable_name) {
+          this.name = this._config!.name ? this._config!.name : attributes.friendly_name;
         }
   
         this.mode = stateMode || hvac_mode_OFF;
@@ -925,12 +951,32 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           this.error = [];
         }
 
-        // Build Power Infos 
-        this.power_infos = [];
-        if (!this?._config?.disable_power_infos && attributes?.is_on) {
+        // Build Power Infos
+        this!.power_infos = [];
+        if (!this!._config?.disable_power_infos && attributes?.is_on) {
+          let powerEntity: SensorEntity | undefined;
+          let power : number | undefined;
+          let unit : string | undefined;
+          if (this!._config!.powerEntity) {
+            if (DEBUG) console.log(`There is a powerEntity ${this._config!.powerEntity}`)
+            powerEntity = this.hass.states[this._config!.powerEntity] as SensorEntity;
+            power = Number(powerEntity.state);
+            unit = powerEntity.attributes["unit_of_measurement"];
+            if (DEBUG) console.log(`Power found ${power} ${unit} for ${name}`);
+          }
+          
+          if (power) {
+            if (DEBUG) console.log("J'ai pushé du power");
+            this!.power_infos!.push({
+              name: "mean_power_cycle",
+              value: power,
+              unit: unit,
+              class: "vt-power-color"
+            });
+          }
           if (attributes?.is_over_switch) {
-            if (attributes?.mean_cycle_power) {
-              this.power_infos.push({
+            if (attributes?.mean_cycle_power && !power) {
+              this!.power_infos!.push({
                 name: "mean_power_cycle",
                 value: roundNumber(attributes?.mean_cycle_power, 1),
                 unit: attributes?.mean_cycle_power < 20 ? "kW" : "W",
@@ -955,7 +1001,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           }
 
           if (attributes?.is_over_climate) {
-            if (attributes?.device_power) {
+            if (attributes?.device_power && !power) {
               this.power_infos.push({
                 name: "mean_power_cycle",
                 value: attributes?.device_power,
@@ -984,7 +1030,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.auto_fan_infos = [];
         if (!this?._config?.disable_auto_fan_infos && attributes?.is_over_climate) {
           const name=attributes?.current_auto_fan_mode != auto_fan_none ? "auto_fan_mode" : "auto_fan_mode_off";
-          console.log(`VersatileThermostat UI : auto_fan icon name ${name}`);
+          if (DEBUG) console.log(`VersatileThermostat UI : auto_fan icon name ${name}`);
           
           this.auto_fan_infos.push({
             name: name,
@@ -1003,6 +1049,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           }
 
         }
+
+        // Build autoStartStop infos
+        this._hasAutoStartStop = (attributes?.hvac_off_reason === hvacOffReasonAutoStartStop);
+        // this._hasAutoStartStopEnable = autoStartStopLevels.includes(attributes?.auto_start_stop_level);
+        this._isAutoStartStopEnabled = (attributes?.auto_start_stop_enable === true);
+        if (DEBUG) console.log(`_isAutoStartStopEnabled=${this._isAutoStartStopEnabled} auto_start_stop_enable=${attributes?.auto_start_stop_enable}`);
 
         this._updateDisplay();
       }
@@ -1077,6 +1129,18 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     });
   }
 
+  private _handleClickAutoStartStopEnable(/*e: MouseEvent*/): void {
+    // Activate or deactivate the auto-start-stop enable
+    let newMode = !this._isAutoStartStopEnabled;
+    console.info(
+      `VersatileThermostatUI-CARD changing auto_start_stop_enable to ${newMode}`
+    );
+    
+    this.hass!.callService("switch", "toggle", {
+      entity_id: this._config!.autoStartStopEnableEntity,
+    });
+  }
+
   private _setTemperature(): void {
       this.hass!.callService("climate", "set_temperature", {
           entity_id: this._config!.entity,
@@ -1104,22 +1168,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       return svg`<path class="status cooler ${(this.is_device_active) ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiAirConditioner}" />`;
     }
     else return svg`<path class="status" transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiClose}" />`;
-
-    // if (full) {
-      // if (this?.value?.low === null && this?.value?.high === null) {
-        // return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(-3,-3.5) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
-      // }
-      // if ((this?.value?.low || 0) >= this.current) return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(-3,-3.5) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
-      // else if ((this?.value?.high || 0) <= this.current) return svg`<path class="status cooler ${(this.stateObj.attributes.hvac_action === 'cooling' && this.mode !== 'off') ? 'active': ''}"  transform="translate(-3,-3.5) scale(0.25)" fill="#9d9d9d"  d="${mdiWeatherWindy}" />`;
-      // else return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(-3,-3.5) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
-    // } else {
-      // if (this?.value?.low === null && this?.value?.high === null) {
-        // return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
-      // }
-      // if ((this?.value?.low || 0) >= this.current) return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
-      // else if ((this?.value?.high || 0) <= this.current) return svg`<path class="status cooler ${(this.stateObj.attributes.hvac_action === 'cooling' && this.mode !== 'off') ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiWeatherWindy}" />`;
-      // else return svg`<path class="status ${(this.stateObj.attributes.hvac_action === 'heating' && this.mode !== 'off') ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
-    // }
   }
 
   private _renderIcon(mode: string, currentMode: string): TemplateResult {
@@ -1211,13 +1259,76 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     `;
   }
 
+  private _renderAutoStartStopEnable(): TemplateResult {
+    const localizeInfo =
+      localize({ hass: this.hass, string: `extra_states.auto_start_stop_enable` }),
+      localizeLabel = localize({ hass: this.hass, string: `extra_states.auto_start_stop_label` });
+
+    const checked=this._isAutoStartStopEnabled ? "checked":"";
+
+    if (DEBUG) console.log(`checked=${checked}`);
+
+    return html`
+      <div class="left-info-label" title="${localizeInfo}">
+        <span>
+          <input type="checkbox" checked="${checked}" class="auto-start-stop-enable" @click=${this._handleClickAutoStartStopEnable} .label="${localizeInfo}" name="auto-start-stop-enable">
+        </span>
+        <span>${localizeLabel}</span>
+      </div>
+    `;
+
+  }
+
   private _handleMoreInfo() {
     fireEvent(this, "hass-more-info", {
         entityId: this._config!.entity,
     });
   }
 
+  private buildTitle() {
+    let ret="";
+    if (this._hasWindow && !this._config?.disable_window) ret += localize({ hass: this.hass, string: `extra_states.window_open` }) + "\n";
+    if (this._hasWindowByPass) ret += localize({ hass: this.hass, string: `extra_states.window_bypass` }) + "\n";
+    if (this._hasOverpowering && !this._config?.disable_overpowering) ret += localize({ hass: this.hass, string: `extra_states.overpowering` }) + "\n";
+    if (this._hasPresence) ret += localize({ hass: this.hass, string: `extra_states.presence` }) + "\n";
+    if (this._hasAutoStartStop && !this._config?.disable_autoStartStop) ret += localize({ hass: this.hass, string: `extra_states.auto_start_stop` }) + "\n";
+    if (this._hasMotion) ret += localize({ hass: this.hass, string: `extra_states.motion` }) + "\n";
+
+    return ret;
+  }
+
+  private _renderTemperature(temperature, isMain: boolean, x: string, y: string) {
+    const fontSize= isMain ? 15:6;
+    const dx = isMain ? -2:-1;
+    const dy = isMain ? -5.5:-2;
+
+    let value:string;
+
+    if (!temperature) {
+      value = this.hass!.localize("extra_states.temp_unavailable");
+    }
+    else {
+      value = formatNumber(
+        temperature,
+        this.hass.locale,
+        { minimumFractionDigits: 1, maximumFractionDigits: 1 }
+      );
+    }
+
+    return svg`
+    <text class="main-value" x="${x}" y="${y}" dominant-baseline="middle" text-anchor="middle" style="font-size:${fontSize}px;">
+      ${svg`${value}`}
+      <tspan dx="${dx}" dy="${dy}" style="font-size: 5px;">
+        ${svg`
+          ${this.hass.config.unit_system.temperature}
+        `}
+      </tspan>
+    </text>
+    `
+  }
+
   public render: () => TemplateResult = (): TemplateResult => {
+    
     return html `
     <ha-card class=${classMap({
       [this.mode]: true,
@@ -1239,12 +1350,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         <div class="name">${this.name}</div>
         ` : ``}
 
-      ${this.security_state !== null ? html`
+      ${this.security_state?.length > 0 ? html`
         <div class="security">
           <ha-icon-button class="alert" .path=${mdiThermometerAlert}>
           </ha-icon-button>
           ${html`
-            ${this.security_state.map((sec_msg) => {
+            ${this.security_state!.map((sec_msg) => {
               return html`<span>${sec_msg.name}: ${sec_msg.security_msg}</span>`;
             })}
            `}
@@ -1258,122 +1369,89 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         </div>
       ` : ``}
 
-      ${
-        (this.value.low != null &&
-        this.value.high != null &&
-        this.stateObj.state !== UNAVAILABLE) ? html`
-        <vt-ha-control-circular-slider
-          class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
-          .inactive=${this.window}
-          dual
-          .low=${this.value.low}
-          .high=${this.value.high}
-          .min=${this.min}
-          .max=${this.max}
-          .step=${this.step}
-          .current=${this.current}
-          @low-changed=${this._highChanged}
-          @low-changing=${this._highChanging}
-          @high-changed=${this._highChanged}
-          @high-changing=${this._highChanging}
-        >
-        ` : html`
-        <vt-ha-control-circular-slider
-          class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
-          .inactive=${this.window}
-          .mode="start"
-          @value-changed=${this._highChanged}
-          @value-changing=${this._highChanging}
-          .value=${this.value.value}
-          .current=${this.current}
-          step=${this.step}
-          min=${this.min}
-          max=${this.max}
-        >
-        `
-      }
-      <div class="content ${this.name.length == 0 ? 'noname':''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} " >
-        <svg id="main" viewbox="0 0 125 100">
-          <g transform="translate(57.5,37) scale(0.35)">
-            ${(this._hasWindow && !this._config?.disable_window) ? svg`
-              <path title="${localize({ hass: this.hass, string: `extra_states.window_open` })}" class="window ${this.window ? 'active': ''}" fill="none" transform="${(this._hasWindow && !this._config?.disable_window) ? 'translate(-50.25,0)' :''}" id="window" d=${mdiWindowOpenVariant} />
-            `: ``}
-            ${(this._hasOverpowering && !this._config?.disable_overpowering) ? svg`
-              <path class="overpowering ${this.overpowering ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
-            `: ``}
-            ${(this._hasPresence) ? svg`
-              <path class="presence ${this.presence ? 'active': ''}" fill="none" transform="${(this._hasPresence) ? 'translate(0.25,0)' :''}" id="overpowering" d=${mdiHomeAccount} />
-            `: ``}
-            ${(this._hasWindowByPass) ? svg`
-              <path class="windowByPass ${this.windowByPass ? 'active': ''}" fill="none" transform="${(this._hasWindowByPass) ? 'translate(25.25,0)' :''}" id="window-by-pass" d=${mdiWindowShutterAuto} />
-            `: ``}
-            ${(this._hasMotion) ? svg`
-              <path class="motion ${this.motion ? 'active': ''}" fill="none" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
-            `: ``}
-          </g>
+      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container':''}">
+        ${
+          this._config?.disable_circle ? html`
+            <!-- No cicle configured -->
+          `:
+            (this.value.low != null &&
+            this.value.high != null &&
+            this.stateObj.state !== UNAVAILABLE) ? html`
+            <vt-ha-control-circular-slider
+              class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
+              .inactive=${this.window}
+              dual
+              .low=${this.value.low}
+              .high=${this.value.high}
+              .min=${this.min}
+              .max=${this.max}
+              .step=${this.step}
+              .current=${this.current}
+              @low-changed=${this._highChanged}
+              @low-changing=${this._highChanging}
+              @high-changed=${this._highChanged}
+              @high-changing=${this._highChanging}
+            >
+            ` : html`
+            <vt-ha-control-circular-slider
+              class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
+              .inactive=${this.window}
+              .mode="start"
+              @value-changed=${this._highChanged}
+              @value-changing=${this._highChanging}
+              .value=${this.value.value}
+              .current=${this.current}
+              step=${this.step}
+              min=${this.min}
+              max=${this.max}
+            >
+            `
+        }
+          <div class="content ${this.name.length == 0 ? 'noname':''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} " >
+            <svg id="main" viewbox="0 0 125 100">
+              <g transform="translate(57.5,37) scale(0.35)">
+                ${(this._hasWindowByPass) ? svg`
+                  <path class="windowByPass ${this.windowByPass ? 'active': ''}" fill="none" transform="${(this._hasWindowByPass) ? 'translate(-50.25,0)' :''}" id="window-by-pass" d=${mdiWindowShutterAuto} />
+                `: ``}
+                ${(!this._hasWindowByPass && this._hasWindow && !this._config?.disable_window) ? svg`
+                  <path class="window ${this.window ? 'active': ''}" fill="none" transform="${(this._hasWindow && !this._config?.disable_window) ? 'translate(-50.25,0)' :''}" id="window" d=${mdiWindowOpenVariant} />
+                `: ``}
+                ${(this._hasOverpowering && !this._config?.disable_overpowering) ? svg`
+                  <path class="overpowering ${this.overpowering ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
+                `: ``}
+                ${(this._hasPresence) ? svg`
+                  <path class="presence ${this.presence ? 'active': ''}" fill="none" transform="${(this._hasPresence) ? 'translate(0.25,0)' :''}" id="overpowering" d=${mdiHomeAccount} />
+                `: ``}
+                ${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? svg`
+                  <path class="auto-start-stop" fill="none" transform="${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? 'translate(25.25,0)' :''}" id="autoStartStop" d=${mdiPowerSleep}/>
+                `: ``}
+                ${(this._hasMotion) ? svg`
+                  <path class="motion ${this.motion ? 'active': ''}" fill="none" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
+                `: ``}
+              </g>
 
-          <text class="main-value" x="62.5" y="60%" dominant-baseline="middle" text-anchor="middle" style="font-size:15px;">
-            ${svg`${formatNumber(
-              this._display_top,
-              this.hass.locale,
-              { minimumFractionDigits: 1, maximumFractionDigits: 1 }
-            )}`}
-            <tspan dx="-2" dy="-5.5" style="font-size: 5px;">
-              ${svg`
-                ${this.hass.config.unit_system.temperature}
-              `}
-            </tspan>
-          </text>
-          ${(this?.stateObj?.state === UNAVAILABLE || this?.stateObj?.state === UNKNOWN) ? svg`
-          <text x="62.5" y="63%" dominant-baseline="middle" text-anchor="middle" style="font-size:6px;">${this.hass!.localize(
-            "state.default.unavailable"
-          )}</text>
-          ` : ''}
-          <line x1="35" y1="72" x2="90" y2="72" stroke="#e7e7e8" stroke-width="0.5" />
-          <g class="current-info" transform="translate(62.5,80)">
-            ${(this.humidity === 0) ? svg`
-                <text x="-5%" y="0%" dominant-baseline="middle" text-anchor="middle" style="font-size:6px;">
-                ${svg`${formatNumber(
-                  this._display_bottom,
-                  this.hass.locale,
-                  { minimumFractionDigits: 1, maximumFractionDigits: 1 }
-                )}`}
-                <tspan dx="-1" dy="-2" style="font-size: 3px;">
-                  ${svg`
-                    ${this.hass.config.unit_system.temperature}
-                  `}
-                </tspan>
-              </text>
-              ${this._renderHVACAction()}
-            `: svg `
-              <text x="-12.25%" y="0%" dominant-baseline="middle" text-anchor="middle" style="font-size:6px;">
-                ${svg`${formatNumber(
-                  this._display_bottom,
-                  this.hass.locale,
-                  { minimumFractionDigits: 1, maximumFractionDigits: 1 }
-                )}`}
-                <tspan dx="-0.3" dy="-2" style="font-size: 3px;">
-                  ${svg`
-                    ${this.hass.config.unit_system.temperature}
-                  `}
-                </tspan>
-              </text>
-              <text x="12.25%" y="0%" dominant-baseline="middle" text-anchor="middle" style="font-size:6px;">
-                ${svg`${formatNumber(
-                  this.humidity,
-                  this.hass.locale,
-                  { minimumFractionDigits: 1, maximumFractionDigits: 1 }
-                )}`}
-                <tspan dx="-0.3" dy="-2" style="font-size: 3px;">
-                %
-                </tspan>
-              </text>
-              ${this._renderHVACAction()}
-            `}
-          </g>
+              ${
+                this._config?.disable_circle ? svg`
+                  ${this._renderTemperature(this._display_top, true, "55", "60%")}
+                  ${this._renderTemperature(this._display_bottom, false, "90", "60%")}
+                  <g class="current-info" transform="translate(100,65)">
+                    ${this._renderHVACAction()}
+                  </g>
+                `: svg`
+                  ${this._renderTemperature(this._display_top, true, "50%", "60%")}
+                  <line x1="35" y1="72" x2="90" y2="72" stroke="#e7e7e8" stroke-width="0.5" />
+                  <g class="current-info" transform="translate(62.5,80)">
+                    ${this._renderTemperature(this._display_bottom, false, "-5%", "0%")}
+                  ${this._renderHVACAction()}
+                </g>
+              `}              
+          </svg>
         </svg>
+            </svg>
+          </div>
+          ${this._config?.disable_window ? html``: html`
+          </vt-ha-control-circular-slider>`}
         </div>
-      </vt-ha-control-circular-slider>
       <div id="modes">
         ${svg`
           ${this.modes.map((mode) => {
@@ -1420,6 +1498,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       </div>
 
       <div id="left-infos">
+      ${ this._config!.autoStartStopEnableEntity ? svg`
+        ${ this._renderAutoStartStopEnable()}
+        `:'' }
       ${svg`
         ${this.power_infos.map((infos) => {
           return this._renderPowerInfo(infos);

@@ -6,7 +6,11 @@
   "editor": {
     "card": {
       "climate": {
+        "autoStartStopEnableEntity": "Entité - auto-start/stop",
+        "powerEntity": "Entité - puissance consommée",
+        "disable_circle": "Désactiver le cercle",
         "disable_window": "Désactiver fenêtre status",
+        "disable_autoStartStop": "Désactiver auto-startStop",
         "disable_overpowering": "Désactiver sur-puissance status",
         "disable_heat": "Désactiver mode chauffe",
         "disable_cool": "Désactiver mode clim",
@@ -26,14 +30,17 @@
   },
   "extra_states": {
     "window_open": "Fenêtre ouverte",
+    "window_bypass": "Bypass fenêtre activé",
     "eco": "Eco",
-    "overpowering": "Sur-puissance",
+    "overpowering": "Sur-puissance détectée",
     "none": "Manuel",
     "comfort": "Confort",
     "boost": "Boost",
     "frost": "Hors-gel",
     "power": "Délestage",
     "activity": "Activité",
+    "presence": "Présence détectée",
+    "motion": "Mouvement détecté",
     "auto_regulation_light": "Légère",
     "auto_regulation_medium": "Moyenne",
     "auto_regulation_strong": "Forte",
@@ -54,7 +61,12 @@
     "fan_mute": "Silence",
     "fan_turbo": "Turbo",
     "fan_none": "Aucun",
+    "fan_auto": "Auto",
     "change_message": "Double clic pour changer le preset",
-    "toggle_message": "Clic pour basculer"
+    "toggle_message": "Clic pour basculer",
+    "auto_start_stop": "Stoppé par auto-start/stop",
+    "auto_start_stop_enable": "Active/désactive l'auto-start/stop",
+    "auto_start_stop_label": "Auto-start/stop",
+    "temp_unavailable": "-"
   }
 }

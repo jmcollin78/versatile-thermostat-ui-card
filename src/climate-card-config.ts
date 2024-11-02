@@ -12,6 +12,8 @@ const entitySharedConfigStruct = object({
     entity: optional(string()),
     name: optional(string()),
     icon: optional(string()),
+    autoStartStopEnableEntity: optional(string()),
+    powerEntity: optional(string())
 });
 type EntitySharedConfig = Infer<typeof entitySharedConfigStruct>;
 
@@ -29,7 +31,9 @@ export type ClimateCardConfig = LovelaceCardConfig &
     EntitySharedConfig &
     {
         disable_name?: boolean;
+        disable_circle?: boolean;
         disable_window?: boolean;
+        disable_autoStartStop?: boolean;
         disable_overpowering?: boolean;
         disable_heat?: boolean;
         disable_cool?: boolean;
@@ -52,7 +56,9 @@ export const climateCardConfigStruct = assign(
     entitySharedConfigStruct,
     object({
         disable_name: optional(boolean()),
+        disable_circle: optional(boolean()),
         disable_window: optional(boolean()),
+        disable_autoStartStop: optional(boolean()),
         disable_overpowering: optional(boolean()),
         disable_heat: optional(boolean()),
         disable_cool: optional(boolean()),

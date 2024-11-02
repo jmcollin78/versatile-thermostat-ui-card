@@ -32,7 +32,7 @@ const loadHaComponents = (version: string) => {
     }
 };
 
-const CLIMATE_LABELS = ["disable_name", "disable_window", "disable_overpowering", "disable_heat", "disable_cool", "disable_heat_cool", "disable_auto", "disable_dry", "disable_fan_only", "disable_off", "disable_menu", "disable_security_warning", "disable_buttons", "set_current_as_main", "disable_power_infos", "disable_auto_fan_infos"] as string[];
+const CLIMATE_LABELS = ["autoStartStopEnableEntity", "powerEntity", "disable_name", "disable_circle", "disable_window", "disable_autoStartStop", "disable_overpowering", "disable_heat", "disable_cool", "disable_heat_cool", "disable_auto", "disable_dry", "disable_fan_only", "disable_off", "disable_menu", "disable_security_warning", "disable_buttons", "set_current_as_main", "disable_power_infos", "disable_auto_fan_infos"] as string[];
 
 const computeSchema = memoizeOne(
     (): any[] => [
@@ -42,8 +42,18 @@ const computeSchema = memoizeOne(
             type: "grid",
             name: "",
             schema: [
+                { name: "autoStartStopEnableEntity", selector: { entity: { domain: ["switch"] } } },
+                { name: "powerEntity", selector: { entity: { domain: ["sensor", "input_number"] } } },
+            ]
+        },
+        {
+            type: "grid",
+            name: "",
+            schema: [
                 { name: "disable_name", selector: { boolean: {} } },
+                { name: "disable_circle", selector: { boolean: {} } },
                 { name: "disable_window", selector: { boolean: {} } },
+                { name: "disable_autoStartStop", selector: { boolean: {} } },
                 { name: "disable_overpowering", selector: { boolean: {} } },
                 { name: "disable_heat", selector: { boolean: {} } },
                 { name: "disable_cool", selector: { boolean: {} } },
