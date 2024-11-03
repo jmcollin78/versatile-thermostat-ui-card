@@ -326,7 +326,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private modes: any = [];
   private presets: any = [];
   private security_state: any = {};
-  private power_infos: any = {};
+  private powerInfos: any = [];
+  private _externalPowerInfos: any = [];
   private auto_fan_infos: any = {};
   private error: any = [];
 
@@ -802,6 +803,33 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     });
   }
 
+  private _willUpdatePower() {
+    let powerEntity: SensorEntity | undefined;
+    let power : number | undefined;
+    let unit : string | undefined;
+
+    this._externalPowerInfos=[];
+
+    if (this!._config!.powerEntity) {
+      if (DEBUG) console.log(`There is a powerEntity ${this._config!.powerEntity}`);
+      powerEntity = this.hass.states[this._config!.powerEntity] as SensorEntity;
+      power = Number(powerEntity.state);
+      unit = powerEntity.attributes["unit_of_measurement"];
+      if (DEBUG) console.log(`Power found ${power} ${unit} for ${name}`);
+    }
+    
+    
+    if (power) {
+      if (DEBUG) console.log("J'ai pushé du power");
+      this!._externalPowerInfos!.push({
+        name: "mean_power_cycle",
+        value: power,
+        unit: unit,
+        class: "vt-power-color"
+      });
+    }
+  }
+
   public willUpdate(changedProps: PropertyValues) {
       if (!this.hass || !this._config || (!changedProps.has("hass") && !changedProps.has("_config"))) {
           return;
@@ -809,16 +837,23 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
       const entity_id:any = this._config!.entity;
 
+      this._willUpdatePower();
+      
       const stateObj = this.hass.states[entity_id] as ClimateEntity;
       if (!stateObj) {
+          if (DEBUG) console.log(`No state`);
           return;
       }
 
       const oldHass = changedProps.get("hass") as HomeAssistant | undefined;
 
       if (!oldHass || oldHass.states[entity_id] !== stateObj) {
-        if (!this._config || !this.hass || !this._config!.entity) return;
+        if (!this._config || !this.hass || !this._config!.entity) {
+          if (DEBUG) console.log(`No change return`);
+          return;
+        }
   
+        console.log(`Something may have change`);
         this.stateObj = stateObj;
         const attributes = this.stateObj.attributes;
         const stateMode = this.stateObj.state;
@@ -952,38 +987,18 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         }
 
         // Build Power Infos
-        this!.power_infos = [];
+        this!.powerInfos = [];
         if (!this!._config?.disable_power_infos && attributes?.is_on) {
-          let powerEntity: SensorEntity | undefined;
-          let power : number | undefined;
-          let unit : string | undefined;
-          if (this!._config!.powerEntity) {
-            if (DEBUG) console.log(`There is a powerEntity ${this._config!.powerEntity}`)
-            powerEntity = this.hass.states[this._config!.powerEntity] as SensorEntity;
-            power = Number(powerEntity.state);
-            unit = powerEntity.attributes["unit_of_measurement"];
-            if (DEBUG) console.log(`Power found ${power} ${unit} for ${name}`);
-          }
-          
-          if (power) {
-            if (DEBUG) console.log("J'ai pushé du power");
-            this!.power_infos!.push({
-              name: "mean_power_cycle",
-              value: power,
-              unit: unit,
-              class: "vt-power-color"
-            });
-          }
           if (attributes?.is_over_switch) {
-            if (attributes?.mean_cycle_power && !power) {
-              this!.power_infos!.push({
+            if (attributes?.mean_cycle_power && !this._config?.powerEntity) {
+              this!.powerInfos!.push({
                 name: "mean_power_cycle",
                 value: roundNumber(attributes?.mean_cycle_power, 1),
                 unit: attributes?.mean_cycle_power < 20 ? "kW" : "W",
                 class: "vt-power-color"
               });
             }
-            this.power_infos.push({
+            this.powerInfos.push({
               name: "power_percent",
               value: attributes?.power_percent,
               unit: "%",
@@ -992,7 +1007,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           }
 
           if (attributes?.is_over_valve) {
-            this.power_infos.push({
+            this.powerInfos.push({
               name: "valve_open_percent",
               value: attributes?.valve_open_percent,
               unit: "%",
@@ -1001,8 +1016,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           }
 
           if (attributes?.is_over_climate) {
-            if (attributes?.device_power && !power) {
-              this.power_infos.push({
+            if (attributes?.device_power && !this._config?.powerEntity) {
+              this.powerInfos.push({
                 name: "mean_power_cycle",
                 value: attributes?.device_power,
                 unit:  attributes?.device_power < 20 ? "kW" : "W",
@@ -1010,13 +1025,13 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
               });
             }
             if (attributes?.is_regulated) {
-              this.power_infos.push({
+              this.powerInfos.push({
                 name: "regulated_target_temperature",
                 value: attributes?.regulated_target_temperature,
                 unit: attributes?.temperature_unit,
                 class: "vt-temp-color"
               });
-              this.power_infos.push({
+              this.powerInfos.push({
                 name: "auto_regulation_mode",
                 value: localize({ hass: this.hass, string: `extra_states.${attributes?.auto_regulation_mode}` }),
                 unit: "",
@@ -1025,6 +1040,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             }
           }
         }
+        else if (DEBUG) console.log(`No power to disply is_on=${attributes?.is_on} or disabled`);
 
         // Build auto-fan infos
         this.auto_fan_infos = [];
@@ -1158,12 +1174,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderHVACAction(): TemplateResult {
-    if (this.stateObj.attributes.hvac_action === 'heating' ||
-        this.stateObj.attributes.hvac_mode == "heat" ||
-        this.stateObj.attributes.hvac_mode == "heat_cool") {
+    if (this.stateObj?.attributes.hvac_action === 'heating' ||
+        this.stateObj?.attributes.hvac_mode == "heat" ||
+        this.stateObj?.attributes.hvac_mode == "heat_cool") {
       return svg`<path class="status ${(this.is_device_active) ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
     }
-    else if (this.stateObj.attributes.hvac_action === 'cooling' ||
+    else if (this.stateObj?.attributes.hvac_action === 'cooling' ||
         this.stateObj.attributes.hvac_mode == "cool") {
       return svg`<path class="status cooler ${(this.is_device_active) ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiAirConditioner}" />`;
     }
@@ -1271,7 +1287,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     return html`
       <div class="left-info-label" title="${localizeInfo}">
         <span>
-          <input type="checkbox" checked="${checked}" class="auto-start-stop-enable" @click=${this._handleClickAutoStartStopEnable} .label="${localizeInfo}" name="auto-start-stop-enable">
+          <input type="checkbox" .checked=${this._isAutoStartStopEnabled} class="auto-start-stop-enable" @click=${this._handleClickAutoStartStopEnable} .label="${localizeInfo}" name="auto-start-stop-enable">
         </span>
         <span>${localizeLabel}</span>
       </div>
@@ -1502,7 +1518,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         ${ this._renderAutoStartStopEnable()}
         `:'' }
       ${svg`
-        ${this.power_infos.map((infos) => {
+        ${this._externalPowerInfos.map((infos) => {
+          return this._renderPowerInfo(infos);
+        })}
+      `}
+      ${svg`
+        ${this.powerInfos.map((infos) => {
           return this._renderPowerInfo(infos);
         })}
       `}
