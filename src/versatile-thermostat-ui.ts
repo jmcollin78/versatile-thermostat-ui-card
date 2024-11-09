@@ -380,6 +380,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       .disabled-circle-container{
           height: 145px;
           width: 100%;
+          background: radial-gradient(var(--mode-color), transparent 50%);
       }
 
       vt-ha-outlined-icon-button {
@@ -505,14 +506,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         --mode-color: var(--energy-non-fossil-color);
       }
 
-      .overpowering {
-        --mode-color: var(--label-badge-yellow)
-      }
-
-      .window_open {
-        --mode-color: #80a7c4
-      }
-
       .auto,
       .heat_cool {
         --mode-color: var(--state-climate-auto-color);
@@ -540,6 +533,14 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
       .unknown-mode {
         --mode-color: var(--state-unknown-color);
+      }
+
+      .window_open {
+        --mode-color: #80a7c4 !important;
+      }
+        
+      .overpowering {
+        --mode-color: var(--error-color) !important;
       }
 
       #modes {
@@ -1385,7 +1386,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         </div>
       ` : ``}
 
-      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container':''}">
+      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container':''}  ${this.mode} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''}">
         ${
           this._config?.disable_circle ? html`
             <!-- No cicle configured -->
