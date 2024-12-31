@@ -909,7 +909,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           this._hasWindow = false;
           this.window = false;
         }
-        if (attributes?.overpowering_state) {
+        if (attributes?.overpowering_state  === 'on') {
           this._hasOverpowering = true;
           this.overpowering = attributes.overpowering_state;
         }
@@ -936,9 +936,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           this.motion = false;
         }
 
-        if (attributes?.window_bypass_state) {
+        if (attributes?.is_window_bypass) {
           this._hasWindowByPass = true;
-          this.windowByPass = attributes.window_bypass_state;
+          this.windowByPass = attributes.is_window_bypass;
         }
         else {
           this._hasWindowByPass = false;
@@ -946,7 +946,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         }
 
         // Build Security state
-        if (attributes?.security_state && !this?._config?.disable_security_warning) {
+        if (attributes?.security_state === 'on' && !this?._config?.disable_security_warning) {
           this.security_state = [];
           if (attributes.last_temperature_datetime) {
             let dif = dateDifferenceInMinutes(new Date(attributes.last_temperature_datetime));
