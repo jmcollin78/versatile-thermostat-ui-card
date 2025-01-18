@@ -52,6 +52,7 @@ import {
   mdiFanAuto,
   mdiFanOff,
   mdiPowerSleep,
+  mdiBullseyeArrow
 } from "@mdi/js";
 
 import {
@@ -119,7 +120,12 @@ const preset_manual="none",
   preset_frost="frost",
   hvac_mode_OFF="off",
   hvac_mode_COOL="cool",
-  auto_fan_none="auto_fan_none";
+  hvac_mode_HEAT="heat",
+  hvac_mode_AUTO="auto",
+  auto_fan_none="auto_fan_none",
+  hvac_action_idle="idle",
+  hvac_action_cooling="cooling",
+  hvac_action_heating="heating";
 
 const autoFanModeMapping={
   "auto_fan_none": "None",
@@ -221,6 +227,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: Boolean }) public is_device_active: boolean = false;
   @property({ type: String }) public status: string = "loading";
   @property({ type: String }) public mode: string = hvac_mode_OFF;
+  @property({ type: String }) public hvac_action: string = hvac_action_idle;
   @property({ type: String }) public preset: string = preset_manual;
   @property({ type: Boolean, reflect: true }) public dragging = false;
   @property({ type: String}) public name: string = "";
@@ -380,7 +387,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       .disabled-circle-container{
           height: 145px;
           width: 100%;
-          background: radial-gradient(var(--mode-color), transparent 50%);
+          background: radial-gradient(var(--hvac-mode-color), transparent 50%);
       }
 
       vt-ha-outlined-icon-button {
@@ -529,7 +536,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         --mode-color: var(--state-climate-dry-color);
       }
       .idle {
-        --mode-color: var(--state-climate-idle-color);
+        --mode-color: var(--state-climate-dry-color);
       }
       .unknown-mode {
         --mode-color: var(--state-unknown-color);
@@ -541,6 +548,26 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         
       .overpowering {
         --mode-color: var(--error-color) !important;
+      }
+
+      .heat_heating {
+        --hvac-mode-color: var(--label-badge-red);
+      }
+
+      .heat_idle {
+        --hvac-mode-color: var(--label-badge-yellow);
+      }
+
+      .cool_cooling {
+        --hvac-mode-color: var(--label-badge-blue);
+      }
+
+      .cool_idle {
+        --hvac-mode-color:rgb(125, 194, 225);
+      }
+
+      .off_off {
+        --hvac-mode-color: var(--slider-track-color);
       }
 
       #modes {
@@ -866,6 +893,16 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   
         this.mode = stateMode || hvac_mode_OFF;
 
+        // hvac action
+        this.hvac_action = attributes?.hvac_action
+        // Patch hvac_action if on_percent is > 0
+        if (attributes?.power_percent > 0) {
+          this.hvac_action = this.mode == hvac_mode_HEAT ? hvac_action_heating : hvac_action_cooling
+        }
+
+        // not-used anymore - handle is_device_active
+        this.is_device_active = (attributes?.is_device_active === true);
+
         if (attributes.hvac_modes) {
           this.modes = Object.values(attributes.hvac_modes);
         }
@@ -971,9 +1008,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         } else {
           this.security_state = null;
         }
-
-        // handle is_device_active
-        this.is_device_active = (attributes?.is_device_active === true)
 
         // Build Errors
         if (attributes?.errors !== undefined) {
@@ -1175,14 +1209,14 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderHVACAction(): TemplateResult {
-    if (this.stateObj?.attributes.hvac_action === 'heating' ||
+    if (this.hvac_action === 'heating' ||
         this.stateObj?.attributes.hvac_mode == "heat" ||
         this.stateObj?.attributes.hvac_mode == "heat_cool") {
-      return svg`<path class="status ${(this.is_device_active) ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
+      return svg`<path class="status ${this.is_device_active ? 'active':''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
     }
-    else if (this.stateObj?.attributes.hvac_action === 'cooling' ||
+    else if (this.hvac_action === 'cooling' ||
         this.stateObj.attributes.hvac_mode == "cool") {
-      return svg`<path class="status cooler ${(this.is_device_active) ? 'active': ''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiAirConditioner}" />`;
+      return svg`<path class="status cooler ${this.is_device_active ? 'active':''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiAirConditioner}" />`;
     }
     else return svg`<path class="status" transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiClose}" />`;
   }
@@ -1314,10 +1348,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     return ret;
   }
 
-  private _renderTemperature(temperature, isMain: boolean, x: string, y: string) {
+  private _renderTemperature(temperature, isMain: boolean, x: string, y: string, isTarget: boolean) {
     const fontSize= isMain ? 15:6;
     const dx = isMain ? -2:-1;
     const dy = isMain ? -5.5:-2;
+    let targetPosX:number = 74, targetPosY: number = 57, targetScale=0.25;
 
     let value:string;
 
@@ -1332,15 +1367,28 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       );
     }
 
+    if (isTarget && isMain) {
+        targetPosX = 25;
+        targetPosY = 54;
+        targetScale = 0.5
+    }
+
     return svg`
-    <text class="main-value" x="${x}" y="${y}" dominant-baseline="middle" text-anchor="middle" style="font-size:${fontSize}px;">
-      ${svg`${value}`}
-      <tspan dx="${dx}" dy="${dy}" style="font-size: 5px;">
-        ${svg`
-          ${this.hass.config.unit_system.temperature}
-        `}
-      </tspan>
-    </text>
+      ${isTarget ? svg`
+        <path 
+          class="main-value" 
+          transform="translate(${targetPosX}, ${targetPosY}) scale(${targetScale})" 
+          fill="#ffffff" 
+          d="${mdiBullseyeArrow}" 
+        />` : ''}
+      <text class="main-value" x="${x}" y="${y}" dominant-baseline="middle" text-anchor="middle" style="font-size:${fontSize}px;">
+        ${svg`${value}`}
+        <tspan dx="${dx}" dy="${dy}" style="font-size: 5px;">
+          ${svg`
+            ${this.hass.config.unit_system.temperature}
+          `}
+        </tspan>
+      </text>
     `
   }
 
@@ -1386,7 +1434,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         </div>
       ` : ``}
 
-      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container':''}  ${this.mode} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''}">
+      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container':''}  ${this.mode}_${this.hvac_action} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''}">
         ${
           this._config?.disable_circle ? html`
             <!-- No cicle configured -->
@@ -1449,16 +1497,16 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
               ${
                 this._config?.disable_circle ? svg`
-                  ${this._renderTemperature(this._display_top, true, "55", "60%")}
-                  ${this._renderTemperature(this._display_bottom, false, "90", "60%")}
+                  ${this._renderTemperature(this._display_top, true, "55", "60%", ! this?._config?.set_current_as_main)}
+                  ${this._renderTemperature(this._display_bottom, false, "90", "60%", this?._config?.set_current_as_main == true)}
                   <g class="current-info" transform="translate(100,65)">
                     ${this._renderHVACAction()}
                   </g>
                 `: svg`
-                  ${this._renderTemperature(this._display_top, true, "50%", "60%")}
+                  ${this._renderTemperature(this._display_top, true, "50%", "60%", ! this?._config?.set_current_as_main)}
                   <line x1="35" y1="72" x2="90" y2="72" stroke="#e7e7e8" stroke-width="0.5" />
                   <g class="current-info" transform="translate(62.5,80)">
-                    ${this._renderTemperature(this._display_bottom, false, "-5%", "0%")}
+                    ${this._renderTemperature(this._display_bottom, false, "-5%", "0%", this?._config?.set_current_as_main == true)}
                   ${this._renderHVACAction()}
                 </g>
               `}              
