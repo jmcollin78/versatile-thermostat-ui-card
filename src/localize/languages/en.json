@@ -8,7 +8,7 @@
       "climate": {
         "autoStartStopEnableEntity": "Auto-start/stop entity",
         "powerEntity": "Power consumption entity",
-        "disable_circle": "Désactiver le cercle",
+        "disable_circle": "Disable circle",
         "disable_window": "Disable window",
         "disable_autoStartStop": "Disable auto-startStop",
         "disable_overpowering": "Disable overpowering",
@@ -66,8 +66,8 @@
     "fan_auto": "Auto",
     "change_message": "Double click to change preset",
     "toggle_message": "Click to toggle",
-    "auto_start_stop": "Stoppé par auto-start/stop",
-    "auto_start_stop_enable": "Active/désactive l'auto-start/stop",
+    "auto_start_stop": "Stopped by auto-start/stop",
+    "auto_start_stop_enable": "Enable/disable auto-start/stop",
     "auto_start_stop_label": "Auto-start/stop",
     "temp_unavailable": "-"
   }
