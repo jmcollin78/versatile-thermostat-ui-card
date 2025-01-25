@@ -907,6 +907,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
         if (attributes.hvac_modes) {
           this.modes = Object.values(attributes.hvac_modes);
+          this.modes.sort((a, b) => {
+            if (a === "off") return 1; // Place "off" après tout le reste
+            if (b === "off") return -1; // Place tout le reste avant "off"
+            return 0; // Sinon, ne change pas l'ordre
+          });
         }
 
         // Reads preset modes
