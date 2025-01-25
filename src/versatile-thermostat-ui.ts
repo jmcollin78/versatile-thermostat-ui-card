@@ -1383,7 +1383,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         />` : ''}
       <text class="main-value" x="${x}" y="${y}" dominant-baseline="middle" text-anchor="middle" style="font-size:${fontSize}px;">
         ${svg`${value}`}
-        <tspan dx="${dx}" dy="${dy}" style="font-size: 5px;">
+        <tspan dx="${dx}" dy="${dy}" style="font-size: 3px;">
           ${svg`
             ${this.hass.config.unit_system.temperature}
           `}
