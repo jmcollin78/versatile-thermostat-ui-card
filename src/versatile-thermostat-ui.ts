@@ -334,7 +334,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _display_top: number = 0;
   private modes: any = [];
   private presets: any = [];
-  private security_state: any = {};
+  private safety_state: any = {};
   private powerInfos: any = [];
   private _externalPowerInfos: any = [];
   private auto_fan_infos: any = {};
@@ -985,12 +985,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         }
 
         // Build Security state
-        if (attributes?.security_state === 'on' && !this?._config?.disable_security_warning) {
-          this.security_state = [];
+        if (attributes?.safety_state === 'on' && !this?._config?.disable_safety_warning) {
+          this.safety_state = [];
           if (attributes.last_temperature_datetime) {
             let dif = dateDifferenceInMinutes(new Date(attributes.last_temperature_datetime));
             if (dif > 0) {
-              this.security_state.push(
+              this.safety_state.push(
               {
                 name: 'Room temp.',
                 security_msg:  dif+" min"
@@ -1000,7 +1000,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           if (attributes.last_ext_temperature_datetime) {
             let dif = dateDifferenceInMinutes(new Date(attributes.last_ext_temperature_datetime));
             if (dif > 0) {
-              this.security_state.push(
+              this.safety_state.push(
               {
                 name: 'External temp.',
                 security_msg:  dif+" min"
@@ -1008,7 +1008,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             }
           }
         } else {
-          this.security_state = null;
+          this.safety_state = null;
         }
 
         // Build Errors
@@ -1417,12 +1417,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         <div class="name">${this.name}</div>
         ` : ``}
 
-      ${this.security_state?.length > 0 ? html`
+      ${this.safety_state?.length > 0 ? html`
         <div class="security">
           <ha-icon-button class="alert" .path=${mdiThermometerAlert}>
           </ha-icon-button>
           ${html`
-            ${this.security_state!.map((sec_msg) => {
+            ${this.safety_state!.map((sec_msg) => {
               return html`<span>${sec_msg.name}: ${sec_msg.security_msg}</span>`;
             })}
            `}
@@ -1445,7 +1445,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             this.value.high != null &&
             this.stateObj.state !== UNAVAILABLE) ? html`
             <vt-ha-control-circular-slider
-              class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
+              class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.safety_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
               .inactive=${this.window}
               dual
               .low=${this.value.low}
@@ -1461,7 +1461,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             >
             ` : html`
             <vt-ha-control-circular-slider
-              class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
+              class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.safety_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
               .inactive=${this.window}
               .mode="start"
               @value-changed=${this._highChanged}
@@ -1474,7 +1474,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             >
             `
         }
-          <div class="content ${this.name.length == 0 ? 'noname':''} ${this.security_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} " >
+          <div class="content ${this.name.length == 0 ? 'noname':''} ${this.safety_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} " >
             <svg id="main" viewbox="0 0 125 100">
               <g transform="translate(57.5,37) scale(0.35)">
                 ${(this._hasWindowByPass) ? svg`

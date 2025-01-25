@@ -72,7 +72,7 @@ Note: those options should be improved with official release
 | disable_fan_only    | boolean  | **optional** | turn off the on/fan_only button                                                                      |
 | disable_off         | boolean  | **optional** | turn off the off button                                                                         |
 | disable_buttons     | boolean  | **optional** | turn off the plus/minus buttons                                                                        |
-| disable_security_warning     | boolean  | **optional** | turn off the security warning (when a temperature sensor is out)                              |
+| disable_safety_warning     | boolean  | **optional** | turn off the security warning (when a temperature sensor is out)                              |
 | disable_power_infos | boolean  | **optional** | turn off the power informations                                                                        |
 | disable_auto_fan_infos | boolean  | **optional** | turn off the auto-fan informations                                                                  |
 | name                | string/boolean  | **optional** | override the default entity name |
@@ -93,7 +93,7 @@ disable_dry: false
 disable_fan_only: false
 disable_menu: false
 disable_off: false
-disable_security_warning: false
+disable_safety_warning: false
 set_current_as_main: true
 disable_buttons: false
 disable_power_infos: false
