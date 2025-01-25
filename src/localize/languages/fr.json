@@ -24,7 +24,8 @@
         "disable_buttons": "Désactiver les boutons +/-",
         "disable_power_infos": "Désactiver les infos de puissance",
         "disable_auto_fan_infos": "Désactiver les infos auto-ventilation",
-        "disable_name": "Désactiver le nom"
+        "disable_name": "Désactiver le nom",
+        "disable_target_icon": "Désactiver l'icône cible"
       }
     }
   },

@@ -1354,7 +1354,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     const fontSize= isMain ? 15:6;
     const dx = isMain ? -2:-1;
     const dy = isMain ? -5.5:-2;
-    let targetPosX:number = 74, targetPosY: number = 57, targetScale=0.25;
+    let targetPosX:number = 76, targetPosY: number = 57, targetScale=0.20;
 
     let value:string;
 
@@ -1370,13 +1370,13 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
 
     if (isTarget && isMain) {
-        targetPosX = 25;
-        targetPosY = 54;
-        targetScale = 0.5
+        targetPosX = 30;
+        targetPosY = 56;
+        targetScale = 0.25
     }
 
     return svg`
-      ${isTarget ? svg`
+      ${isTarget && !this._config?.disable_target_icon && this._config?.disable_circle ? svg`
         <path 
           class="main-value" 
           transform="translate(${targetPosX}, ${targetPosY}) scale(${targetScale})" 

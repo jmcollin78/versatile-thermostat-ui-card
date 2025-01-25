@@ -32,7 +32,7 @@ const loadHaComponents = (version: string) => {
     }
 };
 
-const CLIMATE_LABELS = ["autoStartStopEnableEntity", "powerEntity", "disable_name", "disable_circle", "disable_window", "disable_autoStartStop", "disable_overpowering", "disable_heat", "disable_cool", "disable_heat_cool", "disable_auto", "disable_dry", "disable_fan_only", "disable_off", "disable_menu", "disable_safety_warning", "disable_buttons", "set_current_as_main", "disable_power_infos", "disable_auto_fan_infos"] as string[];
+const CLIMATE_LABELS = ["autoStartStopEnableEntity", "powerEntity", "disable_name", "disable_circle", "disable_window", "disable_autoStartStop", "disable_overpowering", "disable_heat", "disable_cool", "disable_heat_cool", "disable_auto", "disable_dry", "disable_fan_only", "disable_off", "disable_menu", "disable_safety_warning", "disable_buttons", "set_current_as_main", "disable_power_infos", "disable_auto_fan_infos", "disable_target_icon"] as string[];
 
 const computeSchema = memoizeOne(
     (): any[] => [
@@ -68,6 +68,7 @@ const computeSchema = memoizeOne(
                 { name: "set_current_as_main", selector: { boolean: {}}},
                 { name: "disable_power_infos", selector: { Boolean: {}}},
                 { name: "disable_auto_fan_infos", selector: { Boolean: {}}},
+                { name: "disable_target_icon", selector: { Boolean: {}}},
             ],
         },
     ]

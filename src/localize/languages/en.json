@@ -25,7 +25,8 @@
         "disable_buttons": "Disable plus/minus buttons",
         "disable_power_infos": "Disable power infos",
         "disable_auto_fan_infos": "Disable auto-fan infos",
-        "disable_name": "Disable name"
+        "disable_name": "Disable name",
+        "disable_target_icon": "Disable the target icon"
       }
     }
   },
