@@ -41,6 +41,7 @@
     "frost": "Frost",
     "power": "Overpowering",
     "activity": "Activity detected",
+    "presence": "Presence detected",
     "motion": "Motion detected",
     "undefined": "None",
     "auto_regulation_light": "Light",
