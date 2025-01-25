@@ -138,6 +138,8 @@ const autoFanModeMapping={
 const hvacOffReasonAutoStartStop="auto_start_stop";
 const autoStartStopLevels=["auto_start_stop_slow", "auto_start_stop_medium", "auto_start_stop_fast"];
 
+const minPowerWatt=7;
+
 interface RegisterCardParams {
   type: string;
   name: string;
@@ -1029,7 +1031,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
               this!.powerInfos!.push({
                 name: "mean_power_cycle",
                 value: roundNumber(attributes?.mean_cycle_power, 1),
-                unit: attributes?.mean_cycle_power < 20 ? "kW" : "W",
+                unit: attributes?.mean_cycle_power < minPowerWatt ? "kW" : "W",
                 class: "vt-power-color"
               });
             }
@@ -1055,7 +1057,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
               this.powerInfos.push({
                 name: "mean_power_cycle",
                 value: attributes?.device_power,
-                unit:  attributes?.device_power < 20 ? "kW" : "W",
+                unit:  attributes?.device_power < minPowerWatt ? "kW" : "W",
                 class: "vt-power-color"
               });
             }
