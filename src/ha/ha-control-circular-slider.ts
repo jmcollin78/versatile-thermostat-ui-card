@@ -613,7 +613,6 @@ import {
           margin: 0 auto;
           margin-top: 1em;
           position: relative;
-          z-index: 2;
         }
         #interaction {
           display: flex;
