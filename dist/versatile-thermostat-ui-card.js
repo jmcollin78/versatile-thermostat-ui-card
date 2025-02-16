@@ -279,7 +279,6 @@ const qn=270;const Yn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
           margin: 0 auto;
           margin-top: 1em;
           position: relative;
-          z-index: 2;
         }
         #interaction {
           display: flex;
@@ -760,7 +759,6 @@ const qn=270;const Yn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
         align-items: center;
         place-content: center;
         flex-flow: wrap;
-        z-index: 0;
         transform: translate(-50%,-50%);
         max-width: 155px;
       }
@@ -858,7 +856,7 @@ const qn=270;const Yn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
       }
 
       #modes {
-        z-index: 3;
+        z-index: 0;
         position: relative;
         display: flex;
         width: auto;
@@ -868,7 +866,7 @@ const qn=270;const Yn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
       }
 
       #presets {
-        z-index: 3;
+        z-index: 0;
         position: relative;
         display: flex;
         width: 100%;
@@ -905,7 +903,7 @@ const qn=270;const Yn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
       }
 
       #left-infos {
-        z-index: 3;
+        z-index: 0;
         position: absolute;
         display: block;
         width: auto;
@@ -935,7 +933,7 @@ const qn=270;const Yn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
       }
 
       #vt-control-buttons {
-        z-index: 3;
+        z-index: 0;
         position: absolute;
         display: block;
         width: auto;
@@ -946,7 +944,7 @@ const qn=270;const Yn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
       }
 
       #vt-control-buttons .button {
-        z-index: 3;
+        z-index: 0;
         position: relative;
         display: flex;
         width: auto;
@@ -971,7 +969,7 @@ const qn=270;const Yn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
       #value {
         fill: var(--mode-color);
         r: 5;
-        z-index: 9999 !important;
+        z-index: 4 !important;
         transition: r 0.3s ease-in-out, fill 0.6s ease-in-out;
       }
 
