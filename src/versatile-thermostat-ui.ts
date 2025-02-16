@@ -475,7 +475,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         align-items: center;
         place-content: center;
         flex-flow: wrap;
-        z-index: 0;
         transform: translate(-50%,-50%);
         max-width: 155px;
       }
@@ -573,7 +572,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       #modes {
-        z-index: 3;
+        z-index: 0;
         position: relative;
         display: flex;
         width: auto;
@@ -583,7 +582,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       #presets {
-        z-index: 3;
+        z-index: 0;
         position: relative;
         display: flex;
         width: 100%;
@@ -620,7 +619,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       #left-infos {
-        z-index: 3;
+        z-index: 0;
         position: absolute;
         display: block;
         width: auto;
@@ -650,7 +649,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       #vt-control-buttons {
-        z-index: 3;
+        z-index: 0;
         position: absolute;
         display: block;
         width: auto;
@@ -661,7 +660,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       #vt-control-buttons .button {
-        z-index: 3;
+        z-index: 0;
         position: relative;
         display: flex;
         width: auto;
@@ -686,7 +685,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       #value {
         fill: var(--mode-color);
         r: 5;
-        z-index: 9999 !important;
+        z-index: 4 !important;
         transition: r 0.3s ease-in-out, fill 0.6s ease-in-out;
       }
 
@@ -902,7 +901,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           this.hvac_action = this.mode == hvac_mode_HEAT ? hvac_action_heating : hvac_action_cooling
         }
 
-        // not-used anymore - handle is_device_active
         this.is_device_active = (attributes?.is_device_active === true);
 
         if (attributes.hvac_modes) {
