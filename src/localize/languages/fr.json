@@ -18,7 +18,8 @@
         "disable_auto": "Désactiver mode auto",
         "disable_fan_only": "Désactiver mode ventilation",
         "disable_dry": "Désactiver mode déshumidification",
-        "disable_off": "Désactiver arret",
+        "disable_off": "Désactiver mode arret",
+        "disable_sleep": "Désactiver mode endormi",
         "set_current_as_main": "Echanger temperature cible avec temperature locale",
         "disable_safety_warning": "Désactiver sécurité messages",
         "disable_buttons": "Désactiver les boutons +/-",
@@ -68,6 +69,7 @@
     "auto_start_stop": "Stoppé par auto-start/stop",
     "auto_start_stop_enable": "Active/désactive l'auto-start/stop",
     "auto_start_stop_label": "Auto-start/stop",
-    "temp_unavailable": "-"
+    "temp_unavailable": "-",
+    "sleep": "Endormi"
   }
 }

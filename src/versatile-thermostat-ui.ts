@@ -52,7 +52,8 @@ import {
   mdiFanAuto,
   mdiFanOff,
   mdiPowerSleep,
-  mdiBullseyeArrow
+  mdiBullseyeArrow,
+  mdiSleep
 } from "@mdi/js";
 
 import {
@@ -112,7 +113,8 @@ const modeIcons: {
   auto_fan_mode: mdiFanAuto,
   auto_fan_mode_off: mdiFanOff,
   fan_mode: mdiFan,
-  power_sleep: mdiPowerSleep
+  power_sleep: mdiPowerSleep,
+  sleep: mdiSleep
 };
 type Target = "value" | "low" | "high";
 
@@ -122,6 +124,7 @@ const preset_manual="none",
   hvac_mode_COOL="cool",
   hvac_mode_HEAT="heat",
   hvac_mode_AUTO="auto",
+  hvac_mode_sleep="sleep",
   auto_fan_none="auto_fan_none",
   hvac_action_idle="idle",
   hvac_action_cooling="cooling",
@@ -1534,6 +1537,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             if(this._config?.disable_dry && mode === "dry") return html ``;
             if(this._config?.disable_fan_only && mode === "fan_only") return html ``;
             if(this._config?.disable_off && mode === "off") return html ``;
+            if(this._config?.disable_sleep && mode === "sleep") return html ``;
             return this._renderIcon(mode, this.mode);
           })}
         `}
