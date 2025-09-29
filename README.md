@@ -6,6 +6,8 @@
 
 ![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/icon.png?raw=true)
 
+> This card need a "real" front UI developer. If you have time and skill, please contact me. Many issues are related to the front UI.
+
 # UI Card for versatile Thermostat
 
 > ![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/tips.png?raw=true) This card is dedicated to the Versatile Thermostat integration which is available in HACS also and [here](https://github.com/jmcollin78/versatile_thermostat).
