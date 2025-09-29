@@ -1,12 +1,76 @@
 {
-    "common": {
-        "version": "версия",
-        "current": "текущий"
-    },
-    "extra_states": {
-        "window_open": "Окно открыто",
-        "night_mode": "Ночной режим",
-        "eco": "Эко",
-        "overpowering": "Лето"
+  "common": {
+    "version": "Версия",
+    "current": "Текущая"
+  },
+  "editor": {
+    "card": {
+      "climate": {
+        "autoStartStopEnableEntity": "Сущность автоматического старта/стопа",
+        "powerEntity": "Сущность потребления энергии",
+        "disable_circle": "Отключить круг",
+        "disable_window": "Отключить окно",
+        "disable_autoStartStop": "Отключить автоматический старт/стоп",
+        "disable_overpowering": "Отключить перегрузку",
+        "disable_heat": "Отключить обогрев",
+        "disable_cool": "Отключить охлаждение",
+        "disable_heat_cool": "Отключить обогрев/охлаждение",
+        "disable_auto": "Отключить авто",
+        "disable_fan_only": "Отключить только вентилятор",
+        "disable_dry": "Отключить осушение",
+        "disable_off": "Отключить выключение",
+        "disable_menu": "Отключить меню",
+        "set_current_as_main": "Поменять местами целевую и текущую температуру",
+        "disable_safety_warning": "Отключить предупреждение о батарее",
+        "disable_buttons": "Отключить кнопки плюс/минус",
+        "disable_power_infos": "Отключить информацию о питании",
+        "disable_auto_fan_infos": "Отключить информацию авто-вентилятора",
+        "disable_name": "Отключить название",
+        "disable_target_icon": "Отключить иконку цели"
+      }
     }
+  },
+  "extra_states": {
+    "window_open": "Окно открыто",
+    "window_bypass": "Обход окна активирован",
+    "night_mode": "Ночной режим",
+    "eco": "Эко",
+    "overpowering": "Обнаружена перегрузка",
+    "none": "Ручной",
+    "comfort": "Комфорт",
+    "boost": "Турбо",
+    "frost": "Защита от замерзания",
+    "power": "Перегрузка",
+    "activity": "Обнаружена активность",
+    "presence": "Обнаружено присутствие",
+    "motion": "Обнаружено движение",
+    "undefined": "Нет",
+    "auto_regulation_light": "Легкий",
+    "auto_regulation_medium": "Средний",
+    "auto_regulation_strong": "Сильный",
+    "auto_regulation_slow": "Медленный",
+    "auto_regulation_expert": "Экспертный",
+    "auto_fan_mode": "Авто-вентилятор",
+    "auto_fan_mode_off": "Нет",
+    "auto_fan_none": "Нет",
+    "auto_fan_low": "Низкий",
+    "auto_fan_medium": "Средний",
+    "auto_fan_high": "Высокий",
+    "auto_fan_boost": "Турбо",
+    "fan_low": "Низкий",
+    "fan_low_mid": "Низкий-средний",
+    "fan_mid": "Средний",
+    "fan_mid_high": "Средний-высокий",
+    "fan_high": "Высокий",
+    "fan_mute": "Тихий",
+    "fan_turbo": "Турбо",
+    "fan_none": "Нет",
+    "fan_auto": "Авто",
+    "change_message": "Двойной клик для смены предустановки",
+    "toggle_message": "Клик для переключения",
+    "auto_start_stop": "Остановлено авто-старт/стопом",
+    "auto_start_stop_enable": "Включить/отключить авто-старт/стоп",
+    "auto_start_stop_label": "Авто-старт/стоп",
+    "temp_unavailable": "-"
+  }
 }
