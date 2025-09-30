@@ -1130,10 +1130,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _handleAction(e: MouseEvent): void {
-    this.hass!.callService("climate", "set_hvac_mode", {
-      entity_id: this._config!.entity,
-      hvac_mode: (e.currentTarget as any).mode,
-    });
+    if ((e.currentTarget as any).mode === hvac_mode_sleep) {
+      this.hass!.callService("versatile_thermostat", "set_hvac_mode_sleep", {
+        entity_id: this._config!.entity,
+      });
+    }
+    else {
+      this.hass!.callService("climate", "set_hvac_mode", {
+        entity_id: this._config!.entity,
+        hvac_mode: (e.currentTarget as any).mode,
+      });
+    }
   }
 
   private last_target_temperature;
