@@ -12,13 +12,14 @@
         "disable_window": "Disable window",
         "disable_autoStartStop": "Disable auto-startStop",
         "disable_overpowering": "Disable overpowering",
-        "disable_heat": "Disable heat",
-        "disable_cool": "Disable cool",
-        "disable_heat_cool": "Disable heat/cool",
-        "disable_auto": "Disable auto",
-        "disable_fan_only": "Disable fan only",
-        "disable_dry": "Disable dry",
-        "disable_off": "Disable off",
+        "disable_heat": "Disable heat mode",
+        "disable_cool": "Disable cool mode",
+        "disable_heat_cool": "Disable heat/cool mode",
+        "disable_auto": "Disable auto mode",
+        "disable_fan_only": "Disable fan only mode",
+        "disable_dry": "Disable dry mode",
+        "disable_off": "Disable off mode",
+        "disable_sleep": "Disable sleep mode",
         "disable_menu": "Disable menu",
         "set_current_as_main": "Exchange target temperature and room temperature",
         "disable_safety_warning": "Disable battery warning",
@@ -71,6 +72,7 @@
     "auto_start_stop": "Stopped by auto-start/stop",
     "auto_start_stop_enable": "Enable/disable auto-start/stop",
     "auto_start_stop_label": "Auto-start/stop",
-    "temp_unavailable": "-"
+    "temp_unavailable": "-",
+    "sleep": "Sleeping"
   }
 }

@@ -52,7 +52,8 @@ import {
   mdiFanAuto,
   mdiFanOff,
   mdiPowerSleep,
-  mdiBullseyeArrow
+  mdiBullseyeArrow,
+  mdiSleep
 } from "@mdi/js";
 
 import {
@@ -112,7 +113,8 @@ const modeIcons: {
   auto_fan_mode: mdiFanAuto,
   auto_fan_mode_off: mdiFanOff,
   fan_mode: mdiFan,
-  power_sleep: mdiPowerSleep
+  power_sleep: mdiPowerSleep,
+  sleep: mdiSleep
 };
 type Target = "value" | "low" | "high";
 
@@ -122,6 +124,7 @@ const preset_manual="none",
   hvac_mode_COOL="cool",
   hvac_mode_HEAT="heat",
   hvac_mode_AUTO="auto",
+  hvac_mode_sleep="sleep",
   auto_fan_none="auto_fan_none",
   hvac_action_idle="idle",
   hvac_action_cooling="cooling",
@@ -326,6 +329,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _hasOverpowering: Boolean = false;
   private _hasAutoStartStop: Boolean = false;
   private _isAutoStartStopEnabled:Boolean = false;
+  private _isAutoStartStopConfigured:Boolean = false;
   private _timeout: any;
   private _oldValueMin: number = 0;
   private _oldValueMax: number = 0;
@@ -530,6 +534,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       .off {
         --mode-color: var(--slider-track-color);
       }
+      .sleep {
+        --mode-color: #2641a3ff !important;
+      }
       .fan_only {
         --mode-color: var(--state-climate-fan_only-color);
       }
@@ -569,6 +576,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
       .off_off {
         --hvac-mode-color: var(--slider-track-color);
+      }
+
+      .sleep_off {
+        --hvac-mode-color: #2641a3ff;
       }
 
       #modes {
@@ -893,11 +904,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         }
   
         this.mode = stateMode || hvac_mode_OFF;
+        if (this.mode == hvac_mode_OFF && attributes?.is_sleeping === true) {
+          this.mode = hvac_mode_sleep;
+        }
+        if (DEBUG) console.log(`Mode is ${this.mode}`);
 
         // hvac action
         this.hvac_action = attributes?.hvac_action
         // Patch hvac_action if on_percent is > 0
-        if (attributes?.power_percent > 0) {
+        if (! attributes?.is_sleeping && attributes?.power_percent > 0) {
           this.hvac_action = this.mode == hvac_mode_HEAT ? hvac_action_heating : hvac_action_cooling
         }
 
@@ -1109,8 +1124,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         // Build autoStartStop infos
         this._hasAutoStartStop = (attributes?.hvac_off_reason === hvacOffReasonAutoStartStop);
         // this._hasAutoStartStopEnable = autoStartStopLevels.includes(attributes?.auto_start_stop_level);
+        this._isAutoStartStopConfigured = (attributes?.is_auto_start_stop_configured === true);
         this._isAutoStartStopEnabled = (attributes?.auto_start_stop_enable === true);
-        if (DEBUG) console.log(`_isAutoStartStopEnabled=${this._isAutoStartStopEnabled} auto_start_stop_enable=${attributes?.auto_start_stop_enable}`);
+        if (DEBUG) console.log(`_isAutoStartStopConfigured=${this._isAutoStartStopConfigured} _isAutoStartStopEnabled=${this._isAutoStartStopEnabled} auto_start_stop_enable=${attributes?.auto_start_stop_enable}`);
 
         this._updateDisplay();
       }
@@ -1127,10 +1143,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _handleAction(e: MouseEvent): void {
-    this.hass!.callService("climate", "set_hvac_mode", {
-      entity_id: this._config!.entity,
-      hvac_mode: (e.currentTarget as any).mode,
-    });
+    if ((e.currentTarget as any).mode === hvac_mode_sleep) {
+      this.hass!.callService("versatile_thermostat", "set_hvac_mode_sleep", {
+        entity_id: this._config!.entity,
+      });
+    }
+    else {
+      this.hass!.callService("climate", "set_hvac_mode", {
+        entity_id: this._config!.entity,
+        hvac_mode: (e.currentTarget as any).mode,
+      });
+    }
   }
 
   private last_target_temperature;
@@ -1231,6 +1254,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         return html ``;
     }
     const localizeMode = this.hass!.localize(`component.climate.state._.${mode}`) || localize({ hass: this.hass, string: `extra_states.${mode}` });
+    if (DEBUG) console.log(`mode=${mode} currentMode=${currentMode} localizeMode=${localizeMode}`);
     return html `
       <ha-icon-button
         title="${currentMode === mode ? mode : ''}"
@@ -1534,6 +1558,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             if(this._config?.disable_dry && mode === "dry") return html ``;
             if(this._config?.disable_fan_only && mode === "fan_only") return html ``;
             if(this._config?.disable_off && mode === "off") return html ``;
+            if(this._config?.disable_sleep && mode === "sleep") return html ``;
             return this._renderIcon(mode, this.mode);
           })}
         `}
@@ -1570,7 +1595,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       </div>
 
       <div id="left-infos">
-      ${ this._config!.autoStartStopEnableEntity ? svg`
+      ${ this._config!.autoStartStopEnableEntity && this._isAutoStartStopConfigured ? svg`
         ${ this._renderAutoStartStopEnable()}
         `:'' }
       ${svg`
