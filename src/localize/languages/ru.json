@@ -18,13 +18,14 @@
         "disable_auto": "Отключить авто",
         "disable_fan_only": "Отключить только вентилятор",
         "disable_dry": "Отключить осушение",
-        "disable_off": "Отключить выключение",
+        "disable_off": "Отключить режим выключения",
+        "disable_sleep": "Отключить спящий режим",
         "disable_menu": "Отключить меню",
         "set_current_as_main": "Поменять местами целевую и текущую температуру",
         "disable_safety_warning": "Отключить предупреждение о батарее",
         "disable_buttons": "Отключить кнопки плюс/минус",
         "disable_power_infos": "Отключить информацию о питании",
-        "disable_auto_fan_infos": "Отключить информацию авто-вентилятора",
+        "disable_auto_fan_infos": "Отключить информацию автовентилятора",
         "disable_name": "Отключить название",
         "disable_target_icon": "Отключить иконку цели"
       }
@@ -50,7 +51,7 @@
     "auto_regulation_strong": "Сильный",
     "auto_regulation_slow": "Медленный",
     "auto_regulation_expert": "Экспертный",
-    "auto_fan_mode": "Авто-вентилятор",
+    "auto_fan_mode": "Авторежим вентилятора",
     "auto_fan_mode_off": "Нет",
     "auto_fan_none": "Нет",
     "auto_fan_low": "Низкий",
@@ -71,6 +72,7 @@
     "auto_start_stop": "Остановлено авто-старт/стопом",
     "auto_start_stop_enable": "Включить/отключить авто-старт/стоп",
     "auto_start_stop_label": "Авто-старт/стоп",
-    "temp_unavailable": "-"
+    "temp_unavailable": "-",
+    "sleep": "Сон"
   }
 }
