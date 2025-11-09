@@ -568,9 +568,18 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         --hvac-mode-color:rgb(125, 194, 225);
       }
 
-      .off_off {
+      .off_off, .off_idle {
         --hvac-mode-color: var(--slider-track-color);
       }
+
+      .off_heating {
+        --hvac-mode-color: #c7b598ff;
+      }
+
+      .off_cooling {
+        --hvac-mode-color: #90acb8ff;
+      }
+
 
       .sleep_off {
         --hvac-mode-color: #2641a3ff;
@@ -926,6 +935,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.fanMode = attributes?.fan_mode || null;
         this.hvacOffReason = attributes?.hvac_off_reason || null;
         this.isOn = attributes?.specific_states?.is_on === true;
+        const requestedHvacMode = attributes?.requested_state?.hvac_mode || null;
 
         if (!this._config?.disable_name) {
           this.name = this._config!.name ? this._config!.name : attributes.friendly_name;
@@ -937,9 +947,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         if (DEBUG) console.log(`Mode is ${this.hvacMode}`);
 
         // hvac action
-        // Patch hvacAction if on_percent is > 0
+        // Patch hvacAction if power_percent is > 0. This avoid the circle color to change at each switch for over switch vtherm
         if (! this.isSleeping && this.powerPercent > 0) {
-          this.hvacAction = this.hvacMode == hvac_mode_HEAT ? hvacAction_heating : hvacAction_cooling
+          this.hvacAction = requestedHvacMode == hvac_mode_HEAT ? hvacAction_heating : hvacAction_cooling
         }
 
 
