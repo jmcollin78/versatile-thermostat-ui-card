@@ -19,6 +19,7 @@
         "disable_fan_only": "Disabilita Ventilazione",
         "disable_dry": "Disabilita Deumidifica",
         "disable_off": "Disabilita off",
+        "disable_sleep": "Disabilita modo riposo",
         "disable_menu": "Disabilita menu",
         "set_current_as_main": "Scambia Setpoint con Temperatura ambiente",
         "disable_safety_warning": "Disabilita avviso batteria",
@@ -72,5 +73,6 @@
     "auto_start_stop_enable": "Abilita/disabilita auto-start/stop",
     "auto_start_stop_label": "Auto-start/stop",
     "temp_unavailable": "-"
+    "sleep": "Riposo"
   }
 }
