@@ -72,6 +72,7 @@
     "auto_start_stop": "Fermato da auto-start/stop",
     "auto_start_stop_enable": "Abilita/disabilita auto-start/stop",
     "auto_start_stop_label": "Auto-start/stop",
-    "temp_unavailable": "-""sleep": "Riposo"
+    "temp_unavailable": "-",
+    "sleep": "Riposo"
   }
 }

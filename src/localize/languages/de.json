@@ -70,6 +70,7 @@
     "auto_start_stop": "Gestoppt durch Auto-Start/Stop",
     "auto_start_stop_enable": "Aktiviert/deaktiviert Auto-Start/Stop",
     "auto_start_stop_label": "Auto-Start/Stop",
-    "temp_unavailable": "-"
+    "temp_unavailable": "-",
+    "sleep": "Schlafmodus"
   }
 }
