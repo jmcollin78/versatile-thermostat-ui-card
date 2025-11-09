@@ -910,7 +910,14 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.presets = attributes.preset_modes ? Object.values(attributes.preset_modes) : [];
         this.isSleeping = (attributes?.specific_states?.is_sleeping === true);
         this.powerPercent = attributes?.vtherm_over_switch?.power_percent || attributes?.vtherm_over_climate?.valve_regulation?.power_percent || 0;
-        this.isDeviceActive = (attributes?.specific_states?.is_device_active === true);
+        if (attributes?.specific_states?.is_device_active === undefined) {
+           // for non Vtherm is_device_active will be true and then only hvac action will handle the hvac_action display
+          this.isDeviceActive = (this.hvacAction == hvacAction_heating || this.hvacAction == hvacAction_cooling);
+          if (DEBUG) console.log(`is_device_active not found value=${this.isDeviceActive}`);
+        } else {
+          this.isDeviceActive = (attributes?.specific_states?.is_device_active === true);
+          if (DEBUG) console.log(`is_device_active found value=${this.isDeviceActive}`);
+        }
         this.temperature = attributes?.temperature;
         this.step = attributes?.configuration?.target_temperature_step || 0.5;
         this.min = attributes?.min_temp || 7;
