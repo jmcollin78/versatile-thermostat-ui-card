@@ -12,7 +12,7 @@
 
 > ![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/tips.png?raw=true) This card is dedicated to the Versatile Thermostat integration which is available in HACS also and [here](https://github.com/jmcollin78/versatile_thermostat).
 > 
-> This card is based on the beautiful (Better Thermostat UI Card)[https://github.com/KartoffelToby/better-thermostat-ui-card]. It adds some feature so that you can use Versatile Thermostat directly from the card. A big thanks to @KartoffelToby for this Better Thermostat UI Card.
+> This card is based on the beautiful [Better Thermostat UI Card](https://github.com/KartoffelToby/better-thermostat-ui-card). It adds some feature so that you can use Versatile Thermostat directly from the card. A big thanks to @KartoffelToby for this Better Thermostat UI Card.
 
 When presence is detected:
 
