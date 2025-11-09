@@ -22,7 +22,7 @@
         "disable_sleep": "Disabilita modo riposo",
         "disable_menu": "Disabilita menu",
         "set_current_as_main": "Scambia Setpoint con Temperatura ambiente",
-        "disable_safety_warning": "Disabilita avviso batteria",
+        "disable_safety_warning": "Disabilita i messaggi di sicurezza",
         "disable_buttons": "Disabilita pulsanti Più/Meno",
         "disable_power_infos": "Disabilita Info Potenza",
         "disable_auto_fan_infos": "Disabilita Info auto-fan",
@@ -72,7 +72,6 @@
     "auto_start_stop": "Fermato da auto-start/stop",
     "auto_start_stop_enable": "Abilita/disabilita auto-start/stop",
     "auto_start_stop_label": "Auto-start/stop",
-    "temp_unavailable": "-"
-    "sleep": "Riposo"
+    "temp_unavailable": "-""sleep": "Riposo"
   }
 }
