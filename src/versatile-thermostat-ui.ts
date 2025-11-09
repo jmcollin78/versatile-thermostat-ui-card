@@ -78,7 +78,7 @@ import './ha/ha-control-circular-slider';
 import { SensorEntity } from './ha/data/sensor';
 
 const UNAVAILABLE = "unavailable";
-const DEBUG=false;
+const DEBUG=true;
 const modeIcons: {
   [mode in any]: string
 } = {
@@ -126,9 +126,9 @@ const preset_manual="none",
   hvac_mode_AUTO="auto",
   hvac_mode_sleep="sleep",
   auto_fan_none="auto_fan_none",
-  hvac_action_idle="idle",
-  hvac_action_cooling="cooling",
-  hvac_action_heating="heating";
+  hvacAction_idle="idle",
+  hvacAction_cooling="cooling",
+  hvacAction_heating="heating";
 
 const autoFanModeMapping={
   "auto_fan_none": "None",
@@ -186,33 +186,6 @@ function roundNumber(nb, precision) {
 
 @customElement('versatile-thermostat-ui-card')
 export class VersatileThermostatUi extends LitElement implements LovelaceCard {
-  constructor() {
-    super();
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-  }
-  public static async getConfigElement(): Promise<LovelaceCardEditor> {
-    await import("./versatile-thermostat-ui-card-editor");
-    return document.createElement("versatile-thermostat-ui-card-editor") as LovelaceCardEditor;
-  }
-
-  public static async getStubConfig(hass: HomeAssistant): Promise<any> {
-      const entities = Object.keys(hass.states);
-      const climates = entities.filter((e) => ["climate"].includes(e.split(".")[0]));
-      const vt_climate:any = climates.filter((e) => hass.states[e].attributes?.call_for_heat);
-      return {
-          type: "custom:versatile-thermostat-ui-card",
-          entity: vt_climate[0] || climates[0]
-      };
-  }
-
   @property({
       attribute: false
   }) public hass! : HomeAssistant;
@@ -221,19 +194,40 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @state() private _selectTargetTemperature: Target = "low";
   @property({ type: Number }) public current: number = 0;
   @property({ type: Number }) public humidity: number = 0;
+  @property({ type: Number }) public temperature: number = 0;
   @property({ type: Number }) public min = 7;
   @property({ type: Number }) public max = 35;
   @property({ type: Number }) public step = 0.5;
+  @property({ type: Number }) public powerPercent = 0;
+  @property({ type: Number }) public meanCyclePower = 0;
+  @property({ type: Number }) public valveOpenPercent = 0;
+  @property({ type: Number }) public devicePower = 0;
+  @property({ type: Number }) public regulatedTargetTemperature: number | null = null;
+  @property({ type: Boolean }) public isOn: boolean = false;
   @property({ type: Boolean }) public window: boolean = false;
   @property({ type: Boolean }) public windowByPass: boolean = false;
   @property({ type: Boolean }) public presence: boolean = false;
   @property({ type: Boolean }) public motion: boolean = false;
   @property({ type: Boolean }) public overpowering: boolean = false;
-  @property({ type: Boolean }) public is_device_active: boolean = false;
+  @property({ type: Boolean }) public isDeviceActive: boolean = false;
+  @property({ type: Boolean }) public isSleeping: boolean = false;
+  @property({ type: Boolean }) public isRegulated: boolean = false;
+  @property({ type: String }) public windowState: string = "off";
+  @property({ type: String }) public windowAutoState: string = "off";
+  @property({ type: String }) public overpoweringState: string = "off";
+  @property({ type: String }) public presenceState: string = "off";
+  @property({ type: String }) public motionState: string = "off";
+  @property({ type: String }) public isWindowByPass: string = "off";
+  @property({ type: String }) public safetyState: string = "off";
   @property({ type: String }) public status: string = "loading";
-  @property({ type: String }) public mode: string = hvac_mode_OFF;
-  @property({ type: String }) public hvac_action: string = hvac_action_idle;
+  @property({ type: String }) public hvacMode: string = hvac_mode_OFF;
+  @property({ type: String }) public hvacAction: string = hvacAction_idle;
   @property({ type: String }) public preset: string = preset_manual;
+  @property({ type: String }) public autoRegulationMode: string = "";
+  @property({ type: String }) public currentAutoFanMode: string = auto_fan_none;
+  @property({ type: String }) public autoFanMode: string = auto_fan_none;
+  @property({ type: String }) public fanMode: string = "";
+  @property({ type: String }) public hvacOffReason: string = "";
   @property({ type: Boolean, reflect: true }) public dragging = false;
   @property({ type: String}) public name: string = "";
 
@@ -341,7 +335,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private safety_state: any = {};
   private powerInfos: any = [];
   private _externalPowerInfos: any = [];
-  private auto_fan_infos: any = {};
+  private autoFanInfos: any = [];
   private error: any = [];
 
   @state() private _config?: ClimateCardConfig;
@@ -898,67 +892,82 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         const attributes = this.stateObj.attributes;
         const stateMode = this.stateObj.state;
 
+        // Map all needed attributes
         this.name = "";
+        this.hvacMode = stateMode || hvac_mode_OFF;
+        this.hvacAction = attributes?.hvac_action;
+        this.preset = attributes?.preset_mode;
+        this.modes = attributes?.hvac_modes ? Object.values(attributes.hvac_modes) : [];
+        this.presets = attributes.preset_modes ? Object.values(attributes.preset_modes) : [];
+        this.isSleeping = (attributes?.specific_states?.is_sleeping === true);
+        this.powerPercent = attributes?.vtherm_over_switch?.power_percent || attributes?.vtherm_over_climate?.valve_regulation?.power_percent || 0;
+        this.isDeviceActive = (attributes?.specific_states?.is_device_active === true);
+        this.temperature = attributes?.temperature;
+        this.step = attributes?.configuration?.target_temperature_step || 0.5;
+        this.min = attributes?.min_temp || 7;
+        this.max = attributes?.max_temp || 35;
+        this.current = attributes?.current_temperature || 0;
+        this.windowState = attributes?.window_manager?.window_state
+        this.windowAutoState = attributes?.window_manager?.window_auto_state
+        this.humidity = attributes?.humidity ? parseFloat(attributes.humidity) : 0;
+        this.overpoweringState = attributes?.power_manager?.overpowering_state || "off";
+        this.presenceState = attributes?.presence_manager?.presence_state || "off";
+        this.motionState = attributes?.motion_manager?.motion_state || "off";
+        this.isWindowByPass = attributes?.window_manager?.is_window_bypass || "off";
+        this.safetyState = attributes?.safety_manager?.safety_state || "off";
+        this.meanCyclePower = attributes?.power_manager?.mean_cycle_power || 0;
+        this.valveOpenPercent = attributes?.vtherm_over_valve?.valve_open_percent || 0;
+        this.devicePower = attributes?.power_manager?.device_power || 0;
+        this.isRegulated = (attributes?.vtherm_over_climate?.is_regulated === true);
+        this.regulatedTargetTemperature = attributes?.vtherm_over_climate?.regulation?.regulated_target_temperature || null;
+        this.autoRegulationMode = attributes?.vtherm_over_climate?.regulation?.auto_regulation_mode || null;
+        this.currentAutoFanMode = attributes?.vtherm_over_climate?.current_auto_fan_mode || null;
+        this.autoFanMode = attributes?.vtherm_over_climate?.auto_fan_mode || null;
+        this.fanMode = attributes?.fan_mode || null;
+        this.hvacOffReason = attributes?.hvac_off_reason || null;
+        this.isOn = attributes?.specific_states?.is_on === true;
+
         if (!this._config?.disable_name) {
           this.name = this._config!.name ? this._config!.name : attributes.friendly_name;
         }
   
-        this.mode = stateMode || hvac_mode_OFF;
-        if (this.mode == hvac_mode_OFF && attributes?.is_sleeping === true) {
-          this.mode = hvac_mode_sleep;
+        if (this.hvacMode == hvac_mode_OFF && attributes?.is_sleeping === true) {
+          this.hvacMode = hvac_mode_sleep;
         }
-        if (DEBUG) console.log(`Mode is ${this.mode}`);
+        if (DEBUG) console.log(`Mode is ${this.hvacMode}`);
 
         // hvac action
-        this.hvac_action = attributes?.hvac_action
-        // Patch hvac_action if on_percent is > 0
-        if (! attributes?.is_sleeping && attributes?.power_percent > 0) {
-          this.hvac_action = this.mode == hvac_mode_HEAT ? hvac_action_heating : hvac_action_cooling
+        // Patch hvacAction if on_percent is > 0
+        if (! this.isSleeping && this.powerPercent > 0) {
+          this.hvacAction = this.hvacMode == hvac_mode_HEAT ? hvacAction_heating : hvacAction_cooling
         }
 
-        this.is_device_active = (attributes?.is_device_active === true);
 
-        if (attributes.hvac_modes) {
-          this.modes = Object.values(attributes.hvac_modes);
+        // Sort modes to have "off" at the end
+        if (this.modes.length > 1 && this.modes.includes(hvac_mode_OFF)) {
           this.modes.sort((a, b) => {
             if (a === "off") return 1; // Place "off" après tout le reste
             if (b === "off") return -1; // Place tout le reste avant "off"
-            return 0; // Sinon, ne change pas l'ordre
+            // keep the alphabetical order for other modes
+            return a.localeCompare(b);
           });
         }
 
-        // Reads preset modes
-        if (attributes.preset_modes) {
-          this.presets = Object.values(attributes.preset_modes.filter((preset: string) => {
-            return preset != preset_manual &&
-                   (stateMode != hvac_mode_COOL || preset != preset_frost);
-          }));
+        // Remove some preset modes: remove manual and frost in cool mode
+        if (this.presets.length > 0) {
+          this.presets = this.presets.filter((preset: string) => {
+            return preset != preset_manual && (stateMode != hvac_mode_COOL || preset != preset_frost);
+          });
         }
 
-        this.preset = attributes.preset_mode;
-  
+        // The temperature values
         this.value = {
           value: attributes?.temperature || 0,
           low: attributes?.target_temp_low || null,
           high: attributes?.target_temp_high || null,
         };
         
-        if (attributes.target_temperature_step) {
-          this.step = attributes.target_temperature_step;
-        }
-        if (attributes.min_temp) {
-          this.min = attributes.min_temp;
-        }
-        if (attributes.max_temp) {
-          this.max = attributes.max_temp;
-        }
-        if (attributes.current_temperature) {
-          this.current = attributes.current_temperature;
-        }
-        if (attributes?.humidity !== undefined) {
-          this.humidity = parseFloat(attributes.humidity);
-        }
-        if (attributes?.window_state === 'on' || attributes?.window_auto_state === 'on') {
+        if (this.windowState === 'on' || this.windowAutoState === 'on') {
           this._hasWindow = true;
           this.window = true;
         }
@@ -966,36 +975,37 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           this._hasWindow = false;
           this.window = false;
         }
-        if (attributes?.overpowering_state  === 'on') {
+        
+        if (this.overpoweringState === 'on') {
           this._hasOverpowering = true;
-          this.overpowering = attributes.overpowering_state;
+          this.overpowering = true;
         }
         else {
           this._hasOverpowering = false;
           this.overpowering = false;
         }
 
-        if (attributes?.presence_state === 'on') {
+        if (this.presenceState === 'on') {
           this._hasPresence = true;
-          this.presence = attributes.presence_state;
+          this.presence = true;
         }
         else {
           this._hasPresence = false;
           this.presence = false;
         }
 
-        if (attributes?.motion_state === 'on') {
+        if (this.motionState === 'on') {
           this._hasMotion = true;
-          this.motion = attributes.motion_state;
+          this.motion = true;
         }
         else {
           this._hasMotion = false;
           this.motion = false;
         }
 
-        if (attributes?.is_window_bypass) {
+        if (this.isWindowByPass === 'on') {
           this._hasWindowByPass = true;
-          this.windowByPass = attributes.is_window_bypass;
+          this.windowByPass = true;
         }
         else {
           this._hasWindowByPass = false;
@@ -1003,25 +1013,25 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         }
 
         // Build Security state
-        if (attributes?.safety_state === 'on' && !this?._config?.disable_safety_warning) {
+        if (this.safetyState === 'on' && !this?._config?.disable_safety_warning) {
           this.safety_state = [];
-          if (attributes.last_temperature_datetime) {
-            let dif = dateDifferenceInMinutes(new Date(attributes.last_temperature_datetime));
+          if (attributes.specific_states?.last_temperature_datetime) {
+            let dif = dateDifferenceInMinutes(new Date(attributes.specific_states?.last_temperature_datetime));
             if (dif > 0) {
               this.safety_state.push(
               {
-                name: 'Room temp.',
-                security_msg:  dif+" min"
+                name: localize({ hass: this.hass, string: `extra_states.room_temp` }),
+                security_msg:  dif+" "+localize({ hass: this.hass, string: `extra_states.minutes` })
               });
             }
           }
-          if (attributes.last_ext_temperature_datetime) {
-            let dif = dateDifferenceInMinutes(new Date(attributes.last_ext_temperature_datetime));
+          if (attributes.specific_states?.last_ext_temperature_datetime) {
+            let dif = dateDifferenceInMinutes(new Date(attributes.specific_states?.last_ext_temperature_datetime));
             if (dif > 0) {
               this.safety_state.push(
               {
-                name: 'External temp.',
-                security_msg:  dif+" min"
+                name: localize({ hass: this.hass, string: `extra_states.outdoor_temp` }),
+                security_msg:  dif+" "+localize({ hass: this.hass, string: `extra_states.minutes` })
               });
             }
           }
@@ -1043,19 +1053,21 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
         // Build Power Infos
         this!.powerInfos = [];
-        if (!this!._config?.disable_power_infos && attributes?.is_on) {
+        if (DEBUG) console.log(`MeanCyclePower=${this.meanCyclePower} PowerPercent=${this.powerPercent} ValveOpenPercent=${this.valveOpenPercent} DevicePower=${this.devicePower}`);
+
+        if (!this!._config?.disable_power_infos && this.isOn) {
           if (attributes?.is_over_switch) {
-            if (attributes?.mean_cycle_power && !this._config?.powerEntity) {
+            if (this.meanCyclePower && !this._config?.powerEntity) {
               this!.powerInfos!.push({
                 name: "mean_power_cycle",
-                value: roundNumber(attributes?.mean_cycle_power, 1),
-                unit: attributes?.mean_cycle_power < minPowerWatt ? "kW" : "W",
+                value: roundNumber(this.meanCyclePower, 1),
+                unit: this.meanCyclePower < minPowerWatt ? "kW" : "W",
                 class: "vt-power-color"
               });
             }
             this.powerInfos.push({
               name: "power_percent",
-              value: attributes?.power_percent,
+              value: this.powerPercent,
               unit: "%",
               class: "vt-power-color"
             });
@@ -1064,56 +1076,56 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           if (attributes?.is_over_valve) {
             this.powerInfos.push({
               name: "valve_open_percent",
-              value: attributes?.valve_open_percent,
+              value: this.valveOpenPercent,
               unit: "%",
               class: "vt-power-color"
             });
           }
 
           if (attributes?.is_over_climate) {
-            if (attributes?.device_power && !this._config?.powerEntity) {
+            if (this.devicePower && !this._config?.powerEntity) {
               this.powerInfos.push({
                 name: "mean_power_cycle",
-                value: attributes?.device_power,
-                unit:  attributes?.device_power < minPowerWatt ? "kW" : "W",
+                value: this.devicePower,
+                unit:  this.devicePower < minPowerWatt ? "kW" : "W",
                 class: "vt-power-color"
               });
             }
-            if (attributes?.is_regulated) {
+            if (this.isRegulated) {
               this.powerInfos.push({
                 name: "regulated_target_temperature",
-                value: attributes?.regulated_target_temperature,
-                unit: attributes?.temperature_unit,
+                value: this.regulatedTargetTemperature,
+                unit: attributes?.configuration?.temperature_unit,
                 class: "vt-temp-color"
               });
               this.powerInfos.push({
                 name: "auto_regulation_mode",
-                value: localize({ hass: this.hass, string: `extra_states.${attributes?.auto_regulation_mode}` }),
+                value: localize({ hass: this.hass, string: `extra_states.${this.autoRegulationMode}` }),
                 unit: "",
                 class: "vt-label-color"
               });
             }
           }
         }
-        else if (DEBUG) console.log(`No power to disply is_on=${attributes?.is_on} or disabled`);
+        else if (DEBUG) console.log(`No power to disply is_on=${this.isOn} or disabled`);
 
         // Build auto-fan infos
-        this.auto_fan_infos = [];
-        if (!this?._config?.disable_auto_fan_infos && attributes?.is_over_climate) {
-          const name=attributes?.current_auto_fan_mode != auto_fan_none ? "auto_fan_mode" : "auto_fan_mode_off";
+        this.autoFanInfos = [];
+        if (!this?._config?.disable_autoFanInfos && attributes?.is_over_climate) {
+          const name=this.currentAutoFanMode != auto_fan_none ? "auto_fan_mode" : "auto_fan_mode_off";
           if (DEBUG) console.log(`VersatileThermostat UI : auto_fan icon name ${name}`);
           
-          this.auto_fan_infos.push({
+          this.autoFanInfos.push({
             name: name,
-            value: localize({ hass: this.hass, string: `extra_states.${attributes?.current_auto_fan_mode}` }),
+            value: localize({ hass: this.hass, string: `extra_states.${this.currentAutoFanMode}` }),
             unit: "",
             class: "vt-label-color"
           });
 
-          if (attributes?.fan_mode) {
-            this.auto_fan_infos.push({
+          if (this.fanMode) {
+            this.autoFanInfos.push({
               name: "fan_mode",
-              value: localize({ hass: this.hass, string: `extra_states.fan_${attributes?.fan_mode}` }), 
+              value: localize({ hass: this.hass, string: `extra_states.fan_${this.fanMode}` }), 
               unit: "",
               class: "vt-label-color"
             })
@@ -1122,11 +1134,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         }
 
         // Build autoStartStop infos
-        this._hasAutoStartStop = (attributes?.hvac_off_reason === hvacOffReasonAutoStartStop);
+        this._hasAutoStartStop = ( this.hvacOffReason=== hvacOffReasonAutoStartStop);
         // this._hasAutoStartStopEnable = autoStartStopLevels.includes(attributes?.auto_start_stop_level);
         this._isAutoStartStopConfigured = (attributes?.is_auto_start_stop_configured === true);
-        this._isAutoStartStopEnabled = (attributes?.auto_start_stop_enable === true);
-        if (DEBUG) console.log(`_isAutoStartStopConfigured=${this._isAutoStartStopConfigured} _isAutoStartStopEnabled=${this._isAutoStartStopEnabled} auto_start_stop_enable=${attributes?.auto_start_stop_enable}`);
+        this._isAutoStartStopEnabled = (attributes?.auto_start_stop_manager?.auto_start_stop_enable === true);
+        if (DEBUG) console.log(`_isAutoStartStopConfigured=${this._isAutoStartStopConfigured} _isAutoStartStopEnabled=${this._isAutoStartStopEnabled} auto_start_stop_enable=${attributes?.auto_start_stop_manager?.auto_start_stop_enable}`);
 
         this._updateDisplay();
       }
@@ -1159,7 +1171,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private last_target_temperature;
 
   private _handlePreset(e: MouseEvent): void {
-    this.last_target_temperature = this.stateObj.attributes.temperature
+    this.last_target_temperature = this.temperature
     this.hass!.callService("climate", "set_preset_mode", {
       entity_id: this._config!.entity,
       preset_mode: (e.currentTarget as any).preset,
@@ -1182,19 +1194,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
   }
 
-  private _handleClickInfo(e: MouseEvent): void {
-    // TODO removes this or complete thie
-    this.hass!.callService("versatile_thermostat", "set_device_power", {
-      entity_id: this._config!.entity,
-      preset_mode: (e.currentTarget as any).preset,
-    });
-  }
-
   private _handleClickAutoFanInfo(/*e: MouseEvent*/): void {
     // Activate or deactivate the auto-fan mode
     let newMode=auto_fan_none;
-    if (this.stateObj.attributes.current_auto_fan_mode == auto_fan_none) {
-      newMode = this.stateObj.attributes.auto_fan_mode;
+    if (this.currentAutoFanMode == auto_fan_none) {
+      newMode = this.autoFanMode;
     }
     const mappedNewMode=autoFanModeMapping[newMode];
 
@@ -1220,13 +1224,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     });
   }
 
-  private _setTemperature(): void {
-      this.hass!.callService("climate", "set_temperature", {
-          entity_id: this._config!.entity,
-          temperature: this.value,
-      });
-  }
-
   private _getCurrentSetpoint(): number {
     if(this?.value?.high !== null && this?.value?.low !== null) {
       if ((this?.value?.low || 0) >= this.current) return this?.value?.low || 0;
@@ -1237,14 +1234,14 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderHVACAction(): TemplateResult {
-    if (this.hvac_action === 'heating' ||
-        this.stateObj?.attributes.hvac_mode == "heat" ||
-        this.stateObj?.attributes.hvac_mode == "heat_cool") {
-      return svg`<path class="status ${this.is_device_active ? 'active':''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
+    if (this.hvacAction === 'heating' ||
+        this.hvacMode == "heat" ||
+        this.hvacMode == "heat_cool") {
+      return svg`<path class="status ${this.isDeviceActive ? 'active':''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
     }
-    else if (this.hvac_action === 'cooling' ||
-        this.stateObj.attributes.hvac_mode == "cool") {
-      return svg`<path class="status cooler ${this.is_device_active ? 'active':''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiAirConditioner}" />`;
+    else if (this.hvacAction === 'cooling' ||
+        this.hvacMode == "cool") {
+      return svg`<path class="status cooler ${this.isDeviceActive ? 'active':''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiAirConditioner}" />`;
     }
     else return svg`<path class="status" transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiClose}" />`;
   }
@@ -1427,7 +1424,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     
     return html `
     <ha-card class=${classMap({
-      [this.mode]: true,
+      [this.hvacMode]: true,
     })}
     >
     ${this._config?.disable_menu ? `` : html`
@@ -1465,7 +1462,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         </div>
       ` : ``}
 
-      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container':''}  ${this.mode}_${this.hvac_action} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''}">
+      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container':''}  ${this.hvacMode}_${this.hvacAction} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''}">
         ${
           this._config?.disable_circle ? html`
             <!-- No cicle configured -->
@@ -1474,7 +1471,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             this.value.high != null &&
             this.stateObj.state !== UNAVAILABLE) ? html`
             <vt-ha-control-circular-slider
-              class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.safety_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
+              class="${this.safety_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
               .inactive=${this.window}
               dual
               .low=${this.value.low}
@@ -1490,7 +1487,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             >
             ` : html`
             <vt-ha-control-circular-slider
-              class="${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.safety_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
+              class="${this.safety_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
               .inactive=${this.window}
               .mode="start"
               @value-changed=${this._highChanged}
@@ -1503,7 +1500,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             >
             `
         }
-          <div class="content ${this.name.length == 0 ? 'noname':''} ${this.safety_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${(this?.stateObj?.attributes?.saved_temperature && this?.stateObj?.attributes?.saved_temperature !== null) ? 'eco' : ''} ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} " >
+          <div class="content ${this.name.length == 0 ? 'noname':''} ${this.safety_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} " >
             <svg id="main" viewbox="0 0 125 100">
               <g transform="translate(57.5,37) scale(0.35)">
                 ${(this._hasWindowByPass) ? svg`
@@ -1559,7 +1556,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             if(this._config?.disable_fan_only && mode === "fan_only") return html ``;
             if(this._config?.disable_off && mode === "off") return html ``;
             if(this._config?.disable_sleep && mode === "sleep") return html ``;
-            return this._renderIcon(mode, this.mode);
+            return this._renderIcon(mode, this.hvacMode);
           })}
         `}
       </div>
@@ -1609,7 +1606,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         })}
       `}
       ${svg`
-        ${this.auto_fan_infos.map((infos) => {
+        ${this.autoFanInfos.map((infos) => {
           return this._renderAutoFanInfo(infos);
         })}
       `}
@@ -1617,4 +1614,31 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     </ha-card>
   `;
   };
+
+  constructor() {
+    super();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+  }
+  public static async getConfigElement(): Promise<LovelaceCardEditor> {
+    await import("./versatile-thermostat-ui-card-editor");
+    return document.createElement("versatile-thermostat-ui-card-editor") as LovelaceCardEditor;
+  }
+
+  public static async getStubConfig(hass: HomeAssistant): Promise<any> {
+      const entities = Object.keys(hass.states);
+      const climates = entities.filter((e) => ["climate"].includes(e.split(".")[0]));
+      const vt_climate:any = climates.filter((e) => hass.states[e].attributes?.specific_states);
+      return {
+          type: "custom:versatile-thermostat-ui-card",
+          entity: vt_climate[0] || climates[0]
+      };
+  }
 }
