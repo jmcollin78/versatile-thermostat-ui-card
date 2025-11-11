@@ -3,10 +3,19 @@
     "version": "version",
     "current": "Actual"
   },
+  "editor": {
+    "card": {
+      "climate": {
+        "allow_lock_toggle": "Allow lock/unlock from card"
+      }
+    }
+  },
   "extra_states": {
     "window_open": "Ventana abierta",
     "night_mode": "Modo noche",
     "eco": "Eco",
-    "overpowering": "Verano"
+    "overpowering": "Verano",
+    "lock_users_active": "Controles de usuario bloqueados",
+    "lock_automations_active": "Cambios de automatización bloqueados"
   }
 }

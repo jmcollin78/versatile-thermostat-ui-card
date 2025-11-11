@@ -3,10 +3,19 @@
         "version": "версія",
         "current": "поточний"
     },
+    "editor": {
+        "card": {
+            "climate": {
+                "allow_lock_toggle": "Allow lock/unlock from card"
+            }
+        }
+    },
     "extra_states": {
         "window_open": "Вікно відчинено",
         "night_mode": "Нічний режим",
         "eco": "Економія",
-        "overpowering": "Літо"
+        "overpowering": "Літо",
+        "lock_users_active": "Керування користувача заблоковано",
+        "lock_automations_active": "Зміни автоматизації заблоковані"
     }
 }

@@ -3,10 +3,19 @@
     "version": "versiyon",
     "current": "şimdiki"
   },
+  "editor": {
+    "card": {
+      "climate": {
+        "allow_lock_toggle": "Allow lock/unlock from card"
+      }
+    }
+  },
   "extra_states": {
     "window_open": "Pencere açık",
     "night_mode": "Gece modu",
     "eco": "Eco",
-    "overpowering": "Yaz"
+    "overpowering": "Yaz",
+    "lock_users_active": "Kullanıcı kontrolleri kilitlendi",
+    "lock_automations_active": "Otomasyon değişiklikleri kilitlendi"
   }
 }

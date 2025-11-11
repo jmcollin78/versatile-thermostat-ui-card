@@ -3,10 +3,19 @@
     "version": "versjon",
     "current": "nåværende"
   },
+  "editor": {
+    "card": {
+      "climate": {
+        "allow_lock_toggle": "Allow lock/unlock from card"
+      }
+    }
+  },
   "extra_states": {
     "window_open": "Vindu åpent",
     "night_mode": "Nattmodus",
     "eco": "Eco",
-    "overpowering": "Sommer"
+    "overpowering": "Sommer",
+    "lock_users_active": "Brukerkontroller låst",
+    "lock_automations_active": "Automatiseringsendringer låst"
   }
 }

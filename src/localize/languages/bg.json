@@ -3,10 +3,19 @@
     "version": "версия",
     "currrent": "текущий"
   },
+  "editor": {
+    "card": {
+      "climate": {
+        "allow_lock_toggle": "Allow lock/unlock from card"
+      }
+    }
+  },
   "extra_states": {
     "window_open": "Отворен прозорец",
     "night_mode": "Нощен режим",
     "eco": "Екологичен режим",
-    "overpowering": "Лято"
+    "overpowering": "Лято",
+    "lock_users_active": "Потребителските контроли са заключени",
+    "lock_automations_active": "Промените от автоматизации са заключени"
   }
 }

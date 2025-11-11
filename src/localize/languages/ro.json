@@ -3,10 +3,19 @@
     "version": "versiune",
     "current": "curent"
   },
+  "editor": {
+    "card": {
+      "climate": {
+        "allow_lock_toggle": "Permite blocarea/deblocarea din card"
+      }
+    }
+  },
   "extra_states": {
     "window_open": "Fereastră deschisă",
     "night_mode": "Mod noapte",
     "eco": "Eco",
-    "overpowering": "Vară"
+    "overpowering": "Vară",
+    "lock_users_active": "Comenzi utilizator blocate",
+    "lock_automations_active": "Modificări automatizări blocate"
   }
 }

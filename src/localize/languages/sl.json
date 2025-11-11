@@ -3,10 +3,19 @@
     "version": "različica",
     "current": "trenutno"
   },
+  "editor": {
+    "card": {
+      "climate": {
+        "allow_lock_toggle": "Dovoli zaklepanje/odklepanje iz kartice"
+      }
+    }
+  },
   "extra_states": {
     "window_open": "Okno odprto",
     "night_mode": "Nočni način",
     "eco": "Eko",
-    "overpowering": "Poletje"
+    "overpowering": "Poletje",
+    "lock_users_active": "Uporabniške kontrole zaklenjene",
+    "lock_automations_active": "Spremembe avtomatizacije zaklenjene"
   }
 }

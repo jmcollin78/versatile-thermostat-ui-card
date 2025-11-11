@@ -3,10 +3,19 @@
     "version": "version",
     "current": "Nykyinen"
   },
+  "editor": {
+    "card": {
+      "climate": {
+        "allow_lock_toggle": "Allow lock/unlock from card"
+      }
+    }
+  },
   "extra_states": {
     "window_open": "Ikkuna auki",
     "night_mode": "Yötila",
     "eco": "Eco",
-    "overpowering": "Kesä"
+    "overpowering": "Kesä",
+    "lock_users_active": "Käyttäjän säädöt lukittu",
+    "lock_automations_active": "Automaation muutokset lukittu"
   }
 }
