@@ -3,10 +3,19 @@
     "version": "versió",
     "current": "Actual"
   },
+  "editor": {
+    "card": {
+      "climate": {
+        "allow_lock_toggle": "Allow lock/unlock from card"
+      }
+    }
+  },
   "extra_states": {
     "window_open": "Finestra oberta",
     "night_mode": "Mode nocturn",
     "eco": "Eco",
-    "overpowering": "Estiu"
+    "overpowering": "Estiu",
+    "lock_users_active": "Controls d'usuari bloquejats",
+    "lock_automations_active": "Canvis d'automatització bloquejats"
   }
 }

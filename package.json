@@ -44,9 +44,9 @@
     "prettier": "^3.0.3",
     "rollup": "4.3.0",
     "rollup-plugin-import-css": "^3.3.5",
-    "rollup-plugin-minify-html-literals": "^1.2.6",
+    "rollup-plugin-minify-html-literals-v3": "^1.3.4",
     "rollup-plugin-serve": "^2.0.2",
-    "rollup-plugin-terser": "7.0.2",
+    "@wwa/rollup-plugin-terser": "1.1.2",
     "typescript": "^5.2.2"
   }
 }
