@@ -28,7 +28,7 @@ import {
   mdiLeaf,
   mdiThermometer,
   mdiHeatWave,
-  mdiWifiStrengthOffOutline,
+  // mdiWifiStrengthOffOutline,
   mdiMinus,
   mdiPlus,
   mdiAirConditioner,
@@ -53,7 +53,8 @@ import {
   mdiFanOff,
   mdiPowerSleep,
   mdiBullseyeArrow,
-  mdiSleep
+  mdiSleep,
+  mdiInformationBoxOutline,
 } from "@mdi/js";
 
 import {
@@ -336,7 +337,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private powerInfos: any = [];
   private _externalPowerInfos: any = [];
   private autoFanInfos: any = [];
-  private error: any = [];
+  private messages: any = [];
+  private displayMessages: boolean = false;
 
   @state() private _config?: ClimateCardConfig;
 
@@ -397,14 +399,14 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         cursor: pointer;
       }
 
-      .content.security_msg, vt-ha-control-circular-slider.security_msg {
+      .content.security_msg, vt-ha-control-circular-slider.security_msg, #modes.security_msg, #presets.security_msg, #vt-control-buttons.security_msg {
         opacity: 0.5;
         filter: blur(5px);
         pointer-events: none;
       }
       
 
-      .security, .error {
+      .security, .messages {
         position: absolute;
         display: flex;
         flex-flow: column;
@@ -425,7 +427,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         line-height: 40px;
         padding: 1em;
         --mdc-icon-size: 40px;
-
+        z-index: 2;
       }
 
       .unavailable {
@@ -446,7 +448,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         inset-inline-start: initial;
         border-radius: 100%;
         color: var(--secondary-text-color);
-        z-index: 1;
+        z-index: 3;
         direction: var(--direction);
     }
       .container {
@@ -633,7 +635,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       #left-infos {
-        z-index: 0;
+        z-index: 3;
         position: absolute;
         display: block;
         width: auto;
@@ -943,6 +945,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.hvacOffReason = attributes?.hvac_off_reason || null;
         this.isOn = attributes?.specific_states?.is_on === true;
         const requestedHvacMode = attributes?.requested_state?.hvac_mode || null;
+        const msgs = attributes?.specific_states?.messages || [];
 
         if (!this._config?.disable_name) {
           this.name = this._config!.name ? this._config!.name : attributes.friendly_name;
@@ -1032,6 +1035,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         // Build Security state
         if (this.safetyState === 'on' && !this?._config?.disable_safety_warning) {
           this.safety_state = [];
+          this.safety_state.push(
+            {
+              name: localize({ hass: this.hass, string: `extra_states.safety_warning` }),
+              security_msg:  localize({ hass: this.hass, string: `extra_states.safety_warning_msg` })
+            });
           if (attributes.specific_states?.last_temperature_datetime) {
             let dif = dateDifferenceInMinutes(new Date(attributes.specific_states?.last_temperature_datetime));
             if (dif > 0) {
@@ -1056,17 +1064,13 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           this.safety_state = null;
         }
 
-        // Build Errors
-        if (attributes?.errors !== undefined) {
-          const errors = JSON.parse(attributes.errors);
-          if (errors.length > 0) {
-            this.error = errors[0];
-          } else {
-            this.error = [];
-          }
-        } else {
-          this.error = [];
+        // Build Messages
+        if (DEBUG) console.log(`Brut messages=${msgs}`);
+        this.messages = [];
+        for (const msg of msgs) {
+          this.messages.push(localize({ hass: this.hass, string: `extra_states.${msg}` }));
         }
+        if (DEBUG) console.log(`Messages=${JSON.stringify(this.messages)}`);
 
         // Build Power Infos
         this!.powerInfos = [];
@@ -1185,6 +1189,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
   }
 
+  private _handleDisplayMessages(/* e: MouseEvent */): void {
+    this.displayMessages = !this.displayMessages;
+    this.requestUpdate();
+    this._vibrate(40);
+  }
+
   private last_target_temperature;
 
   private _handlePreset(e: MouseEvent): void {
@@ -1278,6 +1288,22 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         tabindex="0"
         .path=${modeIcons[mode]}
         .label=${localizeMode}
+      >
+      </ha-icon-button>
+    `;
+  }
+
+  private _renderMessagesButton(): TemplateResult {
+    const localizeMessages = localize({ hass: this.hass, string: `extra_states.messagesButton` });
+    if (DEBUG) console.log(`localizeMessages=${localizeMessages}`);
+    return html `
+      <ha-icon-button
+        title="${localizeMessages}"
+        class="messages-button"
+        @click=${this._handleDisplayMessages}
+        tabindex="0"
+        .path=${mdiInformationBoxOutline}
+        .label=${localizeMessages}
       >
       </ha-icon-button>
     `;
@@ -1460,7 +1486,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         <div class="name">${this.name}</div>
         ` : ``}
 
-      ${this.safety_state?.length > 0 ? html`
+      ${this.safety_state?.length > 0 && !this.displayMessages ? html`
         <div class="security">
           <ha-icon-button class="alert" .path=${mdiThermometerAlert}>
           </ha-icon-button>
@@ -1471,11 +1497,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
            `}
         </div>
       ` : ``}
-      ${this.error.length > 0 ? html`
-        <div class="error">
-          <ha-icon-button class="alert" .path=${mdiWifiStrengthOffOutline}>
+      ${this.messages.length > 0 && this.displayMessages ? html`
+        <div class="messages">
+          <ha-icon-button class="alert" .path=${mdiInformationBoxOutline}>
           </ha-icon-button>
-          <span>${this.error}</span>
+          ${this.messages.map((message) => html`<span>${message}</span>`)}
         </div>
       ` : ``}
 
@@ -1488,7 +1514,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             this.value.high != null &&
             this.stateObj.state !== UNAVAILABLE) ? html`
             <vt-ha-control-circular-slider
-              class="${this.safety_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
+              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
               .inactive=${this.window}
               dual
               .low=${this.value.low}
@@ -1504,7 +1530,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             >
             ` : html`
             <vt-ha-control-circular-slider
-              class="${this.safety_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
+              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
               .inactive=${this.window}
               .mode="start"
               @value-changed=${this._highChanged}
@@ -1517,7 +1543,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             >
             `
         }
-          <div class="content ${this.name.length == 0 ? 'noname':''} ${this.safety_state !== null || this.error.length > 0 ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} " >
+          <div class="content ${this.name.length == 0 ? 'noname':''} ${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} " >
             <svg id="main" viewbox="0 0 125 100">
               <g transform="translate(57.5,37) scale(0.35)">
                 ${(this._hasWindowByPass) ? svg`
@@ -1562,7 +1588,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           ${this._config?.disable_window ? html``: html`
           </vt-ha-control-circular-slider>`}
         </div>
-      <div id="modes">
+      <div id="modes" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
         ${svg`
           ${this.modes.map((mode) => {
             if(this._config?.disable_heat && mode === "heat") return html ``;
@@ -1578,7 +1604,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         `}
       </div>
       ${this?._config?.disable_buttons ? html`` : html`
-        <div id="vt-control-buttons">
+        <div id="vt-control-buttons" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
             <div class="button">
               <vt-ha-outlined-icon-button 
                 .target=${this.target}
@@ -1600,7 +1626,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         </div>
       `}
       
-      <div id="presets">
+      <div id="presets" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
         ${svg`
           ${this.presets.map((preset) => {
             return this._renderPreset(preset, this.preset);
@@ -1609,6 +1635,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       </div>
 
       <div id="left-infos">
+      ${ this.messages.length > 0 ? svg`
+        ${this._renderMessagesButton()}
+        `:''}
       ${ this._config!.autoStartStopEnableEntity && this._isAutoStartStopConfigured ? svg`
         ${ this._renderAutoStartStopEnable()}
         `:'' }

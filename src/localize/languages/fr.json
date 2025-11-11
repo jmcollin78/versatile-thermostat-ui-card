@@ -71,8 +71,26 @@
     "auto_start_stop_label": "Auto-start/stop",
     "temp_unavailable": "-",
     "sleep": "Endormi",
+    "New strings for recent edits. Please translate": "-------------------------------------",
     "minutes": "min",
     "room_temp": "Temp. pièce",
-    "outdoor_temp": "Temp. ext."
+    "outdoor_temp": "Temp. ext.",
+    "safety_warning": "Attention",
+    "safety_warning_msg": "défaut de temp.",
+    "hvac_off_manual": "Eteint manuellement",
+    "hvac_off_auto_start_stop": "Eteint par auto-start/stop",
+    "hvac_off_window_detection": "Eteint par détection d'ouverture",
+    "hvac_off_sleep_mode": "Eteint par le mode endormi",
+    "hvac_off_safety_detection": "Eteint par le mode sécurité",
+    "hvac_off_central_mode": "Eteint par le mode central",
+    "safety_detected": "Mode sécurité détectée",
+    "overpowering_detected": "Sur-puissance détectée",
+    "target_temp_window_eco": "Temp. cible : fenêtre éco",
+    "target_temp_window_frost": "Temp. cible : fenêtre hors-gel",
+    "target_temp_power": "Temp. cible : délestage",
+    "target_temp_central_mode": "Temp. cible : mode central",
+    "target_temp_activity_detected": "Temp. cible : activité détectée",
+    "target_temp_activity_not_detected": "Temp. cible : activité non détectée",
+    "target_temp_absence_detected": "Temp. cible : absence détectée"
   }
 }
