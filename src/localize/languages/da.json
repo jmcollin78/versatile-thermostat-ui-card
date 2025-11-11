@@ -3,6 +3,13 @@
     "version": "version",
     "current": "nuværende"
   },
+  "editor": {
+    "card": {
+      "climate": {
+        "allow_lock_toggle": "Allow lock/unlock from card"
+      }
+    }
+  },
   "extra_states": {
     "window_open": "Vindue åben",
     "night_mode": "Nattilstand",
