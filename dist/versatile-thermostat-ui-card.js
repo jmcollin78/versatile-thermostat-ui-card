@@ -766,7 +766,7 @@ const Xn=270;const Kn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
           height: 100%;
       }
       vt-ha-control-circular-slider {
-        --primary-color: var(--mode-color);
+        --primary-color: var(--hvac-mode-color);
       }
 
       .content {
@@ -819,13 +819,10 @@ const Xn=270;const Kn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
       text {
         fill: var(--primary-text-color);
       }
-      .eco {
-        --mode-color: var(--energy-non-fossil-color);
-      }
-
+      
       .auto,
       .heat_cool {
-        --mode-color: var(--state-climate-auto-color);
+        --hvac-mode-color: var(--state-climate-auto-color);
       }
       .cool {
         --mode-color: var(--label-badge-blue);
@@ -867,7 +864,7 @@ const Xn=270;const Kn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
         --hvac-mode-color: var(--label-badge-red);
       }
 
-      .heat_idle {
+      .heat_idle, .heat_off {
         --hvac-mode-color: var(--label-badge-yellow);
       }
 
@@ -892,7 +889,7 @@ const Xn=270;const Kn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
       }
 
 
-      .sleep_off {
+      .sleep_off, .sleep_idle {
         --hvac-mode-color: #2641a3ff;
       }
 

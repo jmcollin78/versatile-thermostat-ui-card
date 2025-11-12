@@ -459,7 +459,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           height: 100%;
       }
       vt-ha-control-circular-slider {
-        --primary-color: var(--mode-color);
+        --primary-color: var(--hvac-mode-color);
       }
 
       .content {
@@ -512,13 +512,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       text {
         fill: var(--primary-text-color);
       }
-      .eco {
-        --mode-color: var(--energy-non-fossil-color);
-      }
-
+      
       .auto,
       .heat_cool {
-        --mode-color: var(--state-climate-auto-color);
+        --hvac-mode-color: var(--state-climate-auto-color);
       }
       .cool {
         --mode-color: var(--label-badge-blue);
@@ -560,7 +557,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         --hvac-mode-color: var(--label-badge-red);
       }
 
-      .heat_idle {
+      .heat_idle, .heat_off {
         --hvac-mode-color: var(--label-badge-yellow);
       }
 
@@ -585,7 +582,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
 
-      .sleep_off {
+      .sleep_off, .sleep_idle {
         --hvac-mode-color: #2641a3ff;
       }
 
