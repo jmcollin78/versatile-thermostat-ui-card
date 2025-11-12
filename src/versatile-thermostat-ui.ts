@@ -55,6 +55,7 @@ import {
   mdiBullseyeArrow,
   mdiSleep,
   mdiInformationBoxOutline,
+  mdiUpdate
 } from "@mdi/js";
 
 import {
@@ -213,6 +214,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: Boolean }) public isDeviceActive: boolean = false;
   @property({ type: Boolean }) public isSleeping: boolean = false;
   @property({ type: Boolean }) public isRegulated: boolean = false;
+  @property({ type: Boolean }) public isRecalculateScheduled: boolean = false;
   @property({ type: String }) public windowState: string = "off";
   @property({ type: String }) public windowAutoState: string = "off";
   @property({ type: String }) public overpoweringState: string = "off";
@@ -934,7 +936,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.isWindowByPass = attributes?.window_manager?.is_window_bypass || "off";
         this.safetyState = attributes?.safety_manager?.safety_state || "off";
         this.meanCyclePower = attributes?.power_manager?.mean_cycle_power || 0;
-        this.valveOpenPercent = attributes?.vtherm_over_valve?.valve_open_percent || 0;
+        this.valveOpenPercent = attributes?.vtherm_over_valve?.valve_open_percent || attributes?.vtherm_over_climate_valve?.valve_regulation?.valve_open_percent || 0;
         this.devicePower = attributes?.power_manager?.device_power || 0;
         this.isRegulated = (attributes?.vtherm_over_climate?.is_regulated === true);
         this.regulatedTargetTemperature = attributes?.vtherm_over_climate?.regulation?.regulated_target_temperature || null;
@@ -943,15 +945,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.autoFanMode = attributes?.vtherm_over_climate?.auto_fan_mode || null;
         this.fanMode = attributes?.fan_mode || null;
         this.hvacOffReason = attributes?.specific_states?.hvac_off_reason || null;
+        this.isRecalculateScheduled = attributes?.specific_states?.is_recalculate_scheduled || null;
         this.isOn = attributes?.specific_states?.is_on === true;
         const requestedHvacMode = attributes?.requested_state?.hvac_mode || null;
         const msgs = attributes?.specific_states?.messages || [];
+        const hasValveRegulation = (attributes?.vtherm_over_climate_valve?.have_valve_regulation == true);
 
         if (!this._config?.disable_name) {
           this.name = this._config!.name ? this._config!.name : attributes.friendly_name;
         }
   
-        if (this.hvacMode == hvac_mode_OFF && attributes?.is_sleeping === true) {
+        if (this.hvacMode == hvac_mode_OFF && this.isSleeping === true) {
           this.hvacMode = hvac_mode_sleep;
         }
         if (DEBUG) console.log(`Mode is ${this.hvacMode}`);
@@ -964,6 +968,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
 
         // Sort modes to have "off" at the end
+        if (DEBUG) console.log(`Modes are ${this.modes}`);
         if (this.modes.length > 1 && this.modes.includes(hvac_mode_OFF)) {
           this.modes.sort((a, b) => {
             if (a === "off") return 1; // Place "off" après tout le reste
@@ -972,6 +977,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             return a.localeCompare(b);
           });
         }
+        if (DEBUG) console.log(`After sort modes are ${this.modes}`);
 
         // Remove some preset modes: remove manual and frost in cool mode
         if (this.presets.length > 0) {
@@ -1076,7 +1082,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this!.powerInfos = [];
         if (DEBUG) console.log(`MeanCyclePower=${this.meanCyclePower} PowerPercent=${this.powerPercent} ValveOpenPercent=${this.valveOpenPercent} DevicePower=${this.devicePower}`);
 
-        if (!this!._config?.disable_power_infos && this.isOn) {
+        if (!this!._config?.disable_power_infos && (this.isOn || hasValveRegulation)) {
           if (attributes?.is_over_switch) {
             if (this.meanCyclePower && !this._config?.powerEntity) {
               this!.powerInfos!.push({
@@ -1094,7 +1100,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             });
           }
 
-          if (attributes?.is_over_valve) {
+          if (attributes?.is_over_valve || hasValveRegulation) {
             this.powerInfos.push({
               name: "valve_open_percent",
               value: this.valveOpenPercent,
@@ -1103,7 +1109,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             });
           }
 
-          if (attributes?.is_over_climate) {
+          if (attributes?.is_over_climate && !hasValveRegulation) {
             if (this.devicePower && !this._config?.powerEntity) {
               this.powerInfos.push({
                 name: "mean_power_cycle",
@@ -1132,7 +1138,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
         // Build auto-fan infos
         this.autoFanInfos = [];
-        if (!this?._config?.disable_autoFanInfos && attributes?.is_over_climate) {
+        if (!this?._config?.disable_autoFanInfos && attributes?.is_over_climate && !hasValveRegulation) {
           const name=this.currentAutoFanMode != auto_fan_none ? "auto_fan_mode" : "auto_fan_mode_off";
           if (DEBUG) console.log(`VersatileThermostat UI : auto_fan icon name ${name}`);
           
@@ -1308,6 +1314,23 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       </ha-icon-button>
     `;
   }
+
+  private _renderRecalculateScheduledButton(): TemplateResult {
+    const localizeMessages = localize({ hass: this.hass, string: `extra_states.recalculation_scheduled` });
+    if (DEBUG) console.log(`localizeMessages=${localizeMessages}`);
+    return html `
+      <ha-icon-button
+        title="${localizeMessages}"
+        class="messages-button"
+        tabindex="0"
+        .path=${mdiUpdate}
+        .label=${localizeMessages}
+      >
+      </ha-icon-button>
+    `;
+  }
+
+
 
   private _renderPreset(preset: string, currentPreset: string): TemplateResult {
     const localizePreset =
@@ -1635,6 +1658,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       </div>
 
       <div id="left-infos">
+      ${ this.isRecalculateScheduled ? svg`
+        ${this._renderRecalculateScheduledButton()}
+        `:''}
       ${ this.messages.length > 0 ? svg`
         ${this._renderMessagesButton()}
         `:''}
