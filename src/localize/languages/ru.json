@@ -73,6 +73,9 @@
     "auto_start_stop_enable": "Включить/отключить авто-старт/стоп",
     "auto_start_stop_label": "Авто-старт/стоп",
     "temp_unavailable": "-",
-    "sleep": "Сон"
+    "sleep": "Сон",
+    "minutes": "мин",
+    "room_temp": "Температура в помещении",
+    "outdoor_temp": "Уличная температура"
   }
 }
