@@ -1254,6 +1254,21 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     });
   }
 
+  private _handleToggleWindowByPass(/*e: MouseEvent*/): void {
+    // Activate or deactivate the window bypass
+    if (DEBUG) console.log(`_handleToggleWindowByPass called. Current windowByPass is ${this.windowByPass}`);
+    let newMode= ! this.windowByPass;
+
+    console.info(
+      `VersatileThermostatUI-CARD changing windowByPass to ${newMode}`
+    );
+    
+    this.hass!.callService("versatile_thermostat", "set_window_bypass", {
+      entity_id: this._config!.entity,
+      window_bypass: newMode,
+    });
+  }
+
   private _getCurrentSetpoint(): number {
     if(this?.value?.high !== null && this?.value?.low !== null) {
       if ((this?.value?.low || 0) >= this.current) return this?.value?.low || 0;
@@ -1297,7 +1312,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderMessagesButton(): TemplateResult {
-    const localizeMessages = localize({ hass: this.hass, string: `extra_states.messagesButton` });
+    const localizeMessages = localize({ hass: this.hass, string: `extra_states.messages-button` });
     if (DEBUG) console.log(`localizeMessages=${localizeMessages}`);
     return html `
       <ha-icon-button
@@ -1327,7 +1342,21 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     `;
   }
 
-
+  private _renderWindowByPassButton(): TemplateResult {
+    const localizeMessages = localize({ hass: this.hass, string: `extra_states.window-bypass-button` });
+    if (DEBUG) console.log(`localizeMessages=${localizeMessages}`);
+    return html `
+      <ha-icon-button
+        title="${localizeMessages}"
+        class="window-bypass-button"
+        @click=${this._handleToggleWindowByPass}
+        tabindex="0"
+        .path=${mdiWindowShutterAuto}
+        .label=${localizeMessages}
+      >
+      </ha-icon-button>
+    `;
+  }
 
   private _renderPreset(preset: string, currentPreset: string): TemplateResult {
     const localizePreset =
@@ -1567,10 +1596,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             <svg id="main" viewbox="0 0 125 100">
               <g transform="translate(57.5,37) scale(0.35)">
                 ${(this._hasWindowByPass) ? svg`
-                  <path class="windowByPass ${this.windowByPass ? 'active': ''}" fill="none" transform="${(this._hasWindowByPass) ? 'translate(-50.25,0)' :''}" id="window-by-pass" d=${mdiWindowShutterAuto} />
+                  <path class="windowByPass ${this.windowByPass ? 'active': ''}" fill="none" transform="${(this._hasWindowByPass) ? 'translate(-50.25,0)' :''}" id="window-by-pass" d=${mdiWindowShutterAuto}/>
                 `: ``}
                 ${(!this._hasWindowByPass && this._hasWindow && !this._config?.disable_window) ? svg`
-                  <path class="window ${this.window ? 'active': ''}" fill="none" transform="${(this._hasWindow && !this._config?.disable_window) ? 'translate(-50.25,0)' :''}" id="window" d=${mdiWindowOpenVariant} />
+                  <path class="window ${this.window ? 'active': ''}" fill="none" transform="${(this._hasWindow && !this._config?.disable_window) ? 'translate(-50.25,0)' :''}" id="window" d=${mdiWindowOpenVariant}/>
                 `: ``}
                 ${(this._hasOverpowering && !this._config?.disable_overpowering) ? svg`
                   <path class="overpowering ${this.overpowering ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
@@ -1660,6 +1689,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         `:''}
       ${ this.messages.length > 0 ? svg`
         ${this._renderMessagesButton()}
+        `:''}
+      ${ this.windowState || this.windowByPass ? svg`
+        ${this._renderWindowByPassButton()}
         `:''}
       ${ this._config!.autoStartStopEnableEntity && this._isAutoStartStopConfigured ? svg`
         ${ this._renderAutoStartStopEnable()}

@@ -92,7 +92,8 @@
     "target_temp_activity_detected": "Temp. cible : activité détectée",
     "target_temp_activity_not_detected": "Temp. cible : activité non détectée",
     "target_temp_absence_detected": "Temp. cible : absence détectée",
-    "messagesButton": "Pourquoi cet état ?",
-    "recalculation_scheduled": "Sous-jacent en cours de mise à jour"
+    "messages-button": "Pourquoi cet état ?",
+    "recalculation_scheduled": "Sous-jacent en cours de mise à jour",
+    "window-bypass-button": "Basculer le bypass fenêtre"
   }
 }
