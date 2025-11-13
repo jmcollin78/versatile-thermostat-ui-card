@@ -8,17 +8,39 @@
 
 > This card need a "real" front UI developer. If you have time and skill, please contact me. Many issues are related to the front UI.
 
-# UI Card for versatile Thermostat
+- [UI Card for Versatile Thermostat](#ui-card-for-versatile-thermostat)
+  - [Goals](#goals)
+- [Installation](#installation)
+  - [Options](#options)
+- [Actions](#actions)
+  - [Change the preset temperature](#change-the-preset-temperature)
+  - [Disable the auto-fan mode](#disable-the-auto-fan-mode)
+  - [By-pass the window detection](#by-pass-the-window-detection)
+- [Informations on current state](#informations-on-current-state)
+  - [Display some messages](#display-some-messages)
+  - [Update of underlying scheduled](#update-of-underlying-scheduled)
+  - [Safety state](#safety-state)
+  - [Icons used](#icons-used)
+  - [Help wanted!](#help-wanted)
+  - [Translations](#translations)
+  - [Support me](#support-me)
 
-> ![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/tips.png?raw=true) This card is dedicated to the Versatile Thermostat integration which is available in HACS also and [here](https://github.com/jmcollin78/versatile_thermostat). The VTherm should be in V8.x or above to work well with this version.
+
+# UI Card for Versatile Thermostat 
+
+> ![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/tips.png?raw=true) This card is dedicated to the Versatile Thermostat integration which is available in HACS also and [here](https://github.com/jmcollin78/versatile_thermostat).
 > 
 > This card is based on the beautiful [Better Thermostat UI Card](https://github.com/KartoffelToby/better-thermostat-ui-card). It adds some feature so that you can use Versatile Thermostat directly from the card. A big thanks to @KartoffelToby for this Better Thermostat UI Card.
+
+Notes:
+1. The VTherm should be in V8.x or above to work well with this version.
+2. Only VTherm climate entities will have a correct display with this card. Other climate should work rougthly
 
 When presence is detected:
 
 ![Versatile Thermostat UI Card with presence](/assets/1.png)
 
-When security is detected:
+When safety is detected:
 
 ![Versatile Thermostat UI Card with security](/assets/2.png)
 
@@ -44,7 +66,7 @@ With all status icons:
 
 The card configuration:
 
-![Versatile Thermostat UI Card configuration](/assets/8.png)
+![Versatile Thermostat UI Card configuration](/assets/configuration-window.png)
  
 ## Goals
 
@@ -64,6 +86,9 @@ Note: those options should be improved with official release
 | -------------------- | ------- | ------------ | ------------------------------------------------------------------------------------------------------ |
 | type                 | string  | **Required** | `custom:versatile-thermostat-ui-card`                                                                     |
 | entity               | string  | **Required** | The entity id of climate entity (must be a versatile_thermostat entity). Example: `climate.hvac`          |
+| name                | string/boolean  | **optional** | override the default entity name |
+| disable_name        | boolean  | **optional** | true to hide the name                                                                     |
+| disable_circle        | boolean  | **optional** | true to hide the circle for setpoint. If no checked, an colored ellipse on the background is displayed instead. This option save space                                                                     |
 | disable_window       | boolean  | **optional** | turn off the window open indicator                                                                     |
 | disable_overpowering | boolean  | **optional** | turn off the overpowering indicator                                                                |
 | disable_heat        | boolean  | **optional** | turn off the on/heat button                                                                          |
@@ -73,40 +98,32 @@ Note: those options should be improved with official release
 | disable_dry         | boolean  | **optional** | turn off the on/dry button                                                                           |
 | disable_fan_only    | boolean  | **optional** | turn off the on/fan_only button                                                                      |
 | disable_off         | boolean  | **optional** | turn off the off button                                                                         |
+| disable_sleep_mode     | boolean  | **optional** | turn off the sleep mode button                                                                        |
 | disable_buttons     | boolean  | **optional** | turn off the plus/minus buttons                                                                        |
 | disable_safety_warning     | boolean  | **optional** | turn off the security warning (when a temperature sensor is out)                              |
 | disable_power_infos | boolean  | **optional** | turn off the power informations                                                                        |
 | disable_auto_fan_infos | boolean  | **optional** | turn off the auto-fan informations                                                                  |
-| name                | string/boolean  | **optional** | override the default entity name |
+| disable_target_icon | boolean  | **optional** | hide the target icon for the setpoint temperature (which can be confusing with the room temperature) |
 | set_current_as_main | boolean | **optional** | Exchange target temperature and room temperature |
+| autoStartStopEnableEntity               | string  | **Optional** | The entity id of auto-start/stop entity (must be a switch entity). Example: `switch.clim_salon_auto_start_stop`          |
+| powerEntity               | string  | **Optional** | The entity id of sensor entity which gives the real power consumed by the VTherm. Example: `sensor.clim_salon_power`          |
 
 
 Example:
 ```
 type: custom:versatile-thermostat-ui-card
-entity: climate.thermostat_switch_1
-disable_window: false
-disable_overpowering: false
-disable_heat: false
-disable_cool: false
-disable_heat_cool: false
-disable_auto: false
-disable_dry: false
-disable_fan_only: false
-disable_menu: false
-disable_off: false
-disable_safety_warning: false
+entity: climate.multi_climate
 set_current_as_main: true
-disable_buttons: false
-disable_power_infos: false
-disable_auto_fan_infos: false
-name: Chambre
+disable_circle: true
+disable_menu: true
+autoStartStopEnableEntity: switch.multi_climate_enable_auto_start_stop
+powerEntity: sensor.multi_climate_power
 ```
+
+![configuration window](assets/configuration-window.png)
 
 # Actions
 Some actions are available directly on the card.
-
-__Note:__ all actions done on the card and resetted if the VTherm integration restarts. If you want persistant change, you must edit the configuration of the VTherm itself on the Versatile Thermostat integration.
 
 ## Change the preset temperature
 Preset temperature can be changed directly from the card with the following actions:
@@ -130,7 +147,67 @@ To toggle the auto-fan mode you must:
 
 ## By-pass the window detection
 
-If an open window has been detected but you want to bypass it, you can click 
+If an open window has been detected, you want to bypass it by clicking on the window icon (above the temperatures). This will enable the window by-pass and then disable the window detection impact. Notice that the icon change to this one when the by-pass is set: ![window bypass icon](assets/window-bypass-icon.png)
+
+# Informations on current state
+
+## Display some messages
+When the mode or the preset or the target temperature has been changed due to special event (window detection, motion detection, power, ...) an information icon like ![information icon](assets/information-icon.png) is diplayed on the left bar.
+Click on it and you will see why your VTherm is not in the requested state.
+
+Example when the setpoint has been changed due to motion detection:
+
+  ![message activity detected](assets/message-activity-detected.png)
+
+Another example when the VTherm has been turned off by the auto-start/stop feature:
+
+  ![message turned of by auto-start/stop](assets/message-off-auto-stop.png)
+
+When overpowering and shedding is activated and the setpooint has been set with the `power_temp` configuration value:
+
+  ![shedding message](assets/message-overpowering.png)
+
+If the VTherm has been turned off by the auto-start/stop feature:
+
+  ![auto stop message](assets/message-auto-stop.png)
+
+Just click another time to the information icon to close the information popup.
+
+## Update of underlying scheduled
+When the update of the underlying has been delayed due to temporal filter (see on VTherm documentation), then an update icon will be displayed in the left bar:
+
+![underlyoing update delayed](assets/under-update-delayed.png)
+
+## Safety state
+The safety state informs you that one off the temperature sensors configured in your VTherm don't have send any new temperature to your VTherm. When this happens, there is a risk of overheating and then the VTherm turns into the safety state. This is displayed like that:
+
+![safety message](assets/safety-message.png)
+
+The safety mode has been activated because the outdoor temperature sensor's last measurement was 554 minutes ago (and the room temperature was 13 min ago which is more normal).
+
+More informations on the safety mode can be found [here](https://github.com/jmcollin78/versatile_thermostat/blob/main/documentation/en/troubleshooting.md#why-is-my-versatile-thermostat-going-into-safety-mode).
+
+## Icons used
+
+| Icon  | Meaning  |
+|---|---|
+|  ![information icon](assets/information-icon.png) | Some information messages are available. Click on it to see it  |
+|  ![underlying update delayed icon](assets/under-update-delayed-icon.png) | The underlying device's update has been delayed. See temporal filter on VTherm documentation  |
+|  ![presence detected icon](assets/presence-detected-icon.png) | The presence is detected  |
+|  ![motion detected icon](assets/activity-detected-icon.png) | The activity (ie motion) is detected  |
+|  ![window detected icon](assets/window-detected-icon.png) | The window is detected as open. Click on it to bypass the window detection  |
+|  ![window bypass icon](assets/window-bypass-icon.png) | The window bypass is active. Click on it to cancel the bypass |
+|  ![overpowering detected icon](assets/overpowering-detected-icon.png) | An overpowering detection has been done. The VTherm is in shedding mode |
+|  ![auto stop icon](assets/auto-start-stop-icon.png) | The VTherm has been turned off by the auto-start/stop feature. |
+|  ![target temperature icon](assets/target-temp-icon.png) | The target temperature (setpoint)  |
+|  ![havc action cooling](assets/hvac-action-cool-cooling-icon.png)  | The underlying device is cooling (`hvac_action` is cooling)  |
+|  ![havc action idle in cool mode](assets/hvac-action-cool-idle-icon.png)  | The underlying device is idle and the mode is Cool (`hvac_action` is idle and the `hvac_mode` is Cool)  |
+|  ![havc action heating](assets/hvac-action-heat-heating-icon.png)  | The underlying device is heating (`hvac_action` is heating)  |
+|  ![havc action idle in heat mode](assets/hvac-action-heat-idle-icon.png)  | The underlying device is idle and the mode is Heat (`hvac_action` is idle and the `hvac_mode` is Heat)  |
+
+Example:
+
+  ![alt text](assets/icon-example.png)
 
 ## Help wanted!
 
