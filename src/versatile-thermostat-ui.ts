@@ -37,7 +37,7 @@ import {
   mdiHomeAccount,
   mdiMotionSensor,
   mdiThermometerAlert,
-  mdiWindowShutterAuto,
+  mdiWindowShutterAlert,
   mdiFlashAlert,
   mdiSofa,
   mdiRocketLaunch,
@@ -92,7 +92,7 @@ const modeIcons: {
   fan_only: mdiFan,
   dry: mdiWaterPercent,
   window_open: mdiWindowOpenVariant,
-  windowBypass: mdiWindowShutterAuto,
+  windowBypass: mdiWindowShutterAlert,
   presence: mdiHomeAccount,
   motion: mdiMotionSensor,
   eco: mdiLeaf,
@@ -220,7 +220,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: String }) public overpoweringState: string = "off";
   @property({ type: String }) public presenceState: string = "off";
   @property({ type: String }) public motionState: string = "off";
-  @property({ type: String }) public isWindowByPass: string = "off";
   @property({ type: String }) public safetyState: string = "off";
   @property({ type: String }) public status: string = "loading";
   @property({ type: String }) public hvacMode: string = hvac_mode_OFF;
@@ -754,9 +753,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       .eco ha-icon-button[title="heat"], .window_open ha-icon-button[title="heat"], .overpowering ha-icon-button[title="heat"] {
         --mode-color: var(--disabled-text-color);
       }
+
+      .icon-group {
+        cursor: pointer;
+        pointer-events: auto;
+      }
+
       .window {
         transition: fill 0.3s ease;
         fill: var(--warning-color);
+        cursor: pointer;
+        pointer-events: all;
       }
 
       .auto-start-stop {
@@ -930,7 +937,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.overpoweringState = attributes?.power_manager?.overpowering_state || "off";
         this.presenceState = attributes?.presence_manager?.presence_state || "off";
         this.motionState = attributes?.motion_manager?.motion_state || "off";
-        this.isWindowByPass = attributes?.window_manager?.is_window_bypass || "off";
+        this._hasWindowByPass = (attributes?.window_manager?.is_window_bypass === true);
         this.safetyState = attributes?.safety_manager?.safety_state || "off";
         this.meanCyclePower = attributes?.power_manager?.mean_cycle_power || 0;
         this.valveOpenPercent = attributes?.vtherm_over_valve?.valve_open_percent || attributes?.vtherm_over_climate_valve?.valve_regulation?.valve_open_percent || 0;
@@ -992,11 +999,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         
         if (this.windowState === 'on' || this.windowAutoState === 'on') {
           this._hasWindow = true;
-          this.window = true;
         }
         else {
           this._hasWindow = false;
-          this.window = false;
         }
         
         if (this.overpoweringState === 'on') {
@@ -1024,15 +1029,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         else {
           this._hasMotion = false;
           this.motion = false;
-        }
-
-        if (this.isWindowByPass === 'on') {
-          this._hasWindowByPass = true;
-          this.windowByPass = true;
-        }
-        else {
-          this._hasWindowByPass = false;
-          this.windowByPass = false;
         }
 
         // Build Security state
@@ -1256,8 +1252,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   private _handleToggleWindowByPass(/*e: MouseEvent*/): void {
     // Activate or deactivate the window bypass
-    if (DEBUG) console.log(`_handleToggleWindowByPass called. Current windowByPass is ${this.windowByPass}`);
-    let newMode= ! this.windowByPass;
+    if (DEBUG) console.log(`_handleToggleWindowByPass called. Current windowByPass is ${this._hasWindowByPass}`);
+    let newMode= ! this._hasWindowByPass;
 
     console.info(
       `VersatileThermostatUI-CARD changing windowByPass to ${newMode}`
@@ -1296,7 +1292,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         return html ``;
     }
     const localizeMode = this.hass!.localize(`component.climate.state._.${mode}`) || localize({ hass: this.hass, string: `extra_states.${mode}` });
-    if (DEBUG) console.log(`mode=${mode} currentMode=${currentMode} localizeMode=${localizeMode}`);
+    // if (DEBUG) console.log(`mode=${mode} currentMode=${currentMode} localizeMode=${localizeMode}`);
     return html `
       <ha-icon-button
         title="${currentMode === mode ? mode : ''}"
@@ -1313,7 +1309,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   private _renderMessagesButton(): TemplateResult {
     const localizeMessages = localize({ hass: this.hass, string: `extra_states.messages-button` });
-    if (DEBUG) console.log(`localizeMessages=${localizeMessages}`);
+    // if (DEBUG) console.log(`localizeMessages=${localizeMessages}`);
     return html `
       <ha-icon-button
         title="${localizeMessages}"
@@ -1329,7 +1325,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   private _renderRecalculateScheduledButton(): TemplateResult {
     const localizeMessages = localize({ hass: this.hass, string: `extra_states.recalculation_scheduled` });
-    if (DEBUG) console.log(`localizeMessages=${localizeMessages}`);
+    // if (DEBUG) console.log(`localizeMessages=${localizeMessages}`);
     return html `
       <ha-icon-button
         title="${localizeMessages}"
@@ -1344,14 +1340,14 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   private _renderWindowByPassButton(): TemplateResult {
     const localizeMessages = localize({ hass: this.hass, string: `extra_states.window-bypass-button` });
-    if (DEBUG) console.log(`localizeMessages=${localizeMessages}`);
+    // if (DEBUG) console.log(`localizeMessages=${localizeMessages}`);
     return html `
       <ha-icon-button
         title="${localizeMessages}"
         class="window-bypass-button"
         @click=${this._handleToggleWindowByPass}
         tabindex="0"
-        .path=${mdiWindowShutterAuto}
+        .path=${mdiWindowShutterAlert}
         .label=${localizeMessages}
       >
       </ha-icon-button>
@@ -1554,7 +1550,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         </div>
       ` : ``}
 
-      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container':''}  ${this.hvacMode}_${this.hvacAction} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''}">
+      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container':''}  ${this.hvacMode}_${this.hvacAction} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''}">
         ${
           this._config?.disable_circle ? html`
             <!-- No cicle configured -->
@@ -1563,8 +1559,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             this.value.high != null &&
             this.stateObj.state !== UNAVAILABLE) ? html`
             <vt-ha-control-circular-slider
-              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
-              .inactive=${this.window}
+              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} "
+              .inactive=${this._hasWindow}
               dual
               .low=${this.value.low}
               .high=${this.value.high}
@@ -1579,8 +1575,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             >
             ` : html`
             <vt-ha-control-circular-slider
-              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} "
-              .inactive=${this.window}
+              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} "
+              .inactive=${this._hasWindow}
               .mode="start"
               @value-changed=${this._highChanged}
               @value-changing=${this._highChanging}
@@ -1592,26 +1588,32 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             >
             `
         }
-          <div class="content ${this.name.length == 0 ? 'noname':''} ${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this.window ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this.windowByPass ? 'windowByPass': ''} " >
+          <div class="content ${this.name.length == 0 ? 'noname':''} ${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} " >
             <svg id="main" viewbox="0 0 125 100">
               <g transform="translate(57.5,37) scale(0.35)">
                 ${(this._hasWindowByPass) ? svg`
-                  <path class="windowByPass ${this.windowByPass ? 'active': ''}" fill="none" transform="${(this._hasWindowByPass) ? 'translate(-50.25,0)' :''}" id="window-by-pass" d=${mdiWindowShutterAuto}/>
+                  <g transform="${(this._hasWindowByPass) ? 'translate(-50.25,0)' :''}" @click=${this._handleToggleWindowByPass} class="icon-group">
+                    <rect width="24" height="24" fill="transparent" style="cursor: pointer;"/>
+                    <path class="window window-by-pass ${this._hasWindowByPass ? 'active': ''}" id="window-by-pass" d=${mdiWindowShutterAlert}/>
+                  </g>
                 `: ``}
                 ${(!this._hasWindowByPass && this._hasWindow && !this._config?.disable_window) ? svg`
-                  <path class="window ${this.window ? 'active': ''}" fill="none" transform="${(this._hasWindow && !this._config?.disable_window) ? 'translate(-50.25,0)' :''}" id="window" d=${mdiWindowOpenVariant}/>
+                  <g transform="${(this._hasWindow && !this._config?.disable_window) ? 'translate(-50.25,0)' :''}" @click=${this._handleToggleWindowByPass} class="icon-group">
+                    <rect width="24" height="24" fill="transparent" style="cursor: pointer;"/>
+                    <path class="window ${this._hasWindow ? 'active': ''}" id="window" d=${mdiWindowOpenVariant}/>
+                  </g>
                 `: ``}
                 ${(this._hasOverpowering && !this._config?.disable_overpowering) ? svg`
-                  <path class="overpowering ${this.overpowering ? 'active': ''}" fill="none" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
+                  <path class="overpowering ${this.overpowering ? 'active': ''}" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
                 `: ``}
                 ${(this._hasPresence) ? svg`
-                  <path class="presence ${this.presence ? 'active': ''}" fill="none" transform="${(this._hasPresence) ? 'translate(0.25,0)' :''}" id="overpowering" d=${mdiHomeAccount} />
+                  <path class="presence ${this.presence ? 'active': ''}" transform="${(this._hasPresence) ? 'translate(0.25,0)' :''}" id="overpowering" d=${mdiHomeAccount} />
                 `: ``}
                 ${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? svg`
-                  <path class="auto-start-stop" fill="none" transform="${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? 'translate(25.25,0)' :''}" id="autoStartStop" d=${mdiPowerSleep}/>
+                  <path class="auto-start-stop" transform="${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? 'translate(25.25,0)' :''}" id="autoStartStop" d=${mdiPowerSleep}/>
                 `: ``}
                 ${(this._hasMotion) ? svg`
-                  <path class="motion ${this.motion ? 'active': ''}" fill="none" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
+                  <path class="motion ${this.motion ? 'active': ''}" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
                 `: ``}
               </g>
 
@@ -1689,9 +1691,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         `:''}
       ${ this.messages.length > 0 ? svg`
         ${this._renderMessagesButton()}
-        `:''}
-      ${ this.windowState || this.windowByPass ? svg`
-        ${this._renderWindowByPassButton()}
         `:''}
       ${ this._config!.autoStartStopEnableEntity && this._isAutoStartStopConfigured ? svg`
         ${ this._renderAutoStartStopEnable()}
