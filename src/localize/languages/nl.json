@@ -3,6 +3,13 @@
     "version": "versie",
     "current": "huidig"
   },
+  "editor": {
+    "card": {
+      "climate": {
+        "allow_lock_toggle": "Allow lock/unlock from card"
+      }
+    }
+  },
   "extra_states": {
     "window_open": "Raam open",
     "night_mode": "Nacht modus",

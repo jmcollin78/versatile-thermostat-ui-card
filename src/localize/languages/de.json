@@ -26,7 +26,8 @@
         "disable_power_infos": "Verbrauchsinformationen deaktivieren",
         "disable_auto_fan_infos": "Auto-Lüfter-Informationen deaktivieren",
         "disable_name": "Name deaktivieren",
-        "eco_temperature": "Eco-Temperatur"
+        "eco_temperature": "Eco-Temperatur",
+        "allow_lock_toggle": "Allow lock/unlock from card"
       }
     }
   },

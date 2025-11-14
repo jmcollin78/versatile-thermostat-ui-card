@@ -3,6 +3,13 @@
     "version": "έκδοση",
     "current": "τρέχουσα"
   },
+  "editor": {
+    "card": {
+      "climate": {
+        "allow_lock_toggle": "Allow lock/unlock from card"
+      }
+    }
+  },
   "extra_states": {
     "window_open": "Παράθυρο ανοικτό",
     "night_mode": "Λειτουργία νυκτός",

@@ -27,7 +27,8 @@
         "disable_power_infos": "Отключить информацию о питании",
         "disable_auto_fan_infos": "Отключить информацию автовентилятора",
         "disable_name": "Отключить название",
-        "disable_target_icon": "Отключить иконку цели"
+        "disable_target_icon": "Отключить иконку цели",
+        "allow_lock_toggle": "Разрешить блокировку/разблокировку с карты"
       }
     }
   },

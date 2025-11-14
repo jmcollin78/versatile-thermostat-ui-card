@@ -27,7 +27,8 @@
         "disable_power_infos": "Disabilita Info Potenza",
         "disable_auto_fan_infos": "Disabilita Info auto-fan",
         "disable_name": "Disabilita nome",
-        "disable_target_icon": "Disabilita  icona obbiettivo"
+        "disable_target_icon": "Disabilita  icona obbiettivo",
+        "allow_lock_toggle": "Allow lock/unlock from card"
       }
     }
   },
