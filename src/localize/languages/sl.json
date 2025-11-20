@@ -16,6 +16,9 @@
     "eco": "Eko",
     "overpowering": "Poletje",
     "lock_users_active": "Uporabniške kontrole zaklenjene",
-    "lock_automations_active": "Spremembe avtomatizacije zaklenjene"
+    "lock_automations_active": "Spremembe avtomatizacije zaklenjene",
+    "code_error": "Napačna koda",
+    "lock": "Zakleni",
+    "unlock": "Odkleni"
   }
 }

@@ -16,6 +16,9 @@
     "eco": "Eco",
     "overpowering": "Sommer",
     "lock_users_active": "Brukerkontroller låst",
-    "lock_automations_active": "Automatiseringsendringer låst"
+    "lock_automations_active": "Automatiseringsendringer låst",
+    "code_error": "Feil kode",
+    "lock": "Lås",
+    "unlock": "Lås opp"
   }
 }

@@ -16,6 +16,9 @@
     "eco": "Eco",
     "overpowering": "Estiu",
     "lock_users_active": "Controls d'usuari bloquejats",
-    "lock_automations_active": "Canvis d'automatització bloquejats"
+    "lock_automations_active": "Canvis d'automatització bloquejats",
+    "code_error": "Codi incorrecte",
+    "lock": "Bloquejar",
+    "unlock": "Desbloquejar"
   }
 }

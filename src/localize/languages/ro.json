@@ -16,6 +16,9 @@
     "eco": "Eco",
     "overpowering": "Vară",
     "lock_users_active": "Comenzi utilizator blocate",
-    "lock_automations_active": "Modificări automatizări blocate"
+    "lock_automations_active": "Modificări automatizări blocate",
+    "code_error": "Cod incorect",
+    "lock": "Blocare",
+    "unlock": "Deblocare"
   }
 }

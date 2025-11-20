@@ -100,6 +100,9 @@
     "lock_automations_active": "Automation changes locked",
     "messages-button": "Why this state?",
     "recalculation_scheduled": "Underlying update in progress",
-    "window-bypass-button": "Toggle window bypass"
+    "window-bypass-button": "Toggle window bypass",
+    "code_error": "Incorrect code",
+    "lock": "Lock",
+    "unlock": "Unlock"
   }
 }

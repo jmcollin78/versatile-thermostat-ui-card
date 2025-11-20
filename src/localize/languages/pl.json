@@ -100,6 +100,9 @@
     "recalculation_scheduled": "Aktualizacja urządzeń w toku",
     "window-bypass-button": "Przełącz pomijanie okna",
     "lock_users_active": "Sterowanie użytkownika zablokowane",
-    "lock_automations_active": "Zmiany automatyzacji zablokowane"
+    "lock_automations_active": "Zmiany automatyzacji zablokowane",
+    "code_error": "Błędny kod",
+    "lock": "Zablokuj",
+    "unlock": "Odblokuj"
   }
 }

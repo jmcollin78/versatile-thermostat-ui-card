@@ -27,6 +27,9 @@
     "eco": "Eco",
     "overpowering": "Nyár",
     "lock_users_active": "Felhasználói vezérlők zárolva",
-    "lock_automations_active": "Automatizálási változtatások zárolva"
+    "lock_automations_active": "Automatizálási változtatások zárolva",
+    "code_error": "Rossz kód",
+    "lock": "Zárolás",
+    "unlock": "Feloldás"
   }
 }

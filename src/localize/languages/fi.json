@@ -16,6 +16,9 @@
     "eco": "Eco",
     "overpowering": "Kesä",
     "lock_users_active": "Käyttäjän säädöt lukittu",
-    "lock_automations_active": "Automaation muutokset lukittu"
+    "lock_automations_active": "Automaation muutokset lukittu",
+    "code_error": "Virheellinen koodi",
+    "lock": "Lukitse",
+    "unlock": "Avaa lukitus"
   }
 }
