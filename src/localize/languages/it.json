@@ -76,6 +76,9 @@
     "temp_unavailable": "-",
     "sleep": "Riposo",
     "lock_users_active": "Controlli utente bloccati",
-    "lock_automations_active": "Modifiche automazioni bloccate"
+    "lock_automations_active": "Modifiche automazioni bloccate",
+    "code_error": "Codice errato",
+    "lock": "Blocca",
+    "unlock": "Sblocca"
   }
 }

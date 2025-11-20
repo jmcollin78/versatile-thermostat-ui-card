@@ -57,7 +57,8 @@ import {
   mdiInformationBoxOutline,
   mdiUpdate,
   mdiLock,
-  mdiLockOpen
+  mdiLockOpen,
+  mdiBackspaceOutline
 } from "@mdi/js";
 
 import {
@@ -362,6 +363,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @state() private isLocked: boolean = false;
   @state() private isUserLocked: boolean = false;
   @state() private isAutomationLocked: boolean = false;
+  @state() private showDigicodeModal: boolean = false;
+  @state() private enteredCode: string = "";
+  @state() private codeError: boolean = false;
+  @state() private isLocking: boolean = false;
 
   setConfig(config: ClimateCardConfig): void {
     this._config = {
@@ -870,6 +875,112 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         ha-card {
           padding-top: 2em;
         }
+      }
+      /* Dialog Customization */
+      ha-dialog.digicode-dialog {
+          --mdc-dialog-min-width: 400px;
+          --mdc-dialog-max-width: 450px;
+          --mdc-theme-primary: var(--primary-color);
+          --mdc-theme-surface: var(--card-background-color);
+      }
+
+      .dialog-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+      }
+
+      .dialog-title {
+        margin-top: 0;
+        margin-bottom: 40px;
+        font-size: 24px;
+        font-weight: 400;
+        text-align: center;
+      }
+
+      .error-message {
+        color: var(--error-color);
+        font-size: 14px;
+        height: 20px;
+        margin-top: 4px;
+        margin-bottom: 20px;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      .error-message.visible {
+        opacity: 1;
+      }
+
+      .code-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 200px;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--secondary-text-color);
+      }
+
+      .digit {
+        width: 12px;
+        height: 12px;
+        margin: 0 5px;
+        border-radius: 50%;
+        background-color: var(--secondary-text-color);
+        opacity: 0.3;
+        transition: all 0.2s ease;
+      }
+
+      .digit.filled {
+        opacity: 1;
+        background-color: var(--primary-text-color);
+        transform: scale(1.2);
+      }
+
+      .code-display.error {
+        animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        color: var(--error-color);
+      }
+
+      .keypad {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        max-width: 320px;
+      }
+
+      .keypad-row {
+        display: flex;
+        justify-content: space-around;
+        gap: 16px;
+      }
+
+      .keypad-btn {
+        flex: 1;
+        --mdc-shape-small: 4px;
+        --mdc-typography-button-font-size: 24px;
+        --mdc-typography-button-font-weight: 400;
+        height: 64px;
+        --mdc-theme-primary: var(--primary-text-color);
+        --mdc-button-outline-color: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .keypad-btn.spacer {
+          visibility: hidden;
+          pointer-events: none;
+      }
+      
+      @keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
       }
   `;
 
@@ -1542,14 +1653,72 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       return;
     }
 
+    const hasLockCode = this.stateObj.attributes.specific_states?.lock_code;
+
     if (this.isLocked) {
+      if (hasLockCode) {
+        this.isLocking = false;
+        this.showDigicodeModal = true;
+        this.enteredCode = "";
+        return;
+      }
       this.hass.callService("versatile_thermostat", "unlock", {
         entity_id: this._config.entity,
       });
     } else {
+      if (hasLockCode) {
+        this.isLocking = true;
+        this.showDigicodeModal = true;
+        this.enteredCode = "";
+        return;
+      }
       this.hass.callService("versatile_thermostat", "lock", {
         entity_id: this._config.entity,
       });
+    }
+  }
+
+  private _handleKeypadPress(key: string) {
+    if (this.enteredCode.length < 4) {
+      this.enteredCode += key;
+      this.codeError = false;
+      if (this.enteredCode.length === 4) {
+        this._handleValidate();
+      }
+    }
+  }
+
+  private _handleKeypadClear() {
+    this.enteredCode = this.enteredCode.slice(0, -1);
+    this.codeError = false;
+  }
+
+  private _handleModalClose() {
+    this.showDigicodeModal = false;
+    this.enteredCode = "";
+    this.codeError = false;
+  }
+
+  private async _handleValidate() {
+    if (this.enteredCode.length === 4) {
+      const service = this.isLocking ? "lock" : "unlock";
+      try {
+        await this.hass.callService("versatile_thermostat", service, {
+          entity_id: this._config!.entity,
+          code: this.enteredCode
+        });
+        // If successful, close the modal
+        this._handleModalClose();
+      } catch (e) {
+        // If error (wrong code), set error state and vibrate
+        this.codeError = true;
+        this.enteredCode = ""; // Clear code on error
+        this._vibrate(200);
+      }
+    } else {
+      this.codeError = true;
+      this.enteredCode = ""; // Clear code on error
+      this._vibrate(200);
     }
   }
 
@@ -1833,6 +2002,53 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             `
       ) : ''}
     </div>
+
+    <ha-dialog
+      .open=${this.showDigicodeModal}
+      @closed=${this._handleModalClose}
+      hideActions
+      class="digicode-dialog"
+    >
+      <div class="dialog-content">
+        <h2 class="dialog-title">
+          ${this.isLocking 
+            ? localize({ hass: this.hass, string: `extra_states.lock` }) 
+            : localize({ hass: this.hass, string: `extra_states.unlock` })} ${this.name}
+        </h2>
+        <div class="code-display ${this.codeError ? 'error' : ''}">
+          <span class="digit ${this.enteredCode.length > 0 ? 'filled' : ''}"></span>
+          <span class="digit ${this.enteredCode.length > 1 ? 'filled' : ''}"></span>
+          <span class="digit ${this.enteredCode.length > 2 ? 'filled' : ''}"></span>
+          <span class="digit ${this.enteredCode.length > 3 ? 'filled' : ''}"></span>
+        </div>
+        <div class="error-message ${this.codeError ? 'visible' : ''}">
+          ${localize({ hass: this.hass, string: `extra_states.code_error` })}
+        </div>
+
+        <div class="keypad">
+          <div class="keypad-row">
+            <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('1')}>1</mwc-button>
+            <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('2')}>2</mwc-button>
+            <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('3')}>3</mwc-button>
+          </div>
+          <div class="keypad-row">
+            <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('4')}>4</mwc-button>
+            <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('5')}>5</mwc-button>
+            <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('6')}>6</mwc-button>
+          </div>
+          <div class="keypad-row">
+            <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('7')}>7</mwc-button>
+            <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('8')}>8</mwc-button>
+            <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('9')}>9</mwc-button>
+          </div>
+          <div class="keypad-row">
+            <mwc-button class="keypad-btn spacer" disabled></mwc-button>
+            <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('0')}>0</mwc-button>
+            <mwc-button class="keypad-btn action-btn clear" @click=${this._handleKeypadClear}><ha-svg-icon .path=${mdiBackspaceOutline}></ha-svg-icon></mwc-button>
+          </div>
+        </div>
+      </div>
+    </ha-dialog>
     </ha-card>
   `;
   };

@@ -97,6 +97,9 @@
     "lock_automations_active": "Verrouillage automations actif",
     "messages-button": "Pourquoi cet état ?",
     "recalculation_scheduled": "Sous-jacent en cours de mise à jour",
-    "window-bypass-button": "Basculer le bypass fenêtre"
+    "window-bypass-button": "Basculer le bypass fenêtre",
+    "code_error": "Code incorrect",
+    "lock": "Verrouiller",
+    "unlock": "Déverrouiller"
   }
 }

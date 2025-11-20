@@ -74,6 +74,9 @@
     "temp_unavailable": "-",
     "sleep": "Schlafmodus",
     "lock_users_active": "Benutzersteuerung gesperrt",
-    "lock_automations_active": "Automatisierungsänderungen gesperrt"
+    "lock_automations_active": "Automatisierungsänderungen gesperrt",
+    "lock": "Sperren",
+    "unlock": "Entsperren",
+    "code_error": "Falscher Code"
   }
 }

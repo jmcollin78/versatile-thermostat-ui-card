@@ -30,6 +30,9 @@
     "eco": "Eco",
     "overpowering": "Leto",
     "lock_users_active": "Ovládanie používateľa zamknuté",
-    "lock_automations_active": "Zmeny automatizácie zamknuté"
+    "lock_automations_active": "Zmeny automatizácie zamknuté",
+    "code_error": "Chybný kód",
+    "lock": "Zamknúť",
+    "unlock": "Odomknúť"
   }
 }

@@ -16,6 +16,9 @@
     "eco": "Eco",
     "overpowering": "Overpowering",
     "lock_users_active": "Brugerkontroller låst",
-    "lock_automations_active": "Automatiske ændringer låst"
+    "lock_automations_active": "Automatiske ændringer låst",
+    "code_error": "Forkert kode",
+    "lock": "Lås",
+    "unlock": "Lås op"
   }
 }

@@ -27,6 +27,9 @@
     "eco": "Eco",
     "overpowering": "Verão",
     "lock_users_active": "Controlos de utilizador bloqueados",
-    "lock_automations_active": "Alterações de automação bloqueadas"
+    "lock_automations_active": "Alterações de automação bloqueadas",
+    "code_error": "Código incorreto",
+    "lock": "Bloquear",
+    "unlock": "Desbloquear"
   }
 }

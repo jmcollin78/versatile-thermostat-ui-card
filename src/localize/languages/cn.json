@@ -16,6 +16,9 @@
     "eco": "节能",
     "overpowering": "夏季",
     "lock_users_active": "用户控制已锁定",
-    "lock_automations_active": "自动化更改已锁定"
+    "lock_automations_active": "自动化更改已锁定",
+    "code_error": "代码错误",
+    "lock": "锁定",
+    "unlock": "解锁"
   }
 }

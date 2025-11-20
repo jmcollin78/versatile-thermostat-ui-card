@@ -16,6 +16,9 @@
     "eco": "Εξοικονόμηση",
     "overpowering": "Καλοκαίρι",
     "lock_users_active": "Έλεγχοι χρήστη κλειδωμένοι",
-    "lock_automations_active": "Αλλαγές αυτοματισμών κλειδωμένες"
+    "lock_automations_active": "Αλλαγές αυτοματισμών κλειδωμένες",
+    "code_error": "Λάθος κωδικός",
+    "lock": "Κλείδωμα",
+    "unlock": "Ξεκλείδωμα"
   }
 }

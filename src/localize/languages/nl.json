@@ -16,6 +16,9 @@
     "eco": "Eco",
     "overpowering": "Zomer",
     "lock_users_active": "Gebruikersbediening vergrendeld",
-    "lock_automations_active": "Automatisatie wijzigingen vergrendeld"
+    "lock_automations_active": "Automatisatie wijzigingen vergrendeld",
+    "code_error": "Foute code",
+    "lock": "Vergrendelen",
+    "unlock": "Ontgrendelen"
   }
 }

@@ -9,6 +9,9 @@
     "eco": "Eco",
     "overpowering": "Sommar",
     "lock_users_active": "Användarkontroller låsta",
-    "lock_automations_active": "Automationsändringar låsta"
+    "lock_automations_active": "Automationsändringar låsta",
+    "code_error": "Fel kod",
+    "lock": "Lås",
+    "unlock": "Lås upp"
   }
 }

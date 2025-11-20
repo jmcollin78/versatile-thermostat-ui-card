@@ -16,6 +16,9 @@
     "eco": "Eco",
     "overpowering": "Yaz",
     "lock_users_active": "Kullanıcı kontrolleri kilitlendi",
-    "lock_automations_active": "Otomasyon değişiklikleri kilitlendi"
+    "lock_automations_active": "Otomasyon değişiklikleri kilitlendi",
+    "code_error": "Hatalı kod",
+    "lock": "Kilitle",
+    "unlock": "Kilidi aç"
   }
 }
