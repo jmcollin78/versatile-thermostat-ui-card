@@ -1017,6 +1017,14 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     super.updated(changedProperties);
     this._firstRender = false;
 
+    if (changedProperties.has("showDigicodeModal")) {
+      if (this.showDigicodeModal) {
+        window.addEventListener("keydown", this._handleKeyDown);
+      } else {
+        window.removeEventListener("keydown", this._handleKeyDown);
+      }
+    }
+
     this?.shadowRoot?.querySelector('.security')?.addEventListener('click', () => {
       this?.shadowRoot?.querySelector('.security')?.remove();
       this?.shadowRoot?.querySelector('.content')?.classList.remove('security_msg');
@@ -1678,6 +1686,14 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
   }
 
+  private _handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key >= '0' && e.key <= '9') {
+      this._handleKeypadPress(e.key);
+    } else if (e.key === 'Backspace') {
+      this._handleKeypadClear();
+    }
+  };
+
   private _handleKeypadPress(key: string) {
     if (this.enteredCode.length < 4) {
       this.enteredCode += key;
@@ -2064,6 +2080,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    window.removeEventListener("keydown", this._handleKeyDown);
   }
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     await import("./versatile-thermostat-ui-card-editor");
