@@ -333,17 +333,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     this._vibrate(40);
   }
 
-  private _init: Boolean = true;
-  private _firstRender: Boolean = true;
-  private _ignore: Boolean = false;
-  private _hasWindow: Boolean = false;
-  private _hasWindowByPass: Boolean = false;
-  private _hasPresence: Boolean = false;
-  private _hasMotion: Boolean = false;
-  private _hasOverpowering: Boolean = false;
-  private _hasAutoStartStop: Boolean = false;
-  private _isAutoStartStopEnabled:Boolean = false;
-  private _isAutoStartStopConfigured:Boolean = false;
+  private _init: boolean = true;
+  private _firstRender: boolean = true;
+  private _ignore: boolean = false;
+  private _hasWindow: boolean = false;
+  private _hasWindowByPass: boolean = false;
+  private _hasPresence: boolean = false;
+  private _hasMotion: boolean = false;
+  private _hasOverpowering: boolean = false;
+  private _hasAutoStartStop: boolean = false;
+  private _isAutoStartStopEnabled: boolean = false;
+  private _isAutoStartStopConfigured: boolean = false;
   private _timeout: any;
   private _oldValueMin: number = 0;
   private _oldValueMax: number = 0;
@@ -2000,7 +2000,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     </div>
 
     <div id="right-lock">
-      ${this.stateObj && this._config?.entity ? (
+      ${this.stateObj && this._config?.entity &&
+      (this.stateObj.attributes.specific_states?.lock_users || this.stateObj.attributes.specific_states?.lock_automations) ? (
         this._config?.allow_lock_toggle
           ? html`
               <ha-icon-button
