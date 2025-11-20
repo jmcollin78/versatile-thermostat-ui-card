@@ -26,7 +26,8 @@
         "disable_power_infos": "Désactiver les infos de puissance",
         "disable_auto_fan_infos": "Désactiver les infos auto-ventilation",
         "disable_name": "Désactiver le nom",
-        "disable_target_icon": "Désactiver l'icône cible"
+        "disable_target_icon": "Désactiver l'icône cible",
+        "allow_lock_toggle": "Activer le verrouillage/déverrouillage depuis la carte"
       }
     }
   },
@@ -92,8 +93,13 @@
     "target_temp_activity_detected": "Temp. cible : activité détectée",
     "target_temp_activity_not_detected": "Temp. cible : activité non détectée",
     "target_temp_absence_detected": "Temp. cible : absence détectée",
+    "lock_users_active": "Verrouillage utilisateurs actif",
+    "lock_automations_active": "Verrouillage automations actif",
     "messages-button": "Pourquoi cet état ?",
     "recalculation_scheduled": "Sous-jacent en cours de mise à jour",
-    "window-bypass-button": "Basculer le bypass fenêtre"
+    "window-bypass-button": "Basculer le bypass fenêtre",
+    "code_error": "Code incorrect",
+    "lock": "Verrouiller",
+    "unlock": "Déverrouiller"
   }
 }

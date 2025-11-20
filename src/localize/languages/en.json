@@ -27,7 +27,8 @@
         "disable_power_infos": "Disable power infos",
         "disable_auto_fan_infos": "Disable auto-fan infos",
         "disable_name": "Disable name",
-        "disable_target_icon": "Disable the target icon"
+        "disable_target_icon": "Disable the target icon",
+        "allow_lock_toggle": "Allow lock/unlock from card"
       }
     }
   },
@@ -95,8 +96,13 @@
     "target_temp_activity_detected": "Target temp.: activity detected",
     "target_temp_activity_not_detected": "Target temp.: activity not detected",
     "target_temp_absence_detected": "Target temp.: absence detected",
+    "lock_users_active": "User controls locked",
+    "lock_automations_active": "Automation changes locked",
     "messages-button": "Why this state?",
     "recalculation_scheduled": "Underlying update in progress",
-    "window-bypass-button": "Toggle window bypass"
+    "window-bypass-button": "Toggle window bypass",
+    "code_error": "Incorrect code",
+    "lock": "Lock",
+    "unlock": "Unlock"
   }
 }
