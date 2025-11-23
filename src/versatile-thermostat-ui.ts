@@ -1131,7 +1131,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
         // Build auto-fan infos
         this.autoFanInfos = [];
-        if (!this?._config?.disable_autoFanInfos && attributes?.is_over_climate && !hasValveRegulation) {
+        if (!this?._config?.disable_auto_fan_infos && attributes?.is_over_climate && !hasValveRegulation) {
           const name=this.currentAutoFanMode != auto_fan_none ? "auto_fan_mode" : "auto_fan_mode_off";
           if (DEBUG) console.log(`VersatileThermostat UI : auto_fan icon name ${name}`);
           
