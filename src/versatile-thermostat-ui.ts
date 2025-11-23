@@ -80,7 +80,7 @@ import './ha/ha-control-circular-slider';
 import { SensorEntity } from './ha/data/sensor';
 
 const UNAVAILABLE = "unavailable";
-const DEBUG=true;
+const DEBUG=false;
 const modeIcons: {
   [mode in any]: string
 } = {
@@ -1204,22 +1204,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     });
   }
 
-  private _recordPreset(e: MouseEvent): void {
-    this.hass!.callService("versatile_thermostat", "set_preset_temperature", {
-      entity_id: this._config!.entity,
-      preset: (e.currentTarget as any).preset,
-      temperature: this.last_target_temperature
-    });
-  }
-
-  private _handleClickOrDoubleClick(e: MouseEvent): void {
-    if (e.detail === 1) {
-      this._handlePreset(e);
-    } else if (e.detail === 2) {
-      this._recordPreset(e);
-    }
-  }
-
   private _handleClickAutoFanInfo(/*e: MouseEvent*/): void {
     // Activate or deactivate the auto-fan mode
     let newMode=auto_fan_none;
@@ -1368,8 +1352,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             title="${currentPreset === preset ? preset : ''}"
             class=${classMap({ "selected-icon": currentPreset === preset })}
             .preset=${preset}
-            @click=${this._handleClickOrDoubleClick}
-            @dblclick=${this._handleClickOrDoubleClick}
+            @click=${this._handlePreset}
             tabindex="0"
             .path=${modeIcons[preset]}
             .label=${localizePreset}
