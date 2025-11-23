@@ -13,7 +13,6 @@
 - [Installation](#installation)
   - [Options](#options)
 - [Actions](#actions)
-  - [Change the preset temperature](#change-the-preset-temperature)
   - [Disable the auto-fan mode](#disable-the-auto-fan-mode)
   - [By-pass the window detection](#by-pass-the-window-detection)
 - [Informations on current state](#informations-on-current-state)
@@ -124,18 +123,6 @@ powerEntity: sensor.multi_climate_power
 
 # Actions
 Some actions are available directly on the card.
-
-## Change the preset temperature
-Preset temperature can be changed directly from the card with the following actions:
-1. select the preset, you want to change,
-2. select the temperature you want to set with the selector or the +/- buttons,
-3. double click on the preset you want to change. When this action occurs, the preset rapidly change to the previous value and then to the new value to indicate that it is stored.
-
-You can do this operations for all displayed presets but not on the `Activity` preset because this preset uses the temperature values of the others preset. See documentation of [versatile_thermostat README](https://github.com/jmcollin78/versatile_thermostat/blob/main/README.md#configure-the-activity-mode-or-motion-detection).
-
-Of course you should have displayed the presets to be able to do so.
-
-Note that this change is not persistant. Persistant changes must be done with VTherm temperature entities (or central configuration temperature entities if you use it).
 
 ## Disable the auto-fan mode
 For `over_climate` you have the possibility to configure the `auto-fan` mode feature. See [versatile_thermostat README](https://github.com/jmcollin78/versatile_thermostat/blob/main/README.md#auto-fan-mode).
