@@ -15,6 +15,7 @@
 - [Actions](#actions)
   - [Disable the auto-fan mode](#disable-the-auto-fan-mode)
   - [By-pass the window detection](#by-pass-the-window-detection)
+  - [Lock/Unlock the thermostat](#lockunlock-the-thermostat)
 - [Informations on current state](#informations-on-current-state)
   - [Display some messages](#display-some-messages)
   - [Update of underlying scheduled](#update-of-underlying-scheduled)
@@ -106,6 +107,7 @@ Note: those options should be improved with official release
 | set_current_as_main | boolean | **optional** | Exchange target temperature and room temperature |
 | autoStartStopEnableEntity               | string  | **Optional** | The entity id of auto-start/stop entity (must be a switch entity). Example: `switch.clim_salon_auto_start_stop`          |
 | powerEntity               | string  | **Optional** | The entity id of sensor entity which gives the real power consumed by the VTherm. Example: `sensor.clim_salon_power`          |
+| allow_lock_toggle         | boolean | **Optional** | true to display a lock icon to lock/unlock the thermostat. If a code is configured in VTherm, a keypad will be displayed. |
 
 
 Example:
@@ -135,6 +137,12 @@ To toggle the auto-fan mode you must:
 ## By-pass the window detection
 
 If an open window has been detected, you want to bypass it by clicking on the window icon (above the temperatures). This will enable the window by-pass and then disable the window detection impact. Notice that the icon change to this one when the by-pass is set: ![window bypass icon](assets/window-bypass-icon.png)
+
+## Lock/Unlock the thermostat
+
+You can lock or unlock the thermostat by clicking on the lock icon at the top right of the card.
+If a pincode is configured in the Versatile Thermostat integration, a keypad dialog will appear to enter the code.
+This requires the `allow_lock_toggle` option to be set to `true` in the card configuration.
 
 # Informations on current state
 

@@ -16,7 +16,8 @@
         "disable_dry": "Desactivar Secagem",
         "disable_off": "Desactivar Off",
         "eco_temperature": "Modo Eco",
-        "set_current_as_main": "Mudar para a temperatura local actual"
+        "set_current_as_main": "Mudar para a temperatura local actual",
+        "allow_lock_toggle": "Allow lock/unlock from card"
       }
     }
   },
@@ -24,6 +25,11 @@
     "window_open": "Janela Aberta",
     "night_mode": "Modo Noturno",
     "eco": "Eco",
-    "overpowering": "Verão"
+    "overpowering": "Verão",
+    "lock_users_active": "Controlos de utilizador bloqueados",
+    "lock_automations_active": "Alterações de automação bloqueadas",
+    "code_error": "Código incorreto",
+    "lock": "Bloquear",
+    "unlock": "Desbloquear"
   }
 }

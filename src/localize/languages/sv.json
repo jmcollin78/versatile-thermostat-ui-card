@@ -7,6 +7,11 @@
     "window_open": "Fönster öppet",
     "night_mode": "Nattläge",
     "eco": "Eco",
-    "overpowering": "Sommar"
+    "overpowering": "Sommar",
+    "lock_users_active": "Användarkontroller låsta",
+    "lock_automations_active": "Automationsändringar låsta",
+    "code_error": "Fel kod",
+    "lock": "Lås",
+    "unlock": "Lås upp"
   }
 }
