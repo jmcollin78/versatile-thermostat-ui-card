@@ -68,7 +68,7 @@
     "fan_turbo": "Turbo",
     "fan_none": "Nulla",
     "fan_auto": "Auto",
-    "change_message": "Doppio click per cambio preimpostazione",
+    "change_message": "Click per cambio preimpostazione",
     "toggle_message": "Click per commutare",
     "auto_start_stop": "Fermato da auto-start/stop",
     "auto_start_stop_enable": "Abilita/disabilita auto-start/stop",

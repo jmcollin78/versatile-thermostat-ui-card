@@ -344,6 +344,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _hasAutoStartStop: boolean = false;
   private _isAutoStartStopEnabled: boolean = false;
   private _isAutoStartStopConfigured: boolean = false;
+  private _isLockConfigured: boolean = false;
+  private _isLocked: boolean = true; // locked by default if lock is not configured
+  private _hasLockCode: boolean = false;
   private _timeout: any;
   private _oldValueMin: number = 0;
   private _oldValueMax: number = 0;
@@ -358,6 +361,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private autoFanInfos: any = [];
   private messages: any = [];
   private displayMessages: boolean = false;
+
 
   @state() private _config?: ClimateCardConfig;
   @state() private isLocked: boolean = false;
@@ -420,7 +424,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       ha-card.locked vt-ha-control-circular-slider,
       ha-card.locked .left-info-label .auto-start-stop-enable,
       ha-card.locked .left-info-label ha-icon-button {
-        opacity: 0.4;
+        opacity: 0.6;
         pointer-events: none;
       }
       
@@ -1082,17 +1086,27 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           return;
         }
   
-        console.log(`Something may have change`);
+        if (DEBUG) console.log(`Something may have change`);
         this.stateObj = stateObj;
         const attributes = this.stateObj.attributes;
         const stateMode = this.stateObj.state;
 
         // Map all needed attributes
-        const isLocked = attributes?.specific_states?.is_locked || false;
-        this.isUserLocked = isLocked && (attributes?.specific_states?.lock_users || false);
-        this.isAutomationLocked = isLocked && (attributes?.specific_states?.lock_automations || false);
+        this._isLockConfigured = (attributes?.is_lock_configured === true);
+
+        if (attributes?.lock_manager)
+          // if lock_manager attribute exist, use it to have the global lock state
+          this._isLocked = attributes?.lock_manager?.is_locked || false;
+          // else keep the current value to have a local lock state
+
+        this.isUserLocked = this._isLocked && (!this._isLockConfigured || attributes?.lock_manager?.lock_users || false);
+        this.isAutomationLocked = this._isLocked && (attributes?.lock_manager?.lock_automations || false);
+        this._hasLockCode = (attributes?.lock_manager?.lock_code === true);
+
+
         // isLocked is the global lock state. isUserLocked is used for UI blocking.
-        this.isLocked = isLocked;
+        // TODO if (DEBUG) 
+          console.log(`Lock states. isConfigured:${this._isLockConfigured} isLocked=${this._isLocked} isUserLocked=${this.isUserLocked} isAutomationLocked=${this.isAutomationLocked} hasLockCode=${this._hasLockCode}`);
 
         this.name = "";
         this.hvacMode = stateMode || hvac_mode_OFF;
@@ -1396,25 +1410,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     });
   }
 
-  private _recordPreset(e: MouseEvent): void {
-    if (this.isUserLocked) {
-      return;
-    }
-    this.hass!.callService("versatile_thermostat", "set_preset_temperature", {
-      entity_id: this._config!.entity,
-      preset: (e.currentTarget as any).preset,
-      temperature: this.last_target_temperature
-    });
-  }
-
-  private _handleClickOrDoubleClick(e: MouseEvent): void {
-    if (e.detail === 1) {
-      this._handlePreset(e);
-    } else if (e.detail === 2) {
-      this._recordPreset(e);
-    }
-  }
-
   private _handleClickAutoFanInfo(/*e: MouseEvent*/): void {
     if (this.isUserLocked) {
       return;
@@ -1661,28 +1656,40 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       return;
     }
 
-    const hasLockCode = this.stateObj.attributes.specific_states?.lock_code;
-
-    if (this.isLocked) {
-      if (hasLockCode) {
+    if (this._isLocked) {
+      if (this._hasLockCode) {
         this.isLocking = false;
         this.showDigicodeModal = true;
         this.enteredCode = "";
         return;
       }
-      this.hass.callService("versatile_thermostat", "unlock", {
-        entity_id: this._config.entity,
-      });
+      if (this.isUserLocked && this._isLockConfigured) {
+        this.hass.callService("versatile_thermostat", "unlock", {
+          entity_id: this._config.entity,
+        });
+      }
+      else {
+        this._isLocked = this.isUserLocked = false;
+        this.requestUpdate();
+        // this._updateDisplay();
+      }
     } else {
-      if (hasLockCode) {
+      if (this._hasLockCode) {
         this.isLocking = true;
         this.showDigicodeModal = true;
         this.enteredCode = "";
         return;
       }
-      this.hass.callService("versatile_thermostat", "lock", {
-        entity_id: this._config.entity,
-      });
+      if (this.isUserLocked && this._isLockConfigured) {
+        this.hass.callService("versatile_thermostat", "lock", {
+          entity_id: this._config.entity,
+        });
+      }
+      else {
+        this._isLocked = this.isUserLocked = true;
+        this.requestUpdate();
+        // this._updateDisplay();
+      }
     }
   }
 
@@ -2000,24 +2007,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     </div>
 
     <div id="right-lock">
-      ${this.stateObj && this._config?.entity &&
-      (this.stateObj.attributes.specific_states?.lock_users || this.stateObj.attributes.specific_states?.lock_automations) ? (
-        this._config?.allow_lock_toggle
-          ? html`
+      ${this._config?.allow_lock_toggle ? html`
               <ha-icon-button
-                class="lock-icon ${this.isLocked ? 'locked' : 'unlocked'}"
-                .path=${this.isLocked ? mdiLock : mdiLockOpen}
+                class="lock-icon ${this._isLocked ? 'locked' : 'unlocked'}"
+                .path=${this._isLocked ? mdiLock : mdiLockOpen}
                 @click=${this._handleLockToggle}
                 tabindex="0"
               ></ha-icon-button>
             `
-          : html`
-              <ha-icon
-                class="lock-icon ${this.isLocked ? 'locked' : 'unlocked'}"
-                .path=${this.isLocked ? mdiLock : mdiLockOpen}
-              ></ha-icon>
-            `
-      ) : ''}
+        : ''}
     </div>
 
     <ha-dialog

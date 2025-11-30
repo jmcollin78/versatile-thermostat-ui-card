@@ -65,7 +65,7 @@
     "fan_turbo": "Turbo",
     "fan_none": "Aucun",
     "fan_auto": "Auto",
-    "change_message": "Double clic pour changer le preset",
+    "change_message": "Clic pour sélectionner le preset",
     "toggle_message": "Clic pour basculer",
     "auto_start_stop": "Stoppé par auto-start/stop",
     "auto_start_stop_enable": "Active/désactive l'auto-start/stop",
