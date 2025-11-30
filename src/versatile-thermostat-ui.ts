@@ -1663,7 +1663,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.enteredCode = "";
         return;
       }
-      if (this.isUserLocked && this._isLockConfigured) {
+      if (this._isLockConfigured) {
         this.hass.callService("versatile_thermostat", "unlock", {
           entity_id: this._config.entity,
         });
@@ -1680,7 +1680,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.enteredCode = "";
         return;
       }
-      if (this.isUserLocked && this._isLockConfigured) {
+      if (this._isLockConfigured) {
         this.hass.callService("versatile_thermostat", "lock", {
           entity_id: this._config.entity,
         });
