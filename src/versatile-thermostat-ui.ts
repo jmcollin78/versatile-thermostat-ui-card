@@ -1396,25 +1396,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     });
   }
 
-  private _recordPreset(e: MouseEvent): void {
-    if (this.isUserLocked) {
-      return;
-    }
-    this.hass!.callService("versatile_thermostat", "set_preset_temperature", {
-      entity_id: this._config!.entity,
-      preset: (e.currentTarget as any).preset,
-      temperature: this.last_target_temperature
-    });
-  }
-
-  private _handleClickOrDoubleClick(e: MouseEvent): void {
-    if (e.detail === 1) {
-      this._handlePreset(e);
-    } else if (e.detail === 2) {
-      this._recordPreset(e);
-    }
-  }
-
   private _handleClickAutoFanInfo(/*e: MouseEvent*/): void {
     if (this.isUserLocked) {
       return;
@@ -2001,7 +1982,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
     <div id="right-lock">
       ${this.stateObj && this._config?.entity &&
-      (this.stateObj.attributes.specific_states?.lock_users || this.stateObj.attributes.specific_states?.lock_automations) ? (
+      (this._config?.allow_lock_toggle || this.stateObj.attributes.specific_states?.lock_users || this.stateObj.attributes.specific_states?.lock_automations) ? (
         this._config?.allow_lock_toggle
           ? html`
               <ha-icon-button
