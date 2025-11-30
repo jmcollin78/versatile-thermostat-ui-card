@@ -1,15 +1,13 @@
 import commonjs from "@rollup/plugin-commonjs";
-import resolve from '@rollup/plugin-node-resolve';
+import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import babel from "@rollup/plugin-babel";
 import json from "@rollup/plugin-json";
-import { terser } from "@wwa/rollup-plugin-terser";
+import { terser } from "rollup-plugin-terser";
 import serve from "rollup-plugin-serve";
 import ignore from "./rollup-ignore-plugin.js";
-import cssImports from 'rollup-plugin-import-css';
-const IGNORED_FILES = [
-
-];
+import cssImports from "rollup-plugin-import-css";
+const IGNORED_FILES = [];
 
 const dev = process.env.ROLLUP_WATCH;
 
@@ -40,18 +38,18 @@ const plugins = [
     }),
     terser({
         compress: {
-            defaults: true
+            defaults: true,
         },
         warnings: true,
         output: {
-          comments: function (node, comment) {
-            var text = comment.value;
-            var type = comment.type;
-            if (type == "comment2") {
-              // multiline comment
-              return /@preserve|@license|@cc_on/i.test(text);
-            }
-          },
+            comments: function (node, comment) {
+                var text = comment.value;
+                var type = comment.type;
+                if (type == "comment2") {
+                    // multiline comment
+                    return /@preserve|@license|@cc_on/i.test(text);
+                }
+            },
         },
     }),
     ...(dev ? [serve(serveOptions)] : []),
@@ -71,7 +69,11 @@ export default [
                 "node_modules/@formatjs/intl-utils/lib/src/diff.js",
                 "node_modules/@formatjs/intl-utils/lib/src/resolve-locale.js",
             ];
-            if (thisAsWindowForModules.some((id_) => id.trimRight().endsWith(id_))) {
+            if (
+                thisAsWindowForModules.some((id_) =>
+                    id.trimRight().endsWith(id_)
+                )
+            ) {
                 return "window";
             }
         },
