@@ -6,6 +6,7 @@
   "editor": {
     "card": {
       "climate": {
+        "allow_lock_toggle": "Pozwól na blokowanie/odblokowanie z karty",
         "autoStartStopEnableEntity": "Encja autoSTART/autoSTOP",
         "powerEntity": "Encja poboru mocy",
         "disable_circle": "Wyłącz koło",
@@ -97,6 +98,11 @@
     "target_temp_absence_detected": "Docelowa temp.: wykryta nieobecność",
     "messages-button": "Dlaczego taki stan?",
     "recalculation_scheduled": "Aktualizacja urządzeń w toku",
-    "window-bypass-button": "Przełącz pomijanie okna"
+    "window-bypass-button": "Przełącz pomijanie okna",
+    "lock_users_active": "Sterowanie użytkownika zablokowane",
+    "lock_automations_active": "Zmiany automatyzacji zablokowane",
+    "code_error": "Błędny kod",
+    "lock": "Zablokuj",
+    "unlock": "Odblokuj"
   }
 }

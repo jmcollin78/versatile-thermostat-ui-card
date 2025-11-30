@@ -3,10 +3,22 @@
     "version": "versie",
     "current": "huidig"
   },
+  "editor": {
+    "card": {
+      "climate": {
+        "allow_lock_toggle": "Allow lock/unlock from card"
+      }
+    }
+  },
   "extra_states": {
     "window_open": "Raam open",
     "night_mode": "Nacht modus",
     "eco": "Eco",
-    "overpowering": "Zomer"
+    "overpowering": "Zomer",
+    "lock_users_active": "Gebruikersbediening vergrendeld",
+    "lock_automations_active": "Automatisatie wijzigingen vergrendeld",
+    "code_error": "Foute code",
+    "lock": "Vergrendelen",
+    "unlock": "Ontgrendelen"
   }
 }

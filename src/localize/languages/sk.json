@@ -19,7 +19,8 @@
         "disable_safety_warning": "Zakázať bezpečnostné správy",
         "disable_buttons": "Zakázať plus/mínus tlačidlá",
         "eco_temperature": "Eco teplota",
-        "set_current_as_main": "Vymeňte cieľ za miesta s aktuálnou teplotou"
+        "set_current_as_main": "Vymeňte cieľ za miesta s aktuálnou teplotou",
+        "allow_lock_toggle": "Povoliť uzamknutie/odomknutie z karty"
       }
     }
   },
@@ -27,6 +28,11 @@
     "window_open": "Okno otvorené",
     "night_mode": "Nočný mód",
     "eco": "Eco",
-    "overpowering": "Leto"
+    "overpowering": "Leto",
+    "lock_users_active": "Ovládanie používateľa zamknuté",
+    "lock_automations_active": "Zmeny automatizácie zamknuté",
+    "code_error": "Chybný kód",
+    "lock": "Zamknúť",
+    "unlock": "Odomknúť"
   }
 }
