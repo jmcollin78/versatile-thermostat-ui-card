@@ -83,7 +83,7 @@ import './ha/ha-control-circular-slider';
 import { SensorEntity } from './ha/data/sensor';
 
 const UNAVAILABLE = "unavailable";
-const DEBUG=true;
+const DEBUG=false;
 const modeIcons: {
   [mode in any]: string
 } = {
