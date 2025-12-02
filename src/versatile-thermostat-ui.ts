@@ -83,7 +83,7 @@ import './ha/ha-control-circular-slider';
 import { SensorEntity } from './ha/data/sensor';
 
 const UNAVAILABLE = "unavailable";
-const DEBUG=false;
+const DEBUG=true;
 const modeIcons: {
   [mode in any]: string
 } = {
@@ -1117,7 +1117,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.isSleeping = (attributes?.specific_states?.is_sleeping === true);
         this.powerPercent = attributes?.vtherm_over_switch?.power_percent || attributes?.vtherm_over_climate?.valve_regulation?.power_percent || 0;
         if (attributes?.specific_states?.is_device_active === undefined) {
-           // for non Vtherm is_device_active will be true and then only hvac action will handle the hvac_action display
+           // for non Vtherm is_device_active will be undefined and then only hvac action will handle the hvac_action display
           this.isDeviceActive = (this.hvacAction == hvacAction_heating || this.hvacAction == hvacAction_cooling);
           if (DEBUG) console.log(`is_device_active not found value=${this.isDeviceActive}`);
         } else {
@@ -1164,8 +1164,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
         // hvac action
         // Patch hvacAction if power_percent is > 0. This avoid the circle color to change at each switch for over switch vtherm
-        if (! this.isSleeping && this.powerPercent > 0) {
+        if (attributes?.is_over_switch === true && this.powerPercent > 0) {
           this.hvacAction = requestedHvacMode == hvac_mode_HEAT ? hvacAction_heating : hvacAction_cooling
+          if (DEBUG) console.log(`After hvac_action patch ${this.hvacAction}`);
         }
 
 
