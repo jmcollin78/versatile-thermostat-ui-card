@@ -1105,8 +1105,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
 
         // isLocked is the global lock state. isUserLocked is used for UI blocking.
-        // TODO if (DEBUG) 
-          console.log(`Lock states. isConfigured:${this._isLockConfigured} isLocked=${this._isLocked} isUserLocked=${this.isUserLocked} isAutomationLocked=${this.isAutomationLocked} hasLockCode=${this._hasLockCode}`);
+        if (DEBUG) console.log(`Lock states. isConfigured:${this._isLockConfigured} isLocked=${this._isLocked} isUserLocked=${this.isUserLocked} isAutomationLocked=${this.isAutomationLocked} hasLockCode=${this._hasLockCode}`);
 
         this.name = "";
         this.hvacMode = stateMode || hvac_mode_OFF;
@@ -1295,6 +1294,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           }
 
           if (attributes?.is_over_valve || hasValveRegulation) {
+            if (this.meanCyclePower && !this._config?.powerEntity) {
+              this!.powerInfos!.push({
+                name: "mean_power_cycle",
+                value: roundNumber(this.meanCyclePower, 1),
+                unit: this.meanCyclePower < minPowerWatt ? "kW" : "W",
+                class: "vt-power-color"
+              });
+            }
+
             this.powerInfos.push({
               name: "valve_open_percent",
               value: this.valveOpenPercent,
