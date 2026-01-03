@@ -710,6 +710,29 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         color: var(--text-primary-color, #fff);
       }
 
+      .timed-preset-select {
+        height: 32px;
+        border: 1px solid var(--divider-color, #e0e0e0);
+        border-radius: 4px;
+        padding: 0 4px;
+        font-size: 14px;
+        background: var(--card-background-color, #fff);
+        color: var(--primary-text-color);
+        outline: none;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+      }
+
+      .timed-preset-select:focus {
+        border-color: var(--primary-color);
+      }
+
+      .timed-preset-select.active {
+        border-color: var(--primary-color);
+        background: var(--primary-color);
+        color: var(--text-primary-color, #fff);
+      }
+
       .timed-preset-remaining {
         font-size: 16px;
         font-weight: 500;
@@ -1511,9 +1534,28 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
   }
 
+  private _formatRemainingTime(minutes: number | null): string {
+    if (minutes === null || minutes <= 0) return "0";
+    if (minutes < 60) {
+      return `${minutes}`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    if (remainingMinutes === 0) {
+      return `${hours}h`;
+    }
+    return `${hours}h${remainingMinutes}`;
+  }
+
   private _handleTimedPresetDurationChange(e: Event): void {
     const input = e.target as HTMLInputElement;
     const value = input.value ? parseInt(input.value, 10) : null;
+    this.timedPresetDuration = (value && value > 0) ? value : null;
+  }
+
+  private _handleTimedPresetSelectChange(e: Event): void {
+    const select = e.target as HTMLSelectElement;
+    const value = select.value ? parseInt(select.value, 10) : null;
     this.timedPresetDuration = (value && value > 0) ? value : null;
   }
 
@@ -2098,16 +2140,18 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           <div class="timed-preset-container">
             ${this.timedPresetActive ? html`
               <span class="timed-preset-remaining" title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_active' })}">
-                ${this.timedPresetRemainingTime}
+                ${this._formatRemainingTime(this.timedPresetRemainingTime)}
               </span>
-              <span class="timed-preset-label">${localize({ hass: this.hass, string: 'extra_states.minutes' })}</span>
+              ${(this.timedPresetRemainingTime ?? 0) < 60 ? html`
+                <span class="timed-preset-label">${localize({ hass: this.hass, string: 'extra_states.minutes' })}</span>
+              ` : ''}
               <ha-icon-button
                 class="timed-preset-cancel"
                 @click=${this._handleCancelTimedPreset}
                 title="${localize({ hass: this.hass, string: 'extra_states.cancel_timed_preset' })}"
                 .path=${mdiClose}
               ></ha-icon-button>
-            ` : html`
+            ` : this._config?.use_manual_duration_input ? html`
               <input
                 type="number"
                 class="timed-preset-input ${this.timedPresetDuration ? 'active' : ''}"
@@ -2119,6 +2163,20 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
                 title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_title' })}"
               />
               <span class="timed-preset-label">${localize({ hass: this.hass, string: 'extra_states.minutes' })}</span>
+            ` : html`
+              <select
+                class="timed-preset-select ${this.timedPresetDuration ? 'active' : ''}"
+                @change=${this._handleTimedPresetSelectChange}
+                title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_title' })}"
+              >
+                <option value="" ?selected=${!this.timedPresetDuration}>--</option>
+                <option value="15" ?selected=${this.timedPresetDuration === 15}>15 ${localize({ hass: this.hass, string: 'extra_states.minutes' })}</option>
+                <option value="30" ?selected=${this.timedPresetDuration === 30}>30 ${localize({ hass: this.hass, string: 'extra_states.minutes' })}</option>
+                <option value="60" ?selected=${this.timedPresetDuration === 60}>1 h</option>
+                <option value="240" ?selected=${this.timedPresetDuration === 240}>4 h</option>
+                <option value="480" ?selected=${this.timedPresetDuration === 480}>8 h</option>
+                <option value="1440" ?selected=${this.timedPresetDuration === 1440}>24 h</option>
+              </select>
             `}
           </div>
         ` : ''}

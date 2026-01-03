@@ -29,7 +29,8 @@
         "disable_name": "Disable name",
         "disable_target_icon": "Disable the target icon",
         "allow_lock_toggle": "Allow lock/unlock from card",
-        "disable_timed_preset": "Disable timed preset duration input"
+        "disable_timed_preset": "Disable timed preset duration input",
+        "use_manual_duration_input": "Allow manual duration input instead of selector"
       }
     }
   },
