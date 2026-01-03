@@ -56,6 +56,8 @@ const CLIMATE_LABELS = [
     "disable_auto_fan_infos",
     "disable_target_icon",
     "allow_lock_toggle",
+    "disable_timed_preset",
+    "use_manual_duration_input",
 ] as string[];
 
 const computeSchema = memoizeOne(
@@ -95,6 +97,8 @@ const computeSchema = memoizeOne(
                 { name: "disable_auto_fan_infos", selector: { boolean: {} } },
                 { name: "disable_target_icon", selector: { boolean: {} } },
                 { name: "allow_lock_toggle", selector: { boolean: {} } },
+                { name: "disable_timed_preset", selector: { boolean: {} } },
+                { name: "use_manual_duration_input", selector: { boolean: {} } },
             ],
         },
     ]

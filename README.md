@@ -16,6 +16,10 @@
   - [Disable the auto-fan mode](#disable-the-auto-fan-mode)
   - [By-pass the window detection](#by-pass-the-window-detection)
   - [Lock/Unlock the thermostat](#lockunlock-the-thermostat)
+  - [Timed preset](#timed-preset)
+    - [How to use](#how-to-use)
+    - [When a timed preset is active](#when-a-timed-preset-is-active)
+    - [Configuration options](#configuration-options)
 - [Informations on current state](#informations-on-current-state)
   - [Display some messages](#display-some-messages)
   - [Update of underlying scheduled](#update-of-underlying-scheduled)
@@ -108,6 +112,8 @@ Note: those options should be improved with official release
 | autoStartStopEnableEntity               | string  | **Optional** | The entity id of auto-start/stop entity (must be a switch entity). Example: `switch.clim_salon_auto_start_stop`          |
 | powerEntity               | string  | **Optional** | The entity id of sensor entity which gives the real power consumed by the VTherm. Example: `sensor.clim_salon_power`          |
 | allow_lock_toggle         | boolean | **Optional** | true to display a lock icon to lock/unlock the thermostat. If a code is configured in VTherm, a keypad will be displayed. |
+| disable_timed_preset      | boolean | **Optional** | true to hide the timed preset duration selector next to preset icons. |
+| use_manual_duration_input | boolean | **Optional** | true to use a manual input field instead of the preset duration selector (15min, 30min, 1h, 4h, 8h, 24h). |
 
 
 Example:
@@ -144,6 +150,66 @@ You can lock or unlock the thermostat by clicking on the lock icon at the top ri
 If a pincode is configured in the Versatile Thermostat integration, a keypad dialog will appear to enter the code.
 This requires the `allow_lock_toggle` option to be set to `true` in the card configuration.
 
+## Timed preset
+
+The timed preset feature allows you to temporarily switch to a preset for a specific duration. After the duration expires, the thermostat will automatically return to its previous preset.
+
+This feature requires **Versatile Thermostat v8.4.2 or above**.
+
+### How to use
+
+1. Next to the preset icons, you will see a duration selector (or input field if `use_manual_duration_input` is enabled)
+2. Select a duration: 15 min, 30 min, 1h, 4h, 8h, or 24h (or enter a custom duration in minutes if using manual input)
+3. Click on the desired preset icon
+4. The preset will be activated for the selected duration
+
+
+The new timed preset field:
+
+![timed preset](assets/timed-preset-select-close.png)
+
+When the select duration is open:
+
+![timed preset select open](assets/timed-preset-select-open.png)
+
+With the option to enter manually the duration:
+
+![timed preset select open](assets/timed-preset-duration-field.png)
+
+### When a timed preset is active
+
+When a timed preset is active:
+- The duration selector is replaced by the remaining time display (e.g., "45 min" or "2h30" for durations over 1 hour)
+- A cancel button (X) appears next to the remaining time
+- Click the cancel button to immediately cancel the timed preset and return to the previous preset
+
+![timed preset when active](assets/timed-preset-7h52.png)
+
+### Configuration options
+
+- **disable_timed_preset**: Set to `true` to completely hide the timed preset feature
+- **use_manual_duration_input**: Set to `true` to use a free input field (in minutes) instead of the preset duration selector
+
+Example with timed preset using selector (default):
+```yaml
+type: custom:versatile-thermostat-ui-card
+entity: climate.living_room
+```
+
+Example with manual duration input:
+```yaml
+type: custom:versatile-thermostat-ui-card
+entity: climate.living_room
+use_manual_duration_input: true
+```
+
+Example with timed preset disabled:
+```yaml
+type: custom:versatile-thermostat-ui-card
+entity: climate.living_room
+disable_timed_preset: true
+```
+
 # Informations on current state
 
 ## Display some messages
@@ -165,6 +231,10 @@ When overpowering and shedding is activated and the setpooint has been set with 
 If the VTherm has been turned off by the auto-start/stop feature:
 
   ![auto stop message](assets/message-auto-stop.png)
+
+When the timed preset is active:
+
+  ![timed preset message](assets/message-timed-preset.png)
 
 Just click another time to the information icon to close the information popup.
 
