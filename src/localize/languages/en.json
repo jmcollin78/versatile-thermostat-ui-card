@@ -28,7 +28,8 @@
         "disable_auto_fan_infos": "Disable auto-fan infos",
         "disable_name": "Disable name",
         "disable_target_icon": "Disable the target icon",
-        "allow_lock_toggle": "Allow lock/unlock from card"
+        "allow_lock_toggle": "Allow lock/unlock from card",
+        "disable_timed_preset": "Disable timed preset duration input"
       }
     }
   },
@@ -96,6 +97,7 @@
     "target_temp_activity_detected": "Target temp.: activity detected",
     "target_temp_activity_not_detected": "Target temp.: activity not detected",
     "target_temp_absence_detected": "Target temp.: absence detected",
+    "target_temp_timed_preset": "Timed preset active",
     "lock_users_active": "User controls locked",
     "lock_automations_active": "Automation changes locked",
     "messages-button": "Why this state?",
@@ -103,6 +105,9 @@
     "window-bypass-button": "Toggle window bypass",
     "code_error": "Incorrect code",
     "lock": "Lock",
-    "unlock": "Unlock"
+    "unlock": "Unlock",
+    "timed_preset_title": "Duration in minutes (0 = permanent)",
+    "timed_preset_active": "Timed preset active",
+    "cancel_timed_preset": "Cancel timed preset"
   }
 }

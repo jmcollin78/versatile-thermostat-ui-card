@@ -27,7 +27,8 @@
         "disable_auto_fan_infos": "Désactiver les infos auto-ventilation",
         "disable_name": "Désactiver le nom",
         "disable_target_icon": "Désactiver l'icône cible",
-        "allow_lock_toggle": "Activer le verrouillage/déverrouillage depuis la carte"
+        "allow_lock_toggle": "Activer le verrouillage/déverrouillage depuis la carte",
+        "disable_timed_preset": "Désactiver le champ de durée du preset temporisé"
       }
     }
   },
@@ -93,6 +94,7 @@
     "target_temp_activity_detected": "Temp. cible : activité détectée",
     "target_temp_activity_not_detected": "Temp. cible : activité non détectée",
     "target_temp_absence_detected": "Temp. cible : absence détectée",
+    "target_temp_timed_preset": "Temporisation d'un preset active",
     "lock_users_active": "Verrouillage utilisateurs actif",
     "lock_automations_active": "Verrouillage automations actif",
     "messages-button": "Pourquoi cet état ?",
@@ -100,6 +102,9 @@
     "window-bypass-button": "Basculer le bypass fenêtre",
     "code_error": "Code incorrect",
     "lock": "Verrouiller",
-    "unlock": "Déverrouiller"
+    "unlock": "Déverrouiller",
+    "timed_preset_title": "Durée en minutes (0 = permanent)",
+    "timed_preset_active": "Preset temporisé actif",
+    "cancel_timed_preset": "Annuler le preset temporisé"
   }
 }

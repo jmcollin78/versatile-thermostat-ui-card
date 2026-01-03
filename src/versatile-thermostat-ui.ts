@@ -371,6 +371,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @state() private enteredCode: string = "";
   @state() private codeError: boolean = false;
   @state() private isLocking: boolean = false;
+  @state() private timedPresetDuration: number | null = null;
+  @state() private timedPresetActive: boolean = false;
+  @state() private timedPresetRemainingTime: number | null = null;
+  @state() private timedPresetPreset: string | null = null;
 
   setConfig(config: ClimateCardConfig): void {
     this._config = {
@@ -646,6 +650,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         display: flex;
         width: 100%;
         justify-content: center;
+        align-items: center;
         margin-top: -1em;
         margin-bottom: 1em;
       }
@@ -655,6 +660,73 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
       #presets .selected-icon {
         color: var(--label-badge-yellow);
+      }
+
+      .timed-preset-container {
+        display: flex;
+        align-items: center;
+        margin-left: 10px;
+        padding-left: 10px;
+        border-left: 1px solid var(--divider-color, #e0e0e0);
+      }
+
+      .timed-preset-input {
+        width: 30px;
+        height: 32px;
+        border: 1px solid var(--divider-color, #e0e0e0);
+        border-radius: 4px;
+        padding: 0 8px;
+        font-size: 14px;
+        text-align: center;
+        background: var(--card-background-color, #fff);
+        color: var(--primary-text-color);
+        outline: none;
+        transition: border-color 0.2s ease;
+      }
+
+      .timed-preset-input:focus {
+        border-color: var(--primary-color);
+      }
+
+      .timed-preset-input::-webkit-outer-spin-button,
+      .timed-preset-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      .timed-preset-input[type=number] {
+        -moz-appearance: textfield;
+      }
+
+      .timed-preset-label {
+        font-size: 12px;
+        color: var(--secondary-text-color);
+        margin-left: 4px;
+      }
+
+      .timed-preset-input.active {
+        border-color: var(--primary-color);
+        background: var(--primary-color);
+        color: var(--text-primary-color, #fff);
+      }
+
+      .timed-preset-remaining {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--primary-color);
+        min-width: 30px;
+        text-align: center;
+      }
+
+      .timed-preset-cancel {
+        --mdc-icon-size: 20px;
+        color: var(--error-color);
+        margin-left: 4px;
+        cursor: pointer;
+      }
+
+      .timed-preset-cancel:hover {
+        color: var(--primary-color);
       }
 
       .preset-label {
@@ -1148,6 +1220,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.hvacOffReason = attributes?.specific_states?.hvac_off_reason || null;
         this.isRecalculateScheduled = attributes?.specific_states?.is_recalculate_scheduled || null;
         this.isOn = attributes?.specific_states?.is_on === true;
+        
+        // Timed preset manager state
+        this.timedPresetActive = attributes?.timed_preset_manager?.is_active === true;
+        this.timedPresetRemainingTime = attributes?.timed_preset_manager?.remaining_time_min || null;
+        this.timedPresetPreset = attributes?.timed_preset_manager?.preset || null;
+        
         const requestedHvacMode = attributes?.requested_state?.hvac_mode || null;
         const msgs = attributes?.specific_states?.messages || [];
         const hasValveRegulation = (attributes?.vtherm_over_climate_valve?.have_valve_regulation == true);
@@ -1412,10 +1490,40 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     if (this.isUserLocked) {
       return;
     }
-    this.last_target_temperature = this.temperature
-    this.hass!.callService("climate", "set_preset_mode", {
+    this.last_target_temperature = this.temperature;
+    const presetMode = (e.currentTarget as any).preset;
+    
+    if (this.timedPresetDuration && this.timedPresetDuration > 0) {
+      // Use timed preset service
+      this.hass!.callService("versatile_thermostat", "set_timed_preset", {
+        entity_id: this._config!.entity,
+        preset: presetMode,
+        duration_minutes: this.timedPresetDuration,
+      });
+      // Reset the duration after use
+      this.timedPresetDuration = null;
+    } else {
+      // Use standard preset service
+      this.hass!.callService("climate", "set_preset_mode", {
+        entity_id: this._config!.entity,
+        preset_mode: presetMode,
+      });
+    }
+  }
+
+  private _handleTimedPresetDurationChange(e: Event): void {
+    const input = e.target as HTMLInputElement;
+    const value = input.value ? parseInt(input.value, 10) : null;
+    this.timedPresetDuration = (value && value > 0) ? value : null;
+  }
+
+  private _handleCancelTimedPreset(): void {
+    if (this.isUserLocked) {
+      return;
+    }
+    console.info(`VersatileThermostatUI-CARD canceling timed preset`);
+    this.hass!.callService("versatile_thermostat", "cancel_timed_preset", {
       entity_id: this._config!.entity,
-      preset_mode: (e.currentTarget as any).preset,
     });
   }
 
@@ -1986,6 +2094,34 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             return this._renderPreset(preset, this.preset);
           })}
         `}
+        ${!this._config?.disable_timed_preset ? html`
+          <div class="timed-preset-container">
+            ${this.timedPresetActive ? html`
+              <span class="timed-preset-remaining" title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_active' })}">
+                ${this.timedPresetRemainingTime}
+              </span>
+              <span class="timed-preset-label">${localize({ hass: this.hass, string: 'extra_states.minutes' })}</span>
+              <ha-icon-button
+                class="timed-preset-cancel"
+                @click=${this._handleCancelTimedPreset}
+                title="${localize({ hass: this.hass, string: 'extra_states.cancel_timed_preset' })}"
+                .path=${mdiClose}
+              ></ha-icon-button>
+            ` : html`
+              <input
+                type="number"
+                class="timed-preset-input ${this.timedPresetDuration ? 'active' : ''}"
+                .value=${this.timedPresetDuration ?? ''}
+                @input=${this._handleTimedPresetDurationChange}
+                placeholder="0"
+                min="0"
+                max="1440"
+                title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_title' })}"
+              />
+              <span class="timed-preset-label">${localize({ hass: this.hass, string: 'extra_states.minutes' })}</span>
+            `}
+          </div>
+        ` : ''}
       </div>
 
       <div id="left-infos">
