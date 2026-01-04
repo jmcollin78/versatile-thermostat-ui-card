@@ -345,7 +345,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _isAutoStartStopEnabled: boolean = false;
   private _isAutoStartStopConfigured: boolean = false;
   private _isLockConfigured: boolean = false;
-  private _isLocked: boolean = true; // locked by default if lock is not configured
+  private _isLocked: boolean = false;
   private _hasLockCode: boolean = false;
   private _timeout: any;
   private _oldValueMin: number = 0;
