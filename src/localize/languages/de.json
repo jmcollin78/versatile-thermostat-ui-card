@@ -77,6 +77,8 @@
     "lock_automations_active": "Automatisierungsänderungen gesperrt",
     "lock": "Sperren",
     "unlock": "Entsperren",
-    "code_error": "Falscher Code"
+    "code_error": "Falscher Code",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

@@ -103,6 +103,8 @@
     "lock_automations_active": "Zmiany automatyzacji zablokowane",
     "code_error": "Błędny kod",
     "lock": "Zablokuj",
-    "unlock": "Odblokuj"
+    "unlock": "Odblokuj",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

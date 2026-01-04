@@ -19,6 +19,8 @@
     "lock_automations_active": "Spremembe avtomatizacije zaklenjene",
     "code_error": "Napačna koda",
     "lock": "Zakleni",
-    "unlock": "Odkleni"
+    "unlock": "Odkleni",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

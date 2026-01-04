@@ -19,6 +19,8 @@
     "lock_automations_active": "Automatiseringsendringer låst",
     "code_error": "Feil kode",
     "lock": "Lås",
-    "unlock": "Lås opp"
+    "unlock": "Lås opp",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

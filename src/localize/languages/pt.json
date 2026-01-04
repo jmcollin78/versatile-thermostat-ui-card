@@ -30,6 +30,8 @@
     "lock_automations_active": "Alterações de automação bloqueadas",
     "code_error": "Código incorreto",
     "lock": "Bloquear",
-    "unlock": "Desbloquear"
+    "unlock": "Desbloquear",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

@@ -19,6 +19,8 @@
     "lock_automations_active": "Automatiske ændringer låst",
     "code_error": "Forkert kode",
     "lock": "Lås",
-    "unlock": "Lås op"
+    "unlock": "Lås op",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

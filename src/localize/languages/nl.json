@@ -19,6 +19,8 @@
     "lock_automations_active": "Automatisatie wijzigingen vergrendeld",
     "code_error": "Foute code",
     "lock": "Vergrendelen",
-    "unlock": "Ontgrendelen"
+    "unlock": "Ontgrendelen",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

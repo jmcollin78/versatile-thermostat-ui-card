@@ -19,6 +19,8 @@
     "lock_automations_active": "自动化更改已锁定",
     "code_error": "代码错误",
     "lock": "锁定",
-    "unlock": "解锁"
+    "unlock": "解锁",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

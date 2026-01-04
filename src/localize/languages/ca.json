@@ -19,6 +19,8 @@
     "lock_automations_active": "Canvis d'automatització bloquejats",
     "code_error": "Codi incorrecte",
     "lock": "Bloquejar",
-    "unlock": "Desbloquejar"
+    "unlock": "Desbloquejar",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

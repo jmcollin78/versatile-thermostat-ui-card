@@ -19,6 +19,8 @@
     "lock_automations_active": "Промените от автоматизации са заключени",
     "code_error": "Грешен код",
     "lock": "Заключване",
-    "unlock": "Отключване"
+    "unlock": "Отключване",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }
