@@ -33,6 +33,8 @@
     "lock_automations_active": "Změny automatizace zamčeny",
     "code_error": "Chybný kód",
     "lock": "Zamknout",
-    "unlock": "Odemknout"
+    "unlock": "Odemknout",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

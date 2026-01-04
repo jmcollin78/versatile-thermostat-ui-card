@@ -30,6 +30,8 @@
     "lock_automations_active": "Automatizálási változtatások zárolva",
     "code_error": "Rossz kód",
     "lock": "Zárolás",
-    "unlock": "Feloldás"
+    "unlock": "Feloldás",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

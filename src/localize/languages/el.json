@@ -19,6 +19,8 @@
     "lock_automations_active": "Αλλαγές αυτοματισμών κλειδωμένες",
     "code_error": "Λάθος κωδικός",
     "lock": "Κλείδωμα",
-    "unlock": "Ξεκλείδωμα"
+    "unlock": "Ξεκλείδωμα",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

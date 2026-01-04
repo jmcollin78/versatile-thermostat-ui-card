@@ -82,6 +82,8 @@
     "lock_automations_active": "Изменения автоматизации заблокированы",
     "code_error": "Неверный код",
     "lock": "Блокировать",
-    "unlock": "Разблокировать"
+    "unlock": "Разблокировать",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

@@ -106,6 +106,8 @@
     "unlock": "Déverrouiller",
     "timed_preset_title": "Durée en minutes (0 = permanent)",
     "timed_preset_active": "Preset temporisé actif",
-    "cancel_timed_preset": "Annuler le preset temporisé"
+    "cancel_timed_preset": "Annuler le preset temporisé",
+    "heating_failure": "Défaut de chauffage détecté",
+    "cooling_failure": "Défaut de refroidissement détecté"
   }
 }

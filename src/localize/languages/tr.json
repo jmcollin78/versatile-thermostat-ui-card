@@ -19,6 +19,8 @@
     "lock_automations_active": "Otomasyon değişiklikleri kilitlendi",
     "code_error": "Hatalı kod",
     "lock": "Kilitle",
-    "unlock": "Kilidi aç"
+    "unlock": "Kilidi aç",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

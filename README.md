@@ -6,8 +6,6 @@
 
 ![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/icon.png?raw=true)
 
-> This card need a "real" front UI developer. If you have time and skill, please contact me. Many issues are related to the front UI.
-
 - [UI Card for Versatile Thermostat](#ui-card-for-versatile-thermostat)
   - [Goals](#goals)
 - [Installation](#installation)
@@ -115,7 +113,6 @@ Note: those options should be improved with official release
 | disable_timed_preset      | boolean | **Optional** | true to hide the timed preset duration selector next to preset icons. |
 | use_manual_duration_input | boolean | **Optional** | true to use a manual input field instead of the preset duration selector (15min, 30min, 1h, 4h, 8h, 24h). |
 
-
 Example:
 ```
 type: custom:versatile-thermostat-ui-card
@@ -213,7 +210,7 @@ disable_timed_preset: true
 # Informations on current state
 
 ## Display some messages
-When the mode or the preset or the target temperature has been changed due to special event (window detection, motion detection, power, ...) an information icon like ![information icon](assets/information-icon.png) is diplayed on the left bar.
+When the mode or the preset or the target temperature has been changed due to special event (window detection, motion detection, power, ...) an information icon like ![information icon](assets/information-icon.png) or ![warning icon](assets/warning-icon.png) is diplayed on the left bar.
 Click on it and you will see why your VTherm is not in the requested state.
 
 Example when the setpoint has been changed due to motion detection:
@@ -236,6 +233,12 @@ When the timed preset is active:
 
   ![timed preset message](assets/message-timed-preset.png)
 
+When a heating failure is detected:
+
+  ![heating failure message](assets/message-heating-failure.png)
+
+See more informations on heating failure detection in the _VTherm_ documentation.
+
 Just click another time to the information icon to close the information popup.
 
 ## Update of underlying scheduled
@@ -257,6 +260,7 @@ More informations on the safety mode can be found [here](https://github.com/jmco
 | Icon  | Meaning  |
 |---|---|
 |  ![information icon](assets/information-icon.png) | Some information messages are available. Click on it to see it  |
+|  ![warning icon](assets/warning-icon.png) | Some warning informations messages are available. Click on it to see it  |
 |  ![underlying update delayed icon](assets/under-update-delayed-icon.png) | The underlying device's update has been delayed. See temporal filter on VTherm documentation  |
 |  ![presence detected icon](assets/presence-detected-icon.png) | The presence is detected  |
 |  ![motion detected icon](assets/activity-detected-icon.png) | The activity (ie motion) is detected  |
@@ -272,7 +276,7 @@ More informations on the safety mode can be found [here](https://github.com/jmco
 
 Example:
 
-  ![alt text](assets/icon-example.png)
+  ![a full example of a card with many icons](assets/icon-example.png)
 
 ## Help wanted!
 

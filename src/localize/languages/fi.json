@@ -19,6 +19,8 @@
     "lock_automations_active": "Automaation muutokset lukittu",
     "code_error": "Virheellinen koodi",
     "lock": "Lukitse",
-    "unlock": "Avaa lukitus"
+    "unlock": "Avaa lukitus",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

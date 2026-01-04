@@ -19,6 +19,8 @@
     "lock_automations_active": "Modificări automatizări blocate",
     "code_error": "Cod incorect",
     "lock": "Blocare",
-    "unlock": "Deblocare"
+    "unlock": "Deblocare",
+    "heating_failure": "Heating failure detected",
+    "cooling_failure": "Cooling failure detected"
   }
 }

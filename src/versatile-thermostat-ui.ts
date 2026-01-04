@@ -55,6 +55,7 @@ import {
   mdiBullseyeArrow,
   mdiSleep,
   mdiInformationBoxOutline,
+  mdiAlertBoxOutline,
   mdiUpdate,
   mdiLock,
   mdiLockOpen,
@@ -361,6 +362,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private autoFanInfos: any = [];
   private messages: any = [];
   private displayMessages: boolean = false;
+  @state() private _hasError: boolean = false;
 
 
   @state() private _config?: ClimateCardConfig;
@@ -480,6 +482,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         --mdc-icon-size: 40px;
         z-index: 2;
       }
+
+      .messages-button.error {
+        color: var(--error-color) !important;
+        animation: pulse 2s infinite;
+      }
+
 
       .unavailable {
           opacity: 0.3;
@@ -1251,7 +1259,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.timedPresetPreset = attributes?.timed_preset_manager?.preset || null;
         
         const requestedHvacMode = attributes?.requested_state?.hvac_mode || null;
-        const msgs = attributes?.specific_states?.messages || [];
+        let msgs = attributes?.specific_states?.messages || [];
+        if (msgs && !Array.isArray(msgs)) {
+            msgs = [msgs];
+        }
         const hasValveRegulation = (attributes?.vtherm_over_climate_valve?.have_valve_regulation == true);
 
         if (!this._config?.disable_name) {
@@ -1366,9 +1377,32 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         // Build Messages
         if (DEBUG) console.log(`Brut messages=${msgs}`);
         this.messages = [];
+        this._hasError = false;
+
+        // Add safety messages
+        if (this.safety_state) {
+             for (const safety of this.safety_state) {
+                this.messages.push(`${safety.name}: ${safety.security_msg}`);
+                this._hasError = true;
+            }
+        }
+
         // Add existing messages from the attribute
         for (const msg of msgs) {
           this.messages.push(localize({ hass: this.hass, string: `extra_states.${msg}` }));
+        }
+
+        const failureManager = attributes?.heating_failure_detection_manager;
+        const isHeatingFailure = failureManager?.heating_failure_state === 'on';
+        const isCoolingFailure = failureManager?.cooling_failure_state === 'on';
+
+        if (isHeatingFailure) {
+            this.messages.push(localize({ hass: this.hass, string: `extra_states.heating_failure` }));
+            this._hasError = true;
+        }
+        if (isCoolingFailure) {
+            this.messages.push(localize({ hass: this.hass, string: `extra_states.cooling_failure` }));
+            this._hasError = true;
         }
 
         if (DEBUG) console.log(`Messages=${JSON.stringify(this.messages)}`);
@@ -1672,10 +1706,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     return html `
       <ha-icon-button
         title="${localizeMessages}"
-        class="messages-button"
+        class="messages-button ${this._hasError ? 'error' : ''}"
         @click=${this._handleDisplayMessages}
         tabindex="0"
-        .path=${mdiInformationBoxOutline}
+        .path=${this._hasError ? mdiAlertBoxOutline : mdiInformationBoxOutline}
         .label=${localizeMessages}
       >
       </ha-icon-button>
@@ -2000,7 +2034,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       ` : ``}
       ${this.messages.length > 0 && this.displayMessages ? html`
         <div class="messages">
-          <ha-icon-button class="alert" .path=${mdiInformationBoxOutline}>
+          <ha-icon-button class="alert" .path=${this._hasError ? mdiAlertBoxOutline : mdiInformationBoxOutline}>
           </ha-icon-button>
           ${this.messages.map((message) => html`<span>${message}</span>`)}
         </div>

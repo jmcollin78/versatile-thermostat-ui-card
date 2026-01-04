@@ -19,6 +19,8 @@
         "lock_automations_active": "Зміни автоматизації заблоковані",
         "code_error": "Невірний код",
         "lock": "Блокувати",
-        "unlock": "Розблокувати"
-      }
+        "unlock": "Розблокувати",
+        "heating_failure": "Heating failure detected",
+        "cooling_failure": "Cooling failure detected"
     }
+}
