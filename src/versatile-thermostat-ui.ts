@@ -461,9 +461,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         display: flex;
         flex-flow: column;
         align-items: center;
-        place-content: center;
-        width: -webkit-fill-available;
-        height: -webkit-fill-available;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
         left: 0px;
         top: 0px;
         background: rgba(200, 200, 200, 0.16);
