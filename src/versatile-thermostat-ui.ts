@@ -139,7 +139,7 @@ const preset_manual="none",
 const autoFanModeMapping={
   "auto_fan_none": "None",
   "auto_fan_low": "Low",
-  "auto_fan_mid": "Medium",
+  "auto_fan_medium": "Medium",
   "auto_fan_high": "High",
   "auto_fan_turbo": "Turbo"
 };
