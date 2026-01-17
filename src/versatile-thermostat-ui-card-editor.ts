@@ -37,6 +37,7 @@ const CLIMATE_LABELS = [
     "powerEntity",
     "disable_name",
     "disable_circle",
+    "disable_background_color",
     "disable_window",
     "disable_autoStartStop",
     "disable_overpowering",
@@ -79,6 +80,7 @@ const computeSchema = memoizeOne(
             schema: [
                 { name: "disable_name", selector: { boolean: {} } },
                 { name: "disable_circle", selector: { boolean: {} } },
+                { name: "disable_background_color", selector: { boolean: {} } },
                 { name: "disable_window", selector: { boolean: {} } },
                 { name: "disable_autoStartStop", selector: { boolean: {} } },
                 { name: "disable_overpowering", selector: { boolean: {} } },

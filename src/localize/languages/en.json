@@ -9,6 +9,7 @@
         "autoStartStopEnableEntity": "Auto-start/stop entity",
         "powerEntity": "Power consumption entity",
         "disable_circle": "Disable circle",
+        "disable_background_color": "Disable background color ellipse",
         "disable_window": "Disable window",
         "disable_autoStartStop": "Disable auto-startStop",
         "disable_overpowering": "Disable overpowering",

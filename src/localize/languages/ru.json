@@ -9,6 +9,7 @@
         "autoStartStopEnableEntity": "Сущность автоматического старта/стопа",
         "powerEntity": "Сущность потребления энергии",
         "disable_circle": "Отключить круг",
+        "disable_background_color": "Отключить цветной эллипс фона",
         "disable_window": "Отключить окно",
         "disable_autoStartStop": "Отключить автоматический старт/стоп",
         "disable_overpowering": "Отключить перегрузку",

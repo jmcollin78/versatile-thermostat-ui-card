@@ -9,6 +9,7 @@
         "autoStartStopEnableEntity": "Entità di avvio/arresto automatico",
         "powerEntity": "Entità di consumo energetico",
         "disable_circle": "Disabilita cerchio",
+        "disable_background_color": "Disabilita ellisse colore di sfondo",
         "disable_window": "Disabilita la finestra",
         "disable_autoStartStop": "Disabilita Avvio/Arresto automatico",
         "disable_overpowering": "Disabilita la sovralimentazione",

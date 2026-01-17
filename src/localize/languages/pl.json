@@ -10,6 +10,7 @@
         "autoStartStopEnableEntity": "Encja autoSTART/autoSTOP",
         "powerEntity": "Encja poboru mocy",
         "disable_circle": "Wyłącz koło",
+        "disable_background_color": "Wyłącz kolorową elipsę tła",
         "disable_window": "Wyłącz okno",
         "disable_autoStartStop": "Wyłącz autoSTART/autoSTOP",
         "disable_overpowering": "Wyłącz przeciążenie",
