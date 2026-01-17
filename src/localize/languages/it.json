@@ -28,7 +28,7 @@
         "disable_auto_fan_infos": "Disabilita Info auto-fan",
         "disable_name": "Disabilita nome",
         "disable_target_icon": "Disabilita  icona obbiettivo",
-        "allow_lock_toggle": "Allow lock/unlock from card"
+        "allow_lock_toggle": "Allow lock/unlock from card",
         "disable_timed_preset": "Disattiva immissione durata preimpostata",
         "use_manual_duration_input": "Consenti l'inserimento manuale della durata invece della selezione"
       }
