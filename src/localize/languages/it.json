@@ -29,6 +29,8 @@
         "disable_name": "Disabilita nome",
         "disable_target_icon": "Disabilita  icona obbiettivo",
         "allow_lock_toggle": "Allow lock/unlock from card"
+        "disable_timed_preset": "Disattiva immissione durata preimpostata",
+        "use_manual_duration_input": "Consenti l'inserimento manuale della durata invece della selezione"
       }
     }
   },
@@ -104,7 +106,10 @@
     "code_error": "Codice errato",
     "lock": "Blocca",
     "unlock": "Sblocca",
-    "heating_failure": "Heating failure detected",
-    "cooling_failure": "Cooling failure detected"
+    "timed_preset_title": "Durata in minuti (0 = permanente)",
+    "timed_preset_active": "Preimpostazione temporizzata attiva",
+    "cancel_timed_preset": "Disattiva Preimpostazione temporizzata",
+    "heating_failure": "Rilevato guasto al riscaldamento",
+    "cooling_failure": "Rilevato guasto al raffrescamento"
   }
 }
