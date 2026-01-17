@@ -92,6 +92,7 @@ Note: those options should be improved with official release
 | name                | string/boolean  | **optional** | override the default entity name |
 | disable_name        | boolean  | **optional** | true to hide the name                                                                     |
 | disable_circle        | boolean  | **optional** | true to hide the circle for setpoint. If no checked, an colored ellipse on the background is displayed instead. This option save space                                                                     |
+| disable_background_color | boolean | **optional** | true to hide the colored background ellipse that shows the hvac_action and hvac_mode state |
 | disable_window       | boolean  | **optional** | turn off the window open indicator                                                                     |
 | disable_overpowering | boolean  | **optional** | turn off the overpowering indicator                                                                |
 | disable_heat        | boolean  | **optional** | turn off the on/heat button                                                                          |
