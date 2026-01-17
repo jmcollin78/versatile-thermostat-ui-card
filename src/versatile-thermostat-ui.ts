@@ -82,6 +82,7 @@ import {
 import { ClimateCardConfig } from './climate-card-config';
 import './ha/ha-control-circular-slider';
 import { SensorEntity } from './ha/data/sensor';
+import { map } from 'superstruct';
 
 const UNAVAILABLE = "unavailable";
 const DEBUG=false;
@@ -139,7 +140,7 @@ const preset_manual="none",
 const autoFanModeMapping={
   "auto_fan_none": "None",
   "auto_fan_low": "Low",
-  "auto_fan_mid": "Medium",
+  "auto_fan_medium": "Medium",
   "auto_fan_high": "High",
   "auto_fan_turbo": "Turbo"
 };
@@ -1615,10 +1616,16 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
     const mappedNewMode=autoFanModeMapping[newMode];
 
-    console.info(
+    if (DEBUG)console.info(
       `VersatileThermostatUI-CARD changing auto_fan_mode to ${newMode} (mapped=$${mappedNewMode}`
     );
     
+    if (! mappedNewMode) {
+      console.warn(
+        `VersatileThermostatUI-CARD: auto_fan_mode ${newMode} has no mapping, aborting change.`
+      );
+      return;
+    }
     this.hass!.callService("versatile_thermostat", "set_auto_fan_mode", {
       entity_id: this._config!.entity,
       auto_fan_mode: mappedNewMode,
