@@ -14,6 +14,7 @@
   - [Disable the auto-fan mode](#disable-the-auto-fan-mode)
   - [By-pass the window detection](#by-pass-the-window-detection)
   - [Lock/Unlock the thermostat](#lockunlock-the-thermostat)
+    - [Auto-relock feature](#auto-relock-feature)
   - [Timed preset](#timed-preset)
     - [How to use](#how-to-use)
     - [When a timed preset is active](#when-a-timed-preset-is-active)
@@ -110,6 +111,7 @@ Note: those options should be improved with official release
 | autoStartStopEnableEntity               | string  | **Optional** | The entity id of auto-start/stop entity (must be a switch entity). Example: `switch.clim_salon_auto_start_stop`          |
 | powerEntity               | string  | **Optional** | The entity id of sensor entity which gives the real power consumed by the VTherm. Example: `sensor.clim_salon_power`          |
 | allow_lock_toggle         | boolean | **Optional** | true to display a lock icon to lock/unlock the thermostat. If a code is configured in VTherm, a keypad will be displayed. |
+| lock_relock_delay         | number  | **Optional** | Delay in seconds after which the card will automatically re-lock after being unlocked. Set to 0 or omit to disable auto-relock. |
 | disable_timed_preset      | boolean | **Optional** | true to hide the timed preset duration selector next to preset icons. |
 | use_manual_duration_input | boolean | **Optional** | true to use a manual input field instead of the preset duration selector (15min, 30min, 1h, 4h, 8h, 24h). |
 
@@ -146,6 +148,20 @@ If an open window has been detected, you want to bypass it by clicking on the wi
 You can lock or unlock the thermostat by clicking on the lock icon at the top right of the card.
 If a pincode is configured in the Versatile Thermostat integration, a keypad dialog will appear to enter the code.
 This requires the `allow_lock_toggle` option to be set to `true` in the card configuration.
+
+The lock should be configured in the _VTherm_ integration in order to have a full feature. See [here](https://github.com/jmcollin78/versatile_thermostat/blob/main/documentation/en/feature-lock.md).
+
+### Auto-relock feature
+
+You can configure an auto-relock delay using the `lock_relock_delay` option. When set, the card will automatically re-lock itself after the specified number of seconds following an unlock action.
+
+Example with auto-relock after 60 seconds:
+```yaml
+type: custom:versatile-thermostat-ui-card
+entity: climate.living_room
+allow_lock_toggle: true
+lock_relock_delay: 60
+```
 
 ## Timed preset
 
