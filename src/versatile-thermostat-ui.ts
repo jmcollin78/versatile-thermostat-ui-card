@@ -446,6 +446,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           background: radial-gradient(var(--hvac-mode-color), transparent 50%);
       }
 
+      .disabled-circle-container.no-background-color{
+          background: none;
+      }
+
       vt-ha-outlined-icon-button {
         border: 1px solid var(--secondary-text-color);
         border-radius: 100%;
@@ -2089,7 +2093,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         </div>
       ` : ``}
 
-      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container' : ''}  ${this.hvacMode}_${this.hvacAction} ${this._hasWindow ? 'window_open' : ''}  ${this.overpowering ? 'overpowering' : ''}">
+      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container' : ''} ${this._config?.disable_background_color ? 'no-background-color' : ''}  ${this.hvacMode}_${this.hvacAction} ${this._hasWindow ? 'window_open' : ''}  ${this.overpowering ? 'overpowering' : ''}">
         ${
           this._config?.disable_circle ? html`
             <!-- No cicle configured -->

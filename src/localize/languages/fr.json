@@ -9,6 +9,7 @@
         "autoStartStopEnableEntity": "Entité - auto-start/stop",
         "powerEntity": "Entité - puissance consommée",
         "disable_circle": "Désactiver le cercle",
+        "disable_background_color": "Désactiver l'ellipse colorée de fond",
         "disable_window": "Désactiver fenêtre status",
         "disable_autoStartStop": "Désactiver auto-startStop",
         "disable_overpowering": "Désactiver sur-puissance status",
