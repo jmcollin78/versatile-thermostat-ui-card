@@ -2215,6 +2215,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
                 <option value="15" ?selected=${this.timedPresetDuration === 15}>15 ${localize({ hass: this.hass, string: 'extra_states.minutes' })}</option>
                 <option value="30" ?selected=${this.timedPresetDuration === 30}>30 ${localize({ hass: this.hass, string: 'extra_states.minutes' })}</option>
                 <option value="60" ?selected=${this.timedPresetDuration === 60}>1 h</option>
+                <option value="120" ?selected=${this.timedPresetDuration === 120}>2 h</option>
                 <option value="240" ?selected=${this.timedPresetDuration === 240}>4 h</option>
                 <option value="480" ?selected=${this.timedPresetDuration === 480}>8 h</option>
                 <option value="1440" ?selected=${this.timedPresetDuration === 1440}>24 h</option>

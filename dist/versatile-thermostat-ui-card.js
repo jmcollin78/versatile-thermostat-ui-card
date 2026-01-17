@@ -694,6 +694,7 @@ const un=270;const hn=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
                 <option value="15" ?selected=${15===this.timedPresetDuration}>15 ${Si({hass:this.hass,string:"extra_states.minutes"})}</option>
                 <option value="30" ?selected=${30===this.timedPresetDuration}>30 ${Si({hass:this.hass,string:"extra_states.minutes"})}</option>
                 <option value="60" ?selected=${60===this.timedPresetDuration}>1 h</option>
+                <option value="120" ?selected=${120===this.timedPresetDuration}>2 h</option>
                 <option value="240" ?selected=${240===this.timedPresetDuration}>4 h</option>
                 <option value="480" ?selected=${480===this.timedPresetDuration}>8 h</option>
                 <option value="1440" ?selected=${1440===this.timedPresetDuration}>24 h</option>
