@@ -58,6 +58,7 @@ const CLIMATE_LABELS = [
     "disable_target_icon",
     "allow_lock_toggle",
     "lock_relock_delay",
+    "disable_presets",
     "disable_timed_preset",
     "use_manual_duration_input",
 ] as string[];
@@ -101,6 +102,7 @@ const computeSchema = memoizeOne(
                 { name: "disable_target_icon", selector: { boolean: {} } },
                 { name: "allow_lock_toggle", selector: { boolean: {} } },
                 { name: "lock_relock_delay", selector: { number: { min: 0, max: 3600, unit_of_measurement: "s", mode: "box" } } },
+                { name: "disable_presets", selector: { boolean: {} } },
                 { name: "disable_timed_preset", selector: { boolean: {} } },
                 { name: "use_manual_duration_input", selector: { boolean: {} } },
             ],

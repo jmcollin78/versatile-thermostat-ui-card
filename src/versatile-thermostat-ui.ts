@@ -543,6 +543,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         transform: translate(-50%,-50%);
         max-width: 155px;
       }
+      .content.no-presets {
+        top: calc(60% - 30px);
+      }
 
       #main {
         transform: scale(2.3);
@@ -797,6 +800,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         left: 0%;
         top: 15%;
       }
+        #left-infos.no-presets {
+          top: 30%;
+        }
 
       #right-lock {
         z-index: 0;
@@ -2131,7 +2137,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             >
             `
         }
-          <div class="content ${this.name.length == 0 ? 'noname':''} ${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} " >
+          <div class="content${this._config?.disable_presets ? ' no-presets' : ''} ${this.name.length == 0 ? ' noname':''} ${this.safety_state !== null || this.displayMessages ? ' security_msg': ''} ${this._hasWindow ? ' window_open': ''}  ${this.overpowering ? ' overpowering': ''} ${this.presence ? ' presence': ''} ${this.motion ? ' motion': ''}  ${this._hasWindowByPass ? ' windowByPass': ''} " >
             <svg id="main" viewbox="0 0 125 100">
               <g transform="translate(57.5,37) scale(0.35)">
                 ${(this._hasWindowByPass) ? svg`
@@ -2218,6 +2224,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         </div>
       `}
       
+      ${!this._config?.disable_presets ? html`
       <div id="presets" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
         ${svg`
           ${this.presets.map((preset) => {
@@ -2270,8 +2277,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           </div>
         ` : ''}
       </div>
+      ` : ''}
 
-      <div id="left-infos">
+      <div id="left-infos" class="${this._config?.disable_presets ? 'no-presets' : ''}">
       ${ this.isRecalculateScheduled ? svg`
         ${this._renderRecalculateScheduledButton()}
         `:''}
