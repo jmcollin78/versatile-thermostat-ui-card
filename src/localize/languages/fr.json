@@ -30,6 +30,7 @@
         "disable_target_icon": "Désactiver l'icône cible",
         "allow_lock_toggle": "Activer le verrouillage/déverrouillage depuis la carte",
         "lock_relock_delay": "Délai de reverrouillage auto (secondes, 0 = désactivé)",
+        "disable_presets": "Désactiver les presets",
         "disable_timed_preset": "Désactiver le champ de durée du preset temporisé",
         "use_manual_duration_input": "Permettre la saisie manuelle de la durée"
       }

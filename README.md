@@ -113,6 +113,7 @@ Note: those options should be improved with official release
 | powerEntity               | string  | **Optional** | The entity id of sensor entity which gives the real power consumed by the VTherm. Example: `sensor.clim_salon_power`          |
 | allow_lock_toggle         | boolean | **Optional** | true to display a lock icon to lock/unlock the thermostat. If a code is configured in VTherm, a keypad will be displayed. |
 | lock_relock_delay         | number  | **Optional** | Delay in seconds after which the card will automatically re-lock after being unlocked. Set to 0 or omit to disable auto-relock. |
+| disable_presets           | boolean | **Optional** | true to hide all the preset icons and timed preset controls. |
 | disable_timed_preset      | boolean | **Optional** | true to hide the timed preset duration selector next to preset icons. |
 | use_manual_duration_input | boolean | **Optional** | true to use a manual input field instead of the preset duration selector (15min, 30min, 1h, 4h, 8h, 24h). |
 
