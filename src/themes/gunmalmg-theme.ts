@@ -205,6 +205,25 @@ export const gunmalmgStyles = css`
           opacity: 0.95;
         }
 
+        /* Badge: top-right white icon on colored background */
+        :host([theme="gunmalmg"]) .hvac-badge-container { position: relative; display: inline-block; }
+        :host([theme="gunmalmg"]) .hvac-badge {
+          position: absolute;
+          top: -6px;
+          right: -6px;
+          width: 20px;
+          height: 20px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #ffffff; /* icon white */
+        }
+        :host([theme="gunmalmg"]) .hvac-badge.heating { background: #f44336; }
+        :host([theme="gunmalmg"]) .hvac-badge.cooling { background: #03A9F4; }
+        :host([theme="gunmalmg"]) .hvac-badge.warning { background: #ff9800; }
+        :host([theme="gunmalmg"]) .hvac-badge svg { fill: #ffffff; width: 14px; height: 14px; }
+
         /* Preset pills tweaks */
         :host([theme="gunmalmg"]) .preset-label {
           border-radius: 10px;

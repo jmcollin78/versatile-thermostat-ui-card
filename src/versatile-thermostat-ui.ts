@@ -1965,9 +1965,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderHVACAction(): TemplateResult {
-    if (this.hvacAction === 'heating' ||
-        this.hvacMode == "heat" ||
-        this.hvacMode == "heat_cool") {
+    // return empty when off
+    if (!this.hvacAction || this.hvacAction === 'off' || this.hvacAction === 'idle') {
+      return html``;
+    }
+    // heating: red wave
+    if (this.hvacAction === 'heating') {
       return svg`<path class="status ${this.isDeviceActive ? 'active':''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
     }
     else if (this.hvacAction === 'cooling' ||
@@ -1977,6 +1980,14 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     else return svg`<path class="status" transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiClose}" />`;
   }
 
+  // Small badge SVG for gunmalmg theme (white icon, no wrapper)
+  private _renderHVACActionBadge(): TemplateResult {
+    if (!this.hvacAction || this.hvacAction === 'off' || this.hvacAction === 'idle') return html``;
+    if (this.hvacAction === 'heating') return svg`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${mdiHeatWave}"/></svg>`;
+    if (this.hvacAction === 'cooling') return svg`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${mdiAirConditioner}"/></svg>`;
+    return svg`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${mdiAlertBoxOutline}"/></svg>`;
+  }
+
   private _renderIcon(mode: string, currentMode: string, isToggle?: boolean): TemplateResult {
     if (!modeIcons[mode]) {
         return html ``;
@@ -1984,16 +1995,27 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     const localizeMode = this.hass!.localize(`component.climate.state._.${mode}`) || localize({ hass: this.hass, string: `extra_states.${mode}` });
     // if (DEBUG) console.log(`mode=${mode} currentMode=${currentMode} localizeMode=${localizeMode}`);
     return html `
-      <ha-icon-button
-        title="${currentMode === mode ? mode : ''}"
-        class=${classMap({ "selected-icon": currentMode === mode })}
-        .mode=${mode}
-        @click=${isToggle ? this._cycleHvacMode : this._handleAction}
-        tabindex="0"
-        .path=${modeIcons[mode]}
-        .label=${localizeMode}
-      >
-      </ha-icon-button>
+      <div class="hvac-badge-container">
+        <ha-icon-button
+          title="${currentMode === mode ? mode : ''}"
+          class=${classMap({ "selected-icon": currentMode === mode })}
+          .mode=${mode}
+          @click=${isToggle ? this._cycleHvacMode : this._handleAction}
+          tabindex="0"
+          .path=${modeIcons[mode]}
+          .label=${localizeMode}
+        ></ha-icon-button>
+        ${(() => {
+          // only show badge for gunmalmg theme
+          if (this.theme !== THEMES.GUNMALMG) return html``;
+          let cls = '';
+          if (!this.hvacAction || this.hvacAction === 'off' || this.hvacAction === 'idle') return html``;
+          if (this.hvacAction === 'heating') cls = 'heating';
+          else if (this.hvacAction === 'cooling') cls = 'cooling';
+          else cls = 'warning';
+          return html`<div class="hvac-badge ${cls}">${this._renderHVACActionBadge()}</div>`;
+        })()}
+      </div>
     `;
   }
 
