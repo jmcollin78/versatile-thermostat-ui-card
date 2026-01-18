@@ -2,6 +2,7 @@ import { css } from 'lit';
 import { html } from 'lit';
 import { mdiDotsVertical, mdiClose } from '@mdi/js';
 import type { TemplateResult } from 'lit';
+import { localize } from '../localize/localize';
 
 // Render function for the gunmalmg theme. Accepts the component instance
 // so it can reuse helper render methods (icons, temperatures, presets).
@@ -21,29 +22,30 @@ export function renderGunmalmg(ctx: any): TemplateResult {
       ${ctx._showThemeMenu ? html`
         <div class="menu-backdrop" @click=${() => ctx._closeThemeMenu()}></div>
         <div class="theme-menu">
-          <div class="theme-menu-close" @click=${() => ctx._closeThemeMenu()}>
-            <ha-icon-button .path=${mdiClose} .label="close"></ha-icon-button>
+          <div class="theme-menu-header">
+            <div class="theme-menu-title" @click=${() => { ctx._handleMoreInfo(); ctx._closeThemeMenu(); }}>${localize({ hass: ctx.hass, string: 'editor.card.climate.menu_system' })}</div>
           </div>
-          <div class="theme-menu-item" @click=${() => { ctx._handleMoreInfo(); ctx._closeThemeMenu(); }}>${ctx.hass ? ctx.hass.localize('editor.card.climate.menu_system') : ''}</div>
           <div class="theme-menu-item" style="border-top:1px solid var(--divider-color, #e0e0e0);"></div>
           ${ctx._config?.theme === ctx.THEMES?.GUNMALMG ? html`
             <div class="theme-menu-item" @click=${() => { ctx._menuLockToggle(); ctx._closeThemeMenu(); }}>
-              ${ctx._isLocked ? (ctx.hass ? ctx.hass.localize('extra_states.unlock') : '') : (ctx.hass ? ctx.hass.localize('extra_states.lock') : '')}
+              ${ctx._isLocked ? localize({ hass: ctx.hass, string: 'extra_states.unlock' }) : localize({ hass: ctx.hass, string: 'extra_states.lock' })}
             </div>
             ${ctx.timedPresetActive ? html`
               <div class="theme-menu-item" @click=${() => { ctx._menuCancelTimedPreset(); ctx._closeThemeMenu(); }}>
-                ${ctx.hass ? ctx.hass.localize('extra_states.cancel_timed_preset') : ''}
+                ${localize({ hass: ctx.hass, string: 'extra_states.cancel_timed_preset' })}
               </div>
             ` : ``}
           ` : ``}
-          <div class="theme-menu-item" @click=${() => ctx._applyTheme('classic')}>${ctx.hass ? ctx.hass.localize('editor.card.climate.theme_classic') : 'Classic'}</div>
+          <div class="theme-menu-item" @click=${() => ctx._applyTheme('classic')}>${localize({ hass: ctx.hass, string: 'editor.card.climate.theme_classic' })}</div>
+          <div class="theme-menu-item" @click=${() => ctx._applyTheme('vtherm')}>${localize({ hass: ctx.hass, string: 'editor.card.climate.theme_vtherm' })}</div>
+          <div class="theme-menu-item" @click=${() => ctx._applyTheme('uncolored')}>${localize({ hass: ctx.hass, string: 'editor.card.climate.theme_uncolored' })}</div>
         </div>
       ` : ''}
 
       <div class="gunmalmg-grid">
         <div class="gunmalmg-left">
           <div class="hvac-mode-tile">
-            ${ctx._renderIcon(ctx.hvacMode, ctx.hvacMode)}
+            ${ctx._renderIcon(ctx.hvacMode, ctx.hvacMode, true)}
           </div>
         </div>
         <div class="gunmalmg-center">
@@ -89,7 +91,7 @@ export const gunmalmgStyles = css`
           padding: 0px 0px;
           box-shadow: none;
         }
-        :host([theme="gunmalmg"]) .name { font-weight: 600; color: #ffffff; font-size: 15px;}
+        :host([theme="gunmalmg"]) .name { font-weight: 600; color: #ffffff; font-size: 15px; text-align: left;}
         :host([theme="gunmalmg"]) .content { display: flex; position: relative; width: 100%; height: auto; max-width: none; transform: none; left: 0; top: 0; padding: 0; align-items: center; justify-content: center; }
         :host([theme="gunmalmg"]) .current-info, :host([theme="gunmalmg"]) #left-infos, :host([theme="gunmalmg"]) #vt-control-buttons { display: none !important; }
         :host([theme="gunmalmg"]) .disabled-circle-container { height: 64px; background: transparent; }
@@ -98,13 +100,11 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) #presets {
           display: grid;
           grid-template-columns: repeat(3, minmax(56px, 1fr));
-          /* gap: 10px; */
           margin-top: 8px;
           justify-items: center;
           align-items: center;
         }
         :host([theme="gunmalmg"]) .preset-label {
-            /* height: 44px; */
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -113,15 +113,12 @@ export const gunmalmgStyles = css`
 
         :host([theme="gunmalmg"]) .preset-label ha-icon-button {
           --mdc-icon-size: 22px; /* ~20% larger */
-          /* width: 50px;
-          height: 50px; */
           border-radius: 10px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           background: rgba(255,255,255,0.04);
           color: #e6e6e6;
-          /* color: var(--secondary-text-color); */
           border: 1px solid rgba(255,255,255,0.03);
         }
         :host([theme="gunmalmg"]) .preset-label .selected-icon {
@@ -131,12 +128,11 @@ export const gunmalmgStyles = css`
         /* Presets base: icon grey, dark grey background */
         :host([theme="gunmalmg"]) .preset-label ha-icon-button {
           background: #2b2b2b; /* dark grey */
-          /* color: #9e9e9e; */ /* icon grey */
           border: 1px solid rgba(255,255,255,0.03);
         }
 
         /* Only selected preset icon should be colored */
-        :host([theme="gunmalmg"]) .preset-label ha-icon-button.selected-icon { background: #111111; color: #e6e6e6 !important;}
+        :host([theme="gunmalmg"]) .preset-label ha-icon-button.selected-icon { background: #111111; color: #e6e6e6 !important; transition: background-color 180ms ease, color 180ms ease;}
 
         /* Selected colors mapping */
         :host([theme="gunmalmg"]) .preset-frost ha-icon-button.selected-icon { background: #3a9ff2; } /* blue */
@@ -167,17 +163,18 @@ export const gunmalmgStyles = css`
           background: rgba(255,255,255,0.02);
           color: var(--secondary-text-color);
           border: none;
+          transition: background-color 220ms ease, color 220ms ease, transform 160ms ease;
         }
 
         /* Colored states for hvac mode icon */
         :host([theme="gunmalmg"]) ha-card.heat .hvac-mode-tile ha-icon-button,
         :host([theme="gunmalmg"]) ha-card.heat_cool .hvac-mode-tile ha-icon-button {
           background: #3e2a00; /* dark orange */
-          color: #ffb74d; /* orange icon */
+          color: #fb9600; /* orange icon */
         }
         :host([theme="gunmalmg"]) ha-card.cool .hvac-mode-tile ha-icon-button {
           background: #003147; /* dark blue */
-          color: #90caf9; /* blue icon */
+          color: #038dfe; /* blue icon */
         }
         :host([theme="gunmalmg"]) ha-card.off .hvac-mode-tile ha-icon-button {
           background: #2b2b2b; /* dark grey */
@@ -193,30 +190,22 @@ export const gunmalmgStyles = css`
 
         /* Preset pills tweaks */
         :host([theme="gunmalmg"]) .preset-label {
-          /* height: 36px; */
-          /* padding: 0 12px; */
           border-radius: 10px;
           display: inline-flex;
           align-items: center;
           gap: 8px;
         }
 
-        /* :host([theme="gunmalmg"]) .preset-label ha-icon-button.selected-icon {
-          background: #ff9800;
-          color: #ffffff !important;
-          border-color: rgba(0,0,0,0.08);
-        } */
-
         /* Temperatures look: main number larger, unit and secondary smaller */
         :host([theme="gunmalmg"]) .main-value { font-size: 16px; font-weight: 600; }
         :host([theme="gunmalmg"]) #current { font-size: 12px; }
         :host([theme="gunmalmg"]) .content .name + * { color: var(--secondary-text-color); font-size: 10px; }
 
-        /* Inline temperature display */
-        :host([theme="gunmalmg"]) .gunmalmg-temps-inline { display: flex; gap: 8px; align-items: baseline; justify-content: center; }
-        :host([theme="gunmalmg"]) .gunmalmg-temp-main { font-size: 14px; font-weight: 600; color: #ffffff; }
-        :host([theme="gunmalmg"]) .gunmalmg-temp-secondary { font-size: 12px; color: var(--secondary-text-color); }
-        :host([theme="gunmalmg"]) .gunmalmg-uom { font-size: 11px; color: var(--secondary-text-color); }
+        /* Inline temperature display (left-aligned) */
+        :host([theme="gunmalmg"]) .gunmalmg-temps-inline { display: flex; gap: 8px; align-items: baseline; justify-content: flex-start; }
+        :host([theme="gunmalmg"]) .gunmalmg-temp-main { font-size: 20px; font-weight: 700; color: var(--secondary-text-color); }
+        :host([theme="gunmalmg"]) .gunmalmg-temp-secondary { font-size: 18px; color: var(--secondary-text-color); margin-left: 6px; }
+        :host([theme="gunmalmg"]) .gunmalmg-uom { font-size: 16px; color: var(--secondary-text-color); margin-left: 2px; }
 
         /* Hide lock icon and timed preset controls for Gunmalmg */
         :host([theme="gunmalmg"]) #right-lock { display: none !important; }
@@ -225,21 +214,33 @@ export const gunmalmgStyles = css`
         /* Grid layout: left 1/6, center 2/6, right 3/6 (i.e. 1/6, 2/6, 1/2) */
         :host([theme="gunmalmg"]) .gunmalmg-grid {
           display: grid;
-          /* Use stricter 1/6 | 2/6 | 3/6 ratio but reduce center slightly to avoid overflow */
-          grid-template-columns: 1fr 1.6fr 2.4fr; /* relative 1 : 1.6 : 2.4 */
-          gap: 12px;
+          grid-template-columns: 0.6fr 1.8fr 2.4fr;
+          grid-template-areas: "left center right";
+          gap: 6px;
           align-items: center;
         }
 
+        :host([theme="gunmalmg"]) .gunmalmg-left { grid-area: left; }
+        :host([theme="gunmalmg"]) .gunmalmg-center { grid-area: center; }
+        :host([theme="gunmalmg"]) .gunmalmg-right { grid-area: right; }
+
+        @media (max-width: 480px) {
+          :host([theme="gunmalmg"]) .gunmalmg-grid {
+            grid-template-columns: 1fr 1fr;
+            grid-template-areas:
+              "left center"
+              "right right";
+          }
+          :host([theme="gunmalmg"]) .gunmalmg-right {
+            margin-top: 8px;
+            justify-content: center;
+            padding-right: 0;
+          }
+        }
+
         :host([theme="gunmalmg"]) .gunmalmg-left { background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; }
-        :host([theme="gunmalmg"]) .gunmalmg-center { text-align: center; max-width: 100%; }
+        :host([theme="gunmalmg"]) .gunmalmg-center { text-align: left; max-width: 100%; display:flex; flex-direction:column; justify-content:left; }
         :host([theme="gunmalmg"]) .gunmalmg-right { padding-right: 30px; display: flex; justify-content: flex-end; }
-
-        /* Temporary debug borders to visualize blocks (remove later) */
-        :host([theme="gunmalmg"]) .gunmalmg-left { border: 1px dashed rgba(255,255,255,0.06); }
-        :host([theme="gunmalmg"]) .gunmalmg-center { border: 1px dashed rgba(255,255,255,0.04); }
-        :host([theme="gunmalmg"]) .gunmalmg-right { border: 1px dashed rgba(255,255,255,0.03); }
-
 
         :host([theme="gunmalmg"]) .hvac-mode-tile { display: flex; align-items: center; justify-content: center; padding: 0; background: transparent; }
 
@@ -251,4 +252,6 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) .more-info { color: #e6e6e6; z-index: 6; }
         :host([theme="gunmalmg"]) .theme-menu { background: #1b1b1b; color: #e6e6e6; border-color: rgba(255,255,255,0.06); }
         :host([theme="gunmalmg"]) .theme-menu-item { color: #e6e6e6; }
+        :host([theme="gunmalmg"]) .theme-menu-header { display:flex; align-items:center; justify-content:space-between; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        :host([theme="gunmalmg"]) .theme-menu-title { font-weight:600; cursor:pointer; }
 `;
