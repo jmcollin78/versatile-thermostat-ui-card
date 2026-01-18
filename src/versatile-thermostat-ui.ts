@@ -83,6 +83,7 @@ import { ClimateCardConfig } from './climate-card-config';
 import './ha/ha-control-circular-slider';
 import { SensorEntity } from './ha/data/sensor';
 import { map } from 'superstruct';
+import { gunmalmgStyles, renderGunmalmg } from './themes/gunmalmg';
 
 const UNAVAILABLE = "unavailable";
 const DEBUG=false;
@@ -431,7 +432,29 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       // keep presets visible
       this._config.disable_presets = this._config.disable_presets ?? false;
     }
+
+    // ensure overrides applied to host attribute
+    if (this._config && this._config.theme) {
+      this.setAttribute('theme', this._config.theme);
+    }
   }
+
+  private _applyThemeOverrides(theme: string) {
+    if (!this._config) this._config = {} as ClimateCardConfig;
+    if (theme === THEMES.GUNMALMG) {
+      this._config.disable_circle = true;
+      this._config.disable_background_color = true;
+      this._config.disable_buttons = true;
+      this._config.disable_power_infos = true;
+      this._config.disable_auto_fan_infos = true;
+      this._config.disable_target_icon = true;
+      this._config.disable_window = true;
+      this._config.disable_overpowering = true;
+      this._config.allow_lock_toggle = false;
+      this._config.disable_presets = this._config.disable_presets ?? false;
+    }
+  }
+
 
   private get effectiveDisableCircle(): boolean {
     const theme = (this._config && this._config.theme) ? this._config.theme : undefined;
@@ -457,7 +480,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     return 1;
   }
 
-    public static styles: CSSResultGroup = css `
+    public static styles: CSSResultGroup = [css `
       :host {
           display: block;
           box-sizing: border-box;
@@ -1113,56 +1136,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         :host([theme="uncolored"]) vt-ha-control-circular-slider { display: none; }
           :host([theme="uncolored"]) .disabled-circle-container { display: block !important; background: none !important; }
 
-        :host([theme="gunmalmg"]) vt-ha-control-circular-slider { display: none; }
-          :host([theme="gunmalmg"]) vt-ha-control-circular-slider { display: none !important; }
-        :host([theme="gunmalmg"]) .disabled-circle-container { display: block; background: none; }
-
-        /* Gunmalmg theme - minimalist compact list style */
-        :host([theme="gunmalmg"]) ha-card {
-          background: #121212;
-          color: #e6e6e6;
-          border-radius: 10px;
-          padding: 12px 14px;
-          box-shadow: none;
-        }
-        :host([theme="gunmalmg"]) .name { font-weight: 600; color: #ffffff; }
-        :host([theme="gunmalmg"]) .content { display: block; position: relative; width: auto; height: auto; max-width: none; transform: none; left: 0; top: 0; padding: 0; }
-        :host([theme="gunmalmg"]) .current-info, :host([theme="gunmalmg"]) #left-infos, :host([theme="gunmalmg"]) #vt-control-buttons { display: none !important; }
-        :host([theme="gunmalmg"]) .disabled-circle-container { height: 64px; background: transparent; }
-
-        /* Presets as pill buttons */
-        :host([theme="gunmalmg"]) #presets { display: flex; gap: 8px; margin-top: 8px; justify-content: flex-end; }
-        :host([theme="gunmalmg"]) .preset-label { height: 36px; display: inline-flex; align-items: center; }
-        :host([theme="gunmalmg"]) .preset-label ha-icon-button {
-          --mdc-icon-size: 20px;
-          width: 64px;
-          height: 36px;
-          border-radius: 8px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          background: rgba(255,255,255,0.04);
-          color: var(--secondary-text-color);
-          border: 1px solid rgba(255,255,255,0.03);
-        }
-        :host([theme="gunmalmg"]) .preset-label .selected-icon {
-          box-shadow: 0 2px 0 rgba(0,0,0,0.3) inset;
-        }
-
-        /* Specific preset colors */
-        :host([theme="gunmalmg"]) .preset-manual ha-icon-button { background: rgba(24,144,255,0.14); color: #90caf9; }
-        :host([theme="gunmalmg"]) .preset-eco ha-icon-button { background: rgba(67,160,71,0.14); color: #a5d6a7; }
-        :host([theme="gunmalmg"]) .preset-comfort ha-icon-button { background: rgba(255,152,0,0.14); color: #ffb74d; }
-        :host([theme="gunmalmg"]) .preset-boost ha-icon-button { background: rgba(244,67,54,0.14); color: #ef9a9a; }
-        :host([theme="gunmalmg"]) .preset-activity ha-icon-button { background: rgba(33,150,243,0.14); color: #90caf9; }
-
-        /* Temperatures look: main number larger, unit and secondary smaller */
-        :host([theme="gunmalmg"]) .main-value { font-size: 20px; font-weight: 600; }
-        :host([theme="gunmalmg"]) .content .name + * { color: var(--secondary-text-color); font-size: 12px; }
-
-        /* Hide lock icon and timed preset controls for Gunmalmg */
-        :host([theme="gunmalmg"]) #right-lock { display: none !important; }
-        :host([theme="gunmalmg"]) .timed-preset-container { display: none !important; }
+        /* gunmalmg theme rules moved to src/themes/gunmalmg.ts */
 
 
       .dialog-content {
@@ -1263,7 +1237,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
         40%, 60% { transform: translate3d(4px, 0, 0); }
       }
-  `;
+      }
+
+      @keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
+      }
+  `, gunmalmgStyles];
 
   private _vibrate(delay:number) {
     try {
@@ -1287,6 +1269,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     this._closeThemeMenu();
     // apply to host attribute
     this.setAttribute('theme', theme);
+    this._applyThemeOverrides(theme);
   }
 
   // Toggle lock action callable from the menu (bypasses allow_lock_toggle check)
@@ -2233,11 +2216,20 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderTemperature(temperature, isMain: boolean, x: string, y: string, isTarget: boolean) {
-    const fontSize= isMain ? 15:6;
-    const dx = isMain ? -2:-1;
-    const dy = isMain ? -5.5:-2;
-    const uomSize = isMain ? 5:3;
+    // Default sizes
+    let fontSize= isMain ? 15:6;
+    let dx = isMain ? -2:-1;
+    let dy = isMain ? -5.5:-2;
+    let uomSize = isMain ? 5:3;
     
+    // gunmalmg: smaller, more centered
+    if (this._config?.theme === THEMES.GUNMALMG) {
+      fontSize = isMain ? 10 : 5;
+      dx = isMain ? -1 : -1;
+      dy = isMain ? -4 : -2;
+      uomSize = isMain ? 4 : 3;
+    }
+
     let targetPosX:number = 76, targetPosY: number = 57, targetScale=0.20;
 
     let value:string;
@@ -2254,9 +2246,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
 
     if (isTarget && isMain) {
-        targetPosX = 30;
-        targetPosY = 56;
-        targetScale = 0.25
+      targetPosX = this._config?.theme === THEMES.GUNMALMG ? 40 : 30;
+      targetPosY = this._config?.theme === THEMES.GUNMALMG ? 56 : 56;
+      targetScale = this._config?.theme === THEMES.GUNMALMG ? 0.22 : 0.25
     }
 
     return svg`
@@ -2279,7 +2271,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   public render: () => TemplateResult = (): TemplateResult => {
-   
+
+    if (this._config?.theme === THEMES.GUNMALMG) {
+      return renderGunmalmg(this);
+    }
+
    return html `
    <ha-card class=${classMap({
      [this.hvacMode]: true,
@@ -2552,6 +2548,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         })}
       `}
     </div>
+
+    ${this._config?.theme === THEMES.GUNMALMG ? html`
+      <div id="left-infos-gunmalmg">
+        <div class="hvac-mode">
+          ${this._renderIcon(this.hvacMode, this.hvacMode)}
+        </div>
+        <div class="hvac-action">
+          ${this._renderHVACAction()}
+        </div>
+      </div>
+    ` : ''}
 
     <div id="right-lock">
       ${this._config?.allow_lock_toggle ? html`
