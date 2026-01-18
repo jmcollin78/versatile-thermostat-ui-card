@@ -63,10 +63,10 @@ const CLIMATE_LABELS = [
 ] as string[];
 
 const computeSchema = memoizeOne(
-    (): any[] => [
+    (themeOptions: any): any[] => [
         { name: "entity", selector: { entity: { domain: ["climate"] } } },
         { name: "name", selector: { text: {} } },
-        { name: "theme", selector: { select: { options: [ { value: "classic", label: "Classic" }, { value: "vtherm", label: "VTherm" }, { value: "uncolored", label: "Uncolored" }, { value: "gunmalmg", label: "Gunmalmg" } ] } } },
+        { name: "theme", selector: { select: { options: themeOptions } } },
         {
             type: "grid",
             name: "",
@@ -140,8 +140,15 @@ export class ClimateCardEditor extends LitElement implements LovelaceCardEditor 
             return html``;
         }
 
+        const customLocalize = setupCustomlocalize(this.hass!);
+        const themeOptions = [
+            { value: "classic", label: customLocalize("editor.card.climate.theme_classic") || "Classic" },
+            { value: "vtherm", label: customLocalize("editor.card.climate.theme_vtherm") || "VTherm" },
+            { value: "uncolored", label: customLocalize("editor.card.climate.theme_uncolored") || "Uncolored" },
+            { value: "gunmalmg", label: customLocalize("editor.card.climate.theme_gunmalmg") || "Gunmalmg" },
+        ];
 
-        const schema = computeSchema();
+        const schema = computeSchema(themeOptions);
 
         return html`
             <ha-form
