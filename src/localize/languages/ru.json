@@ -86,5 +86,10 @@
     "unlock": "Разблокировать",
     "heating_failure": "Heating failure detected",
     "cooling_failure": "Cooling failure detected"
-  }
+  },
+  "theme": "Тема",
+  "theme_classic": "Классический",
+  "theme_vtherm": "VTherm",
+  "theme_uncolored": "Без цвета",
+  "theme_gunmalmg": "Gunmalmg"
 }

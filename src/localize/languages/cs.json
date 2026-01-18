@@ -36,5 +36,10 @@
     "unlock": "Odemknout",
     "heating_failure": "Heating failure detected",
     "cooling_failure": "Cooling failure detected"
-  }
+  },
+  "theme": "Téma",
+  "theme_classic": "Klasické",
+  "theme_vtherm": "VTherm",
+  "theme_uncolored": "Bez barvy",
+  "theme_gunmalmg": "Gunmalmg"
 }

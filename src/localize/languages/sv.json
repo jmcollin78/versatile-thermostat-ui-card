@@ -15,5 +15,10 @@
     "unlock": "Lås upp",
     "heating_failure": "Heating failure detected",
     "cooling_failure": "Cooling failure detected"
-  }
+  },
+  "theme": "Tema",
+  "theme_classic": "Klassisk",
+  "theme_vtherm": "VTherm",
+  "theme_uncolored": "Omdfärgad",
+  "theme_gunmalmg": "Gunmalmg"
 }

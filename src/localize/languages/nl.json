@@ -22,5 +22,10 @@
     "unlock": "Ontgrendelen",
     "heating_failure": "Heating failure detected",
     "cooling_failure": "Cooling failure detected"
-  }
+  },
+  "theme": "Thema",
+  "theme_classic": "Classic",
+  "theme_vtherm": "VTherm",
+  "theme_uncolored": "Ongekleurd",
+  "theme_gunmalmg": "Gunmalmg"
 }

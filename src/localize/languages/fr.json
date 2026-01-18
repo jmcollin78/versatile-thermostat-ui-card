@@ -8,6 +8,11 @@
       "climate": {
         "autoStartStopEnableEntity": "Entité - auto-start/stop",
         "powerEntity": "Entité - puissance consommée",
+        "theme": "Thème",
+        "theme_classic": "Classique",
+        "theme_vtherm": "VTherm",
+        "theme_uncolored": "Sans couleur",
+        "theme_gunmalmg": "Gunmalmg",
         "disable_circle": "Désactiver le cercle",
         "disable_background_color": "Désactiver l'ellipse colorée de fond",
         "disable_window": "Désactiver fenêtre status",

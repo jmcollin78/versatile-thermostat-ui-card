@@ -22,5 +22,10 @@
     "unlock": "Desbloquear",
     "heating_failure": "Heating failure detected",
     "cooling_failure": "Cooling failure detected"
-  }
+  },
+  "theme": "Tema",
+  "theme_classic": "Clásico",
+  "theme_vtherm": "VTherm",
+  "theme_uncolored": "Sin color",
+  "theme_gunmalmg": "Gunmalmg"
 }

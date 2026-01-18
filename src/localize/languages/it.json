@@ -31,7 +31,12 @@
         "disable_target_icon": "Disabilita  icona obbiettivo",
         "allow_lock_toggle": "Allow lock/unlock from card",
         "disable_timed_preset": "Disattiva immissione durata preimpostata",
-        "use_manual_duration_input": "Consenti l'inserimento manuale della durata invece della selezione"
+        "use_manual_duration_input": "Consenti l'inserimento manuale della durata invece della selezione",
+        "theme": "Tema",
+        "theme_classic": "Classico",
+        "theme_vtherm": "VTherm",
+        "theme_uncolored": "Senza colore",
+        "theme_gunmalmg": "Gunmalmg"
       }
     }
   },

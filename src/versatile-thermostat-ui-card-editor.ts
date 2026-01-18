@@ -33,11 +33,10 @@ const loadHaComponents = (version: string) => {
 };
 
 const CLIMATE_LABELS = [
+    "theme",
     "autoStartStopEnableEntity",
     "powerEntity",
     "disable_name",
-    "disable_circle",
-    "disable_background_color",
     "disable_window",
     "disable_autoStartStop",
     "disable_overpowering",
@@ -67,6 +66,7 @@ const computeSchema = memoizeOne(
     (): any[] => [
         { name: "entity", selector: { entity: { domain: ["climate"] } } },
         { name: "name", selector: { text: {} } },
+        { name: "theme", selector: { select: { options: [ { value: "classic", label: "Classic" }, { value: "vtherm", label: "VTherm" }, { value: "uncolored", label: "Uncolored" }, { value: "gunmalmg", label: "Gunmalmg" } ] } } },
         {
             type: "grid",
             name: "",
@@ -80,8 +80,6 @@ const computeSchema = memoizeOne(
             name: "",
             schema: [
                 { name: "disable_name", selector: { boolean: {} } },
-                { name: "disable_circle", selector: { boolean: {} } },
-                { name: "disable_background_color", selector: { boolean: {} } },
                 { name: "disable_window", selector: { boolean: {} } },
                 { name: "disable_autoStartStop", selector: { boolean: {} } },
                 { name: "disable_overpowering", selector: { boolean: {} } },
@@ -157,7 +155,17 @@ export class ClimateCardEditor extends LitElement implements LovelaceCardEditor 
     }
 
     private _valueChanged(ev: CustomEvent): void {
-        fireEvent(this, "config-changed", { config: ev.detail.value });
-        fireEvent(this, "hass", { config: ev.detail.value });
+        const cfg = ev.detail.value as ClimateCardConfig;
+        // If theme not explicitly set, derive it from flags for a better UX
+        if (!cfg.theme) {
+            const disableCircle = !!cfg.disable_circle;
+            const disableBg = !!cfg.disable_background_color;
+            if (!disableCircle) cfg.theme = 'classic';
+            else if (disableCircle && !disableBg) cfg.theme = 'vtherm';
+            else if (disableCircle && disableBg) cfg.theme = 'uncolored';
+        }
+
+        fireEvent(this, "config-changed", { config: cfg });
+        fireEvent(this, "hass", { config: cfg });
     }
 }

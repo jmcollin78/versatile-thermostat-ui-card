@@ -17,6 +17,11 @@
         "disable_off": "Desactivar Off",
         "eco_temperature": "Modo Eco",
         "set_current_as_main": "Mudar para a temperatura local actual",
+        "theme": "Tema",
+        "theme_classic": "Clássico",
+        "theme_vtherm": "VTherm",
+        "theme_uncolored": "Sem cor",
+        "theme_gunmalmg": "Gunmalmg",
         "allow_lock_toggle": "Allow lock/unlock from card"
       }
     }

@@ -22,5 +22,10 @@
     "unlock": "解锁",
     "heating_failure": "Heating failure detected",
     "cooling_failure": "Cooling failure detected"
-  }
+  },
+  "theme": "主题",
+  "theme_classic": "经典",
+  "theme_vtherm": "VTherm",
+  "theme_uncolored": "无颜色",
+  "theme_gunmalmg": "Gunmalmg"
 }

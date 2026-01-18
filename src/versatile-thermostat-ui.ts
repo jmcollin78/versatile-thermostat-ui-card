@@ -150,6 +150,13 @@ const autoStartStopLevels=["auto_start_stop_slow", "auto_start_stop_medium", "au
 
 const minPowerWatt=7;
 
+const THEMES = {
+  CLASSIC: 'classic',
+  VTHERM: 'vtherm',
+  UNCOLORED: 'uncolored',
+  GUNMALMG: 'gunmalmg'
+};
+
 interface RegisterCardParams {
   type: string;
   name: string;
@@ -368,6 +375,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
 
   @state() private _config?: ClimateCardConfig;
+  @property({ type: String }) public theme: string = "";
   @state() private isLocked: boolean = false;
   @state() private isUserLocked: boolean = false;
   @state() private isAutomationLocked: boolean = false;
@@ -390,18 +398,53 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         },
         ...config,
     };
+    // apply theme attribute on host for CSS selection
+    const themeFromConfig = (this._config && this._config.theme) ? this._config.theme : "";
+    this.theme = themeFromConfig;
+    if (this.theme) {
+      this.setAttribute('theme', this.theme);
+    } else {
+      // derive default theme from effective flags (use getters for compatibility)
+      if (!this.effectiveDisableCircle) {
+        this.setAttribute('theme', 'classic');
+      } else if (this.effectiveDisableCircle && !this.effectiveDisableBackgroundColor) {
+        this.setAttribute('theme', 'vtherm');
+      } else if (this.effectiveDisableCircle && this.effectiveDisableBackgroundColor) {
+        this.setAttribute('theme', 'uncolored');
+      }
+    }
+  }
+
+  private get effectiveDisableCircle(): boolean {
+    const theme = (this._config && this._config.theme) ? this._config.theme : undefined;
+    if (theme === THEMES.CLASSIC) return false;
+    if (theme === THEMES.VTHERM) return true;
+    if (theme === THEMES.UNCOLORED) return true;
+    if (theme === THEMES.GUNMALMG) return true;
+    // fallback to legacy flag
+    return !!this._config?.disable_circle;
+  }
+
+  private get effectiveDisableBackgroundColor(): boolean {
+    const theme = (this._config && this._config.theme) ? this._config.theme : undefined;
+    if (theme === THEMES.CLASSIC) return false;
+    if (theme === THEMES.VTHERM) return false;
+    if (theme === THEMES.UNCOLORED) return true;
+    if (theme === THEMES.GUNMALMG) return true;
+    // fallback to legacy flag
+    return !!this._config?.disable_background_color;
   }
 
   getCardSize(): number | Promise<number> {
     return 1;
   }
 
-  public static styles: CSSResultGroup = css `
+    public static styles: CSSResultGroup = css `
       :host {
           display: block;
           box-sizing: border-box;
           position: relative;
-          container: vt-card / inline-size;
+        container: vt-card / inline-size;
       }
 
       ha-card {
@@ -1004,6 +1047,21 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           --mdc-theme-surface: var(--card-background-color);
       }
 
+        /* Theme variations ------------------------------------------------- */
+        :host([theme="classic"]) vt-ha-control-circular-slider { display: block; }
+          :host([theme="classic"]) .disabled-circle-container { display: none !important; }
+
+        :host([theme="vtherm"]) vt-ha-control-circular-slider { display: none !important; }
+          :host([theme="vtherm"]) .disabled-circle-container { display: block !important; background: radial-gradient(var(--hvac-mode-color), transparent 50%); }
+
+        :host([theme="uncolored"]) vt-ha-control-circular-slider { display: none; }
+          :host([theme="uncolored"]) .disabled-circle-container { display: block !important; background: none !important; }
+
+        :host([theme="gunmalmg"]) vt-ha-control-circular-slider { display: none; }
+          :host([theme="gunmalmg"]) vt-ha-control-circular-slider { display: none !important; }
+        :host([theme="gunmalmg"]) .disabled-circle-container { display: block; background: none; }
+
+
       .dialog-content {
         display: flex;
         flex-direction: column;
@@ -1201,7 +1259,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           if (DEBUG) console.log(`No change return`);
           return;
         }
-  
+      // const stateObj = this.hass.states[entity_id] as ClimateEntity;
+      // if (!stateObj) {
+      //     if (DEBUG) console.log(`No state`);
+      //     return;
+      // }
         if (DEBUG) console.log(`Something may have change`);
         this.stateObj = stateObj;
         const attributes = this.stateObj.attributes;
@@ -2038,7 +2100,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
 
     return svg`
-      ${isTarget && !this._config?.disable_target_icon && this._config?.disable_circle ? svg`
+      ${isTarget && !this._config?.disable_target_icon && this.effectiveDisableCircle ? svg`
         <path 
           class="main-value" 
           transform="translate(${targetPosX}, ${targetPosY}) scale(${targetScale})" 
@@ -2099,9 +2161,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         </div>
       ` : ``}
 
-      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container' : ''} ${this._config?.disable_background_color ? 'no-background-color' : ''}  ${this.hvacMode}_${this.hvacAction} ${this._hasWindow ? 'window_open' : ''}  ${this.overpowering ? 'overpowering' : ''}">
+      <div title="${this.buildTitle()}" class="${this.effectiveDisableCircle ? 'disabled-circle-container' : ''} ${this.effectiveDisableBackgroundColor ? 'no-background-color' : ''}  ${this.hvacMode}_${this.hvacAction} ${this._hasWindow ? 'window_open' : ''}  ${this.overpowering ? 'overpowering' : ''}">
         ${
-          this._config?.disable_circle ? html`
+          this.effectiveDisableCircle ? html`
             <!-- No cicle configured -->
           `:
             (this.value.low != null &&
@@ -2167,7 +2229,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
               </g>
 
               ${
-                this._config?.disable_circle ? svg`
+                this.effectiveDisableCircle ? svg`
                   ${this._renderTemperature(this._display_top, true, "55", "60%", ! this?._config?.set_current_as_main)}
                   ${this._renderTemperature(this._display_bottom, false, "90", "60%", this?._config?.set_current_as_main == true)}
                   <g class="current-info" transform="translate(100,65)">

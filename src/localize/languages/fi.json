@@ -22,5 +22,10 @@
     "unlock": "Avaa lukitus",
     "heating_failure": "Heating failure detected",
     "cooling_failure": "Cooling failure detected"
-  }
+  },
+  "theme": "Teema",
+  "theme_classic": "Klassinen",
+  "theme_vtherm": "VTherm",
+  "theme_uncolored": "Väritön",
+  "theme_gunmalmg": "Gunmalmg"
 }
