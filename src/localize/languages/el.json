@@ -22,5 +22,10 @@
     "unlock": "Ξεκλείδωμα",
     "heating_failure": "Heating failure detected",
     "cooling_failure": "Cooling failure detected"
-  }
+  },
+  "theme": "Θέμα",
+  "theme_classic": "Κλασικό",
+  "theme_vtherm": "VTherm",
+  "theme_uncolored": "Χωρίς χρώμα",
+  "theme_gunmalmg": "Gunmalmg"
 }

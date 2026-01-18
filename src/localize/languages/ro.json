@@ -22,5 +22,10 @@
     "unlock": "Deblocare",
     "heating_failure": "Heating failure detected",
     "cooling_failure": "Cooling failure detected"
-  }
+  },
+  "theme": "Temă",
+  "theme_classic": "Clasic",
+  "theme_vtherm": "VTherm",
+  "theme_uncolored": "Fără culoare",
+  "theme_gunmalmg": "Gunmalmg"
 }
