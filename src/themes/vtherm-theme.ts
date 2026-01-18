@@ -5,7 +5,7 @@ import { localize } from '../localize/localize';
 
 export function renderVtherm(ctx: any): TemplateResult {
   return html`
-    <ha-card class="vtherm-card ${ctx.hvacMode}">
+    <ha-card class="vtherm-card ${ctx.hvacMode} ${ctx._isLocked ? 'locked' : ''}">
       <ha-icon-button
         class="more-info"
         .label=${ctx.hass!.localize(
@@ -53,4 +53,12 @@ export const vthermStyles = css`
   :host([theme="vtherm"]) .vtherm-right { display:flex; justify-content:flex-end; }
   :host([theme="vtherm"]) .more-info { z-index:6 }
   :host([theme="vtherm"]) .theme-menu { background: var(--card-background-color); }
+  /* Dim hvac mode and preset icons when locked */
+  :host([theme="vtherm"]) ha-card.locked .vtherm-left ha-icon-button,
+  :host([theme="vtherm"]) ha-card.locked .vtherm-right ha-icon-button,
+  :host([theme="vtherm"]) ha-card.locked .vtherm-right .preset-label {
+    opacity: 0.5;
+    color: var(--disabled-text-color);
+    pointer-events: none;
+  }
 `;

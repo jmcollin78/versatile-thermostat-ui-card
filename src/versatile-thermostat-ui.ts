@@ -468,7 +468,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       this._config.disable_target_icon = true;
       this._config.disable_window = true;
       this._config.disable_overpowering = true;
-      this._config.allow_lock_toggle = false;
+      // preserve allow_lock_toggle from user config for gunmalmg
       this._config.disable_presets = this._config.disable_presets ?? false;
     } else if (this._originalConfigOptions) {
       // Si on quitte gunmalmg, restaurer les options d'origine
@@ -512,7 +512,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       this._config.disable_target_icon = true;
       this._config.disable_window = true;
       this._config.disable_overpowering = true;
-      this._config.allow_lock_toggle = false;
+      // preserve allow_lock_toggle from user config for gunmalmg
       this._config.disable_presets = this._config.disable_presets ?? false;
     } else if (this._originalConfigOptions) {
       Object.assign(this._config, this._originalConfigOptions);

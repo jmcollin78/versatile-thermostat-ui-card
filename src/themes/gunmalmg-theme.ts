@@ -1,6 +1,6 @@
 import { css } from 'lit';
 import { html } from 'lit';
-import { mdiDotsVertical, mdiClose } from '@mdi/js';
+import { mdiDotsVertical, mdiClose, mdiLock, mdiLockOpen } from '@mdi/js';
 import type { TemplateResult } from 'lit';
 import { localize } from '../localize/localize';
 
@@ -9,7 +9,7 @@ import { localize } from '../localize/localize';
 export function renderGunmalmg(ctx: any): TemplateResult {
   // Layout: a grid with 3 columns: 1/6 | 2/6 | 3/6 (i.e. 1/6, 2/6, 1/2)
   return html`
-    <ha-card class="gunmalmg-card ${ctx.hvacMode}">
+    <ha-card class="gunmalmg-card ${ctx.hvacMode} ${ctx._isLocked ? 'locked' : ''}">
       <ha-icon-button
         class="more-info"
         .label=${ctx.hass!.localize(
@@ -33,9 +33,6 @@ export function renderGunmalmg(ctx: any): TemplateResult {
           <div class="theme-menu-item" @click=${() => ctx._applyTheme('uncolored')}>${localize({ hass: ctx.hass, string: 'editor.card.climate.theme_uncolored' })}</div>
 
           <div class="theme-menu-item" style="border-top:1px solid var(--divider-color, #e0e0e0);"></div>
-          <div class="theme-menu-item" @click=${() => { ctx._menuLockToggle(); ctx._closeThemeMenu(); }}>
-            ${ctx._isLocked ? localize({ hass: ctx.hass, string: 'extra_states.unlock' }) : localize({ hass: ctx.hass, string: 'extra_states.lock' })}
-          </div>
           ${ctx.timedPresetActive ? html`
             <div class="theme-menu-item" @click=${() => { ctx._menuCancelTimedPreset(); ctx._closeThemeMenu(); }}>
               ${localize({ hass: ctx.hass, string: 'extra_states.cancel_timed_preset' })}
@@ -49,6 +46,18 @@ export function renderGunmalmg(ctx: any): TemplateResult {
           </div>
         </div>
       ` : ''}
+
+      <div id="right-lock" style="margin-top: 4px; display: flex; justify-content: center;">
+        ${ctx._config?.allow_lock_toggle ? html`
+            <ha-icon-button
+                class="lock-icon ${ctx._isLocked ? 'locked' : 'unlocked'}"
+                .path=${ctx._isLocked ? mdiLock : mdiLockOpen}
+                @click=${ctx._handleLockToggle}
+                tabindex="0"
+            ></ha-icon-button>
+            `
+        : ''}
+      </div>
 
       <div class="gunmalmg-grid">
         <div class="gunmalmg-left">
@@ -215,8 +224,7 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) .gunmalmg-temp-secondary { font-size: 18px; color: var(--secondary-text-color); margin-left: 6px; }
         :host([theme="gunmalmg"]) .gunmalmg-uom { font-size: 16px; color: var(--secondary-text-color); margin-left: 2px; }
 
-        /* Hide lock icon and timed preset controls for Gunmalmg */
-        :host([theme="gunmalmg"]) #right-lock { display: none !important; }
+        /* Hide timed preset controls for Gunmalmg */
         :host([theme="gunmalmg"]) .timed-preset-container { display: none !important; }
 
         /* Grid layout: left 1/6, center 2/6, right 3/6 (i.e. 1/6, 2/6, 1/2) */
@@ -254,10 +262,29 @@ export const gunmalmgStyles = css`
 
         :host([theme="gunmalmg"]) .hvac-mode-tile ha-icon-button { overflow: hidden; box-shadow: none; border-radius: 30px; }
 
+        /* Dim hvac mode and preset icons when locked */
+        :host([theme="gunmalmg"]) ha-card.locked .hvac-mode-tile ha-icon-button,
+        :host([theme="gunmalmg"]) ha-card.locked #presets ha-icon-button,
+        :host([theme="gunmalmg"]) ha-card.locked #presets .preset-label {
+          opacity: 0.5;
+          color: var(--disabled-text-color);
+          pointer-events: none;
+        }
+
         :host([theme="gunmalmg"]) .gunmalmg-presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; justify-items: center; }
 
         /* Make the more-info icon more visible on dark background */
         :host([theme="gunmalmg"]) .more-info { color: #e6e6e6; z-index: 6; }
+        :host([theme="gunmalmg"]) #right-lock {
+          position: absolute;
+          top: 40px; /* place under the menu button */
+          right: 0px;
+          z-index: 8; /* above some elements but below the menu overlay */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          pointer-events: auto;
+        }
         :host([theme="gunmalmg"]) .theme-menu { background: #1b1b1b; color: #e6e6e6; border-color: rgba(255,255,255,0.06); }
         :host([theme="gunmalmg"]) .theme-menu-item { color: #e6e6e6; }
         :host([theme="gunmalmg"]) .theme-menu-header { display:flex; align-items:center; justify-content:space-between; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
