@@ -85,6 +85,8 @@
     "unlock": "Entsperren",
     "code_error": "Falscher Code",
     "heating_failure": "Heating failure detected",
-    "cooling_failure": "Cooling failure detected"
+    "cooling_failure": "Cooling failure detected",
+    "increase_temp": "Temperatur erhöhen",
+    "decrease_temp": "Temperatur verringern"
   }
 }

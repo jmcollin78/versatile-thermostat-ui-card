@@ -21,7 +21,9 @@
     "lock": "Bloquear",
     "unlock": "Desbloquear",
     "heating_failure": "Heating failure detected",
-    "cooling_failure": "Cooling failure detected"
+    "cooling_failure": "Cooling failure detected",
+    "increase_temp": "Aumentar la temperatura",
+    "decrease_temp": "Disminuir la temperatura"
   },
   "theme": "Tema",
   "theme_classic": "Clásico",

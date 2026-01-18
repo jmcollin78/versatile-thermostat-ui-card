@@ -122,6 +122,8 @@
     "timed_preset_active": "Preset temporisé actif",
     "cancel_timed_preset": "Annuler le preset temporisé",
     "heating_failure": "Défaut de chauffage détecté",
-    "cooling_failure": "Défaut de refroidissement détecté"
+    "cooling_failure": "Défaut de refroidissement détecté",
+    "increase_temp": "Augmenter la température",
+    "decrease_temp": "Diminuer la température"
   }
 }

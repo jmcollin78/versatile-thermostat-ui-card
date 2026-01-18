@@ -336,6 +336,29 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     this._debouncedCallService(target);
   }
 
+    /** Incrémente la température cible principale */
+  private _handleTempUp() {
+    if (this.isUserLocked) return;
+    const step = this.step || 0.5;
+    let temp = typeof this.value?.value === 'number' ? this.value.value : this.min;
+    temp += step;
+    temp = Math.min(temp, this.max);
+    this.value = { ...this.value, value: temp };
+    this._callService('value');
+  }
+
+  /** Décrémente la température cible principale */
+  private _handleTempDown() {
+    if (this.isUserLocked) return;
+    const step = this.step || 0.5;
+    let temp = typeof this.value?.value === 'number' ? this.value.value : this.min;
+    temp -= step;
+    temp = Math.max(temp, this.min);
+    this.value = { ...this.value, value: temp };
+    this._callService('value');
+  }
+
+
   private _handleSelectTemp(ev) {
     if (this.isUserLocked) {
       return;
@@ -2344,6 +2367,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   public render: () => TemplateResult = (): TemplateResult => {
 
     if (this._config?.theme === THEMES.GUNMALMG) {
+      if (DEBUG) console.log(`Rendering Gunmalmg theme`);
       return renderGunmalmg(this);
     }
 

@@ -26,19 +26,27 @@ export function renderGunmalmg(ctx: any): TemplateResult {
             <div class="theme-menu-title" @click=${() => { ctx._handleMoreInfo(); ctx._closeThemeMenu(); }}>${localize({ hass: ctx.hass, string: 'editor.card.climate.menu_system' })}</div>
           </div>
           <div class="theme-menu-item" style="border-top:1px solid var(--divider-color, #e0e0e0);"></div>
-          ${ctx._config?.theme === ctx.THEMES?.GUNMALMG ? html`
-            <div class="theme-menu-item" @click=${() => { ctx._menuLockToggle(); ctx._closeThemeMenu(); }}>
-              ${ctx._isLocked ? localize({ hass: ctx.hass, string: 'extra_states.unlock' }) : localize({ hass: ctx.hass, string: 'extra_states.lock' })}
-            </div>
-            ${ctx.timedPresetActive ? html`
-              <div class="theme-menu-item" @click=${() => { ctx._menuCancelTimedPreset(); ctx._closeThemeMenu(); }}>
-                ${localize({ hass: ctx.hass, string: 'extra_states.cancel_timed_preset' })}
-              </div>
-            ` : ``}
-          ` : ``}
+          
+
           <div class="theme-menu-item" @click=${() => ctx._applyTheme('classic')}>${localize({ hass: ctx.hass, string: 'editor.card.climate.theme_classic' })}</div>
           <div class="theme-menu-item" @click=${() => ctx._applyTheme('vtherm')}>${localize({ hass: ctx.hass, string: 'editor.card.climate.theme_vtherm' })}</div>
           <div class="theme-menu-item" @click=${() => ctx._applyTheme('uncolored')}>${localize({ hass: ctx.hass, string: 'editor.card.climate.theme_uncolored' })}</div>
+
+          <div class="theme-menu-item" style="border-top:1px solid var(--divider-color, #e0e0e0);"></div>
+          <div class="theme-menu-item" @click=${() => { ctx._menuLockToggle(); ctx._closeThemeMenu(); }}>
+            ${ctx._isLocked ? localize({ hass: ctx.hass, string: 'extra_states.unlock' }) : localize({ hass: ctx.hass, string: 'extra_states.lock' })}
+          </div>
+          ${ctx.timedPresetActive ? html`
+            <div class="theme-menu-item" @click=${() => { ctx._menuCancelTimedPreset(); ctx._closeThemeMenu(); }}>
+              ${localize({ hass: ctx.hass, string: 'extra_states.cancel_timed_preset' })}
+            </div>
+          ` : ``}
+          <div class="theme-menu-item" @click=${() => { ctx._handleTempUp(); ctx._closeThemeMenu(); }}>
+              ${localize({ hass: ctx.hass, string: 'extra_states.increase_temp' }) || '+ Température'}
+          </div>
+          <div class="theme-menu-item" @click=${() => { ctx._handleTempDown(); ctx._closeThemeMenu(); }}>
+              ${localize({ hass: ctx.hass, string: 'extra_states.decrease_temp' }) || '- Température'}
+          </div>
         </div>
       ` : ''}
 

@@ -116,6 +116,8 @@
     "timed_preset_active": "Preimpostazione temporizzata attiva",
     "cancel_timed_preset": "Disattiva Preimpostazione temporizzata",
     "heating_failure": "Rilevato guasto al riscaldamento",
-    "cooling_failure": "Rilevato guasto al raffrescamento"
+    "cooling_failure": "Rilevato guasto al raffrescamento",
+    "increase_temp": "Aumenta la temperatura",
+    "decrease_temp": "Diminuisci la temperatura"
   }
 }

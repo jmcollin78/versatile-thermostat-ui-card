@@ -125,6 +125,8 @@
     "timed_preset_active": "Timed preset active",
     "cancel_timed_preset": "Cancel timed preset",
     "heating_failure": "Heating failure detected",
-    "cooling_failure": "Cooling failure detected"
+    "cooling_failure": "Cooling failure detected",
+    "increase_temp": "Increase temperature",
+    "decrease_temp": "Decrease temperature"
   }
 }
