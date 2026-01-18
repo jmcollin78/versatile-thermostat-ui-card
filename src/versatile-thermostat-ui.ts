@@ -375,6 +375,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
 
   @state() private _config?: ClimateCardConfig;
+  @state() private _showThemeMenu: boolean = false;
   @property({ type: String }) public theme: string = "";
   @state() private isLocked: boolean = false;
   @state() private isUserLocked: boolean = false;
@@ -1047,6 +1048,24 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           --mdc-theme-surface: var(--card-background-color);
       }
 
+      /* Theme menu styles */
+      .theme-menu {
+        position: absolute;
+        right: 8px;
+        top: 36px;
+        background: var(--card-background-color, #fff);
+        border: 1px solid var(--divider-color, #e0e0e0);
+        border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 10;
+        min-width: 160px;
+      }
+      .theme-menu-item {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      .theme-menu-item:hover { background: var(--divider-color, #f1f1f1); }
+
         /* Theme variations ------------------------------------------------- */
         :host([theme="classic"]) vt-ha-control-circular-slider { display: block; }
           :host([theme="classic"]) .disabled-circle-container { display: none !important; }
@@ -1166,6 +1185,24 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     try {
       navigator.vibrate(delay);
     } catch(e){}
+  }
+
+  private _toggleThemeMenu() {
+    this._showThemeMenu = !this._showThemeMenu;
+  }
+
+  private _closeThemeMenu() {
+    this._showThemeMenu = false;
+  }
+
+  private _applyTheme(theme: string) {
+    if (!this._config) this._config = {} as ClimateCardConfig;
+    this._config.theme = theme as any;
+    // persist the change via config-changed event so Lovelace editor can save it
+    fireEvent(this, 'config-changed', { config: this._config });
+    this._closeThemeMenu();
+    // apply to host attribute
+    this.setAttribute('theme', theme);
   }
 
   protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -2133,9 +2170,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           "ui.panel.lovelace.cards.show_more_info"
         )}
         .path=${mdiDotsVertical}
-        @click=${this._handleMoreInfo}
+        @click=${this._toggleThemeMenu}
         tabindex="0"
       ></ha-icon-button>
+      ${this._showThemeMenu ? html`
+        <div class="theme-menu">
+          <div class="theme-menu-item" @click=${() => this._applyTheme('classic')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_classic' })}</div>
+          <div class="theme-menu-item" @click=${() => this._applyTheme('vtherm')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_vtherm' })}</div>
+          <div class="theme-menu-item" @click=${() => this._applyTheme('uncolored')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_uncolored' })}</div>
+          <div class="theme-menu-item" @click=${() => this._applyTheme('gunmalmg')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_gunmalmg' })}</div>
+        </div>
+      ` : ``}
       `}
 
       ${this.name.length > 0 ? html`
