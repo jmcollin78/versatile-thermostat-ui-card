@@ -414,6 +414,23 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.setAttribute('theme', 'uncolored');
       }
     }
+
+    // If Gunmalmg theme, enforce config flags to produce a minimal UI
+    if (this._config && this._config.theme === THEMES.GUNMALMG) {
+      // force visual/interactive flags suitable for the minimalist theme
+      this._config.disable_circle = true;
+      this._config.disable_background_color = true;
+      this._config.disable_buttons = true;
+      this._config.disable_power_infos = true;
+      this._config.disable_auto_fan_infos = true;
+      this._config.disable_target_icon = true;
+      this._config.disable_window = true;
+      this._config.disable_overpowering = true;
+      // hide lock toggle from the card - the menu system will handle lock actions
+      this._config.allow_lock_toggle = false;
+      // keep presets visible
+      this._config.disable_presets = this._config.disable_presets ?? false;
+    }
   }
 
   private get effectiveDisableCircle(): boolean {
@@ -449,7 +466,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       ha-card {
-        overflow: hidden;
+        overflow: visible;
         height: 100%;
         width: 100%;
         vertical-align: middle;
@@ -1059,6 +1076,26 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         z-index: 10;
         min-width: 160px;
+        max-height: 60vh;
+        overflow-y: auto;
+        box-sizing: border-box;
+      }
+      .menu-backdrop {
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9;
+        background: transparent;
+      }
+      .theme-menu-close {
+        display: flex;
+        justify-content: flex-end;
+        padding: 6px 8px 0 0;
+      }
+      .theme-menu .theme-menu-close ha-icon-button {
+        --mdc-icon-size: 18px;
       }
       .theme-menu-item {
         padding: 8px 12px;
@@ -1079,6 +1116,53 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         :host([theme="gunmalmg"]) vt-ha-control-circular-slider { display: none; }
           :host([theme="gunmalmg"]) vt-ha-control-circular-slider { display: none !important; }
         :host([theme="gunmalmg"]) .disabled-circle-container { display: block; background: none; }
+
+        /* Gunmalmg theme - minimalist compact list style */
+        :host([theme="gunmalmg"]) ha-card {
+          background: #121212;
+          color: #e6e6e6;
+          border-radius: 10px;
+          padding: 12px 14px;
+          box-shadow: none;
+        }
+        :host([theme="gunmalmg"]) .name { font-weight: 600; color: #ffffff; }
+        :host([theme="gunmalmg"]) .content { display: block; position: relative; width: auto; height: auto; max-width: none; transform: none; left: 0; top: 0; padding: 0; }
+        :host([theme="gunmalmg"]) .current-info, :host([theme="gunmalmg"]) #left-infos, :host([theme="gunmalmg"]) #vt-control-buttons { display: none !important; }
+        :host([theme="gunmalmg"]) .disabled-circle-container { height: 64px; background: transparent; }
+
+        /* Presets as pill buttons */
+        :host([theme="gunmalmg"]) #presets { display: flex; gap: 8px; margin-top: 8px; justify-content: flex-end; }
+        :host([theme="gunmalmg"]) .preset-label { height: 36px; display: inline-flex; align-items: center; }
+        :host([theme="gunmalmg"]) .preset-label ha-icon-button {
+          --mdc-icon-size: 20px;
+          width: 64px;
+          height: 36px;
+          border-radius: 8px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(255,255,255,0.04);
+          color: var(--secondary-text-color);
+          border: 1px solid rgba(255,255,255,0.03);
+        }
+        :host([theme="gunmalmg"]) .preset-label .selected-icon {
+          box-shadow: 0 2px 0 rgba(0,0,0,0.3) inset;
+        }
+
+        /* Specific preset colors */
+        :host([theme="gunmalmg"]) .preset-manual ha-icon-button { background: rgba(24,144,255,0.14); color: #90caf9; }
+        :host([theme="gunmalmg"]) .preset-eco ha-icon-button { background: rgba(67,160,71,0.14); color: #a5d6a7; }
+        :host([theme="gunmalmg"]) .preset-comfort ha-icon-button { background: rgba(255,152,0,0.14); color: #ffb74d; }
+        :host([theme="gunmalmg"]) .preset-boost ha-icon-button { background: rgba(244,67,54,0.14); color: #ef9a9a; }
+        :host([theme="gunmalmg"]) .preset-activity ha-icon-button { background: rgba(33,150,243,0.14); color: #90caf9; }
+
+        /* Temperatures look: main number larger, unit and secondary smaller */
+        :host([theme="gunmalmg"]) .main-value { font-size: 20px; font-weight: 600; }
+        :host([theme="gunmalmg"]) .content .name + * { color: var(--secondary-text-color); font-size: 12px; }
+
+        /* Hide lock icon and timed preset controls for Gunmalmg */
+        :host([theme="gunmalmg"]) #right-lock { display: none !important; }
+        :host([theme="gunmalmg"]) .timed-preset-container { display: none !important; }
 
 
       .dialog-content {
@@ -1203,6 +1287,45 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     this._closeThemeMenu();
     // apply to host attribute
     this.setAttribute('theme', theme);
+  }
+
+  // Toggle lock action callable from the menu (bypasses allow_lock_toggle check)
+  private async _menuLockToggle() {
+    if (!this._config?.entity || !this.hass || !this.stateObj) return;
+    // If lock code is required, open keypad modal
+    if (this._hasLockCode) {
+      this.isLocking = this._isLocked ? false : true;
+      this.showDigicodeModal = true;
+      this.enteredCode = "";
+      return;
+    }
+    try {
+      if (this._isLocked) {
+        if (this._isLockConfigured) {
+          await this.hass.callService("versatile_thermostat", "unlock", { entity_id: this._config!.entity });
+          this._startRelockTimeout();
+        } else {
+          this._isLocked = this.isUserLocked = false;
+          this.requestUpdate();
+          this._startRelockTimeout();
+        }
+      } else {
+        if (this._isLockConfigured) {
+          await this.hass.callService("versatile_thermostat", "lock", { entity_id: this._config!.entity });
+        } else {
+          this._isLocked = this.isUserLocked = true;
+          this.requestUpdate();
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private _menuCancelTimedPreset() {
+    if (this.timedPresetActive) {
+      this._handleCancelTimedPreset();
+    }
   }
 
   protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -1873,7 +1996,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     // title="${currentPreset === preset ? preset : ''}"
 
     return html `
-      <div class="preset-label">
+      <div class="preset-label preset-${preset}">
           <ha-icon-button
             title="${currentPreset === preset ? preset : ''}"
             class=${classMap({ "selected-icon": currentPreset === preset })}
@@ -2174,7 +2297,24 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         tabindex="0"
       ></ha-icon-button>
       ${this._showThemeMenu ? html`
+        <div class="menu-backdrop" @click=${this._closeThemeMenu}></div>
         <div class="theme-menu">
+          <div class="theme-menu-close" @click=${this._closeThemeMenu}>
+            <ha-icon-button .path=${mdiClose} .label="close"></ha-icon-button>
+          </div>
+          <div class="theme-menu-item" @click=${() => { this._handleMoreInfo(); this._closeThemeMenu(); }}>${localize({ hass: this.hass, string: 'editor.card.climate.menu_system' })}</div>
+          <div class="theme-menu-item" style="border-top:1px solid var(--divider-color, #e0e0e0);"></div>
+          ${/* Lock control moved into menu for gunmalmg */''}
+          ${this._config?.theme === THEMES.GUNMALMG ? html`
+            <div class="theme-menu-item" @click=${() => { this._menuLockToggle(); this._closeThemeMenu(); }}>
+              ${this._isLocked ? localize({ hass: this.hass, string: 'extra_states.unlock' }) : localize({ hass: this.hass, string: 'extra_states.lock' })}
+            </div>
+            ${this.timedPresetActive ? html`
+              <div class="theme-menu-item" @click=${() => { this._menuCancelTimedPreset(); this._closeThemeMenu(); }}>
+                ${localize({ hass: this.hass, string: 'extra_states.cancel_timed_preset' })}
+              </div>
+            ` : ``}
+          ` : ``}
           <div class="theme-menu-item" @click=${() => this._applyTheme('classic')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_classic' })}</div>
           <div class="theme-menu-item" @click=${() => this._applyTheme('vtherm')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_vtherm' })}</div>
           <div class="theme-menu-item" @click=${() => this._applyTheme('uncolored')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_uncolored' })}</div>
@@ -2262,13 +2402,13 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
                 ${(this._hasOverpowering && !this._config?.disable_overpowering) ? svg`
                   <path class="overpowering ${this.overpowering ? 'active': ''}" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
                 `: ``}
-                ${(this._hasPresence) ? svg`
+                ${(this._hasPresence && this._config?.theme !== THEMES.GUNMALMG) ? svg`
                   <path class="presence ${this.presence ? 'active': ''}" transform="${(this._hasPresence) ? 'translate(0.25,0)' :''}" id="overpowering" d=${mdiHomeAccount} />
                 `: ``}
                 ${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? svg`
                   <path class="auto-start-stop" transform="${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? 'translate(25.25,0)' :''}" id="autoStartStop" d=${mdiPowerSleep}/>
                 `: ``}
-                ${(this._hasMotion) ? svg`
+                ${(this._hasMotion && this._config?.theme !== THEMES.GUNMALMG) ? svg`
                   <path class="motion ${this.motion ? 'active': ''}" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
                 `: ``}
               </g>
