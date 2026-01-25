@@ -8,6 +8,12 @@
       "climate": {
         "autoStartStopEnableEntity": "Entité - auto-start/stop",
         "powerEntity": "Entité - puissance consommée",
+        "theme": "Thème",
+        "theme_classic": "Classique",
+        "theme_vtherm": "VTherm",
+        "theme_uncolored": "Sans couleur",
+        "theme_gunmalmg": "Gunmalmg",
+        "menu_system": "Menu système",
         "disable_circle": "Désactiver le cercle",
         "disable_background_color": "Désactiver l'ellipse colorée de fond",
         "disable_window": "Désactiver fenêtre status",
@@ -32,7 +38,8 @@
         "lock_relock_delay": "Délai de reverrouillage auto (secondes, 0 = désactivé)",
         "disable_presets": "Désactiver les presets",
         "disable_timed_preset": "Désactiver le champ de durée du preset temporisé",
-        "use_manual_duration_input": "Permettre la saisie manuelle de la durée"
+        "use_manual_duration_input": "Permettre la saisie manuelle de la durée",
+        "disable_menu": "Disable menu"
       }
     }
   },
@@ -116,6 +123,11 @@
     "timed_preset_active": "Preset temporisé actif",
     "cancel_timed_preset": "Annuler le preset temporisé",
     "heating_failure": "Défaut de chauffage détecté",
-    "cooling_failure": "Défaut de refroidissement détecté"
+    "cooling_failure": "Défaut de refroidissement détecté",
+    "increase_temp": "Augmenter la température",
+    "decrease_temp": "Diminuer la température",
+    "night_mode": "Night mode",
+    "undefined": "None",
+    "auto_fan_boost": "Boost"
   }
 }

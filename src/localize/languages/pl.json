@@ -29,7 +29,17 @@
         "disable_power_infos": "Wyłącz komunikaty mocowe",
         "disable_auto_fan_infos": "Wyłącz komunikaty autowentylacji",
         "disable_name": "Wyłącz nazwę",
-        "disable_target_icon": "Wyłącz ikonę"
+        "disable_target_icon": "Wyłącz ikonę",
+        "theme": "Theme",
+        "theme_classic": "Classic",
+        "theme_vtherm": "VTherm",
+        "theme_uncolored": "Uncolored",
+        "theme_gunmalmg": "Gunmalmg",
+        "menu_system": "System menu",
+        "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
+        "disable_presets": "Disable presets",
+        "disable_timed_preset": "Disable timed preset duration input",
+        "use_manual_duration_input": "Allow manual duration input instead of selector"
       }
     }
   },
@@ -40,6 +50,11 @@
     "eco": "Tryb Eko",
     "overpowering": "Wykryte przeciążenie",
     "none": "Ręczny",
+    "theme": "Motyw",
+    "theme_classic": "Klasyczny",
+    "theme_vtherm": "VTherm",
+    "theme_uncolored": "Bez koloru",
+    "theme_gunmalmg": "Gunmalmg",
     "comfort": "Komfort",
     "boost": "Boost",
     "frost": "Ochrona przed mrozem",
@@ -106,6 +121,17 @@
     "lock": "Zablokuj",
     "unlock": "Odblokuj",
     "heating_failure": "Heating failure detected",
-    "cooling_failure": "Cooling failure detected"
+    "cooling_failure": "Cooling failure detected",
+    "fan_1": "Speed 1",
+    "fan_2": "Speed 2",
+    "fan_3": "Speed 3",
+    "fan_4": "Speed 4",
+    "fan_5": "Speed 5",
+    "target_temp_timed_preset": "Timed preset active",
+    "timed_preset_title": "Duration in minutes (0 = permanent)",
+    "timed_preset_active": "Timed preset active",
+    "cancel_timed_preset": "Cancel timed preset",
+    "increase_temp": "Increase temperature",
+    "decrease_temp": "Decrease temperature"
   }
 }

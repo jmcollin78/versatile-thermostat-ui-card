@@ -30,8 +30,16 @@
         "disable_name": "Disabilita nome",
         "disable_target_icon": "Disabilita  icona obbiettivo",
         "allow_lock_toggle": "Allow lock/unlock from card",
-        "disable_timed_preset": "Disable timed preset duration input",
-        "use_manual_duration_input": "Allow manual duration input instead of selector"
+        "disable_timed_preset": "Disattiva immissione durata preimpostata",
+        "use_manual_duration_input": "Consenti l'inserimento manuale della durata invece della selezione",
+        "theme": "Tema",
+        "theme_classic": "Classico",
+        "theme_vtherm": "VTherm",
+        "theme_uncolored": "Senza colore",
+        "theme_gunmalmg": "Gunmalmg",
+        "menu_system": "System menu",
+        "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
+        "disable_presets": "Disable presets"
       }
     }
   },
@@ -117,6 +125,14 @@
     "timed_preset_active": "Preimpostazione temporizzata attiva",
     "cancel_timed_preset": "Disattiva Preimpostazione temporizzata",
     "heating_failure": "Rilevato guasto al riscaldamento",
-    "cooling_failure": "Rilevato guasto al raffrescamento"
+    "cooling_failure": "Rilevato guasto al raffrescamento",
+    "increase_temp": "Aumenta la temperatura",
+    "decrease_temp": "Diminuisci la temperatura",
+    "fan_1": "Speed 1",
+    "fan_2": "Speed 2",
+    "fan_3": "Speed 3",
+    "fan_4": "Speed 4",
+    "fan_5": "Speed 5",
+    "target_temp_timed_preset": "Timed preset active"
   }
 }
