@@ -310,7 +310,7 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) .more-info { color: #e6e6e6; z-index: 6; }
         :host([theme="gunmalmg"]) #right-lock {
           position: absolute;
-          top: 40px; /* place under the menu button */
+          top: 60px; /* place under the menu button */
           right: 0px;
           z-index: 8; /* above some elements but below the menu overlay */
           display: flex;
