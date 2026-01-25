@@ -8,6 +8,12 @@
       "climate": {
         "autoStartStopEnableEntity": "Auto-start/stop entity",
         "powerEntity": "Power consumption entity",
+        "theme": "Theme",
+        "theme_classic": "Classic",
+        "theme_vtherm": "VTherm",
+        "theme_uncolored": "Uncolored",
+        "theme_gunmalmg": "Gunmalmg",
+        "menu_system": "System menu",
         "disable_circle": "Disable circle",
         "disable_background_color": "Disable background color ellipse",
         "disable_window": "Disable window",
@@ -119,6 +125,8 @@
     "timed_preset_active": "Timed preset active",
     "cancel_timed_preset": "Cancel timed preset",
     "heating_failure": "Heating failure detected",
-    "cooling_failure": "Cooling failure detected"
+    "cooling_failure": "Cooling failure detected",
+    "increase_temp": "Increase temperature",
+    "decrease_temp": "Decrease temperature"
   }
 }

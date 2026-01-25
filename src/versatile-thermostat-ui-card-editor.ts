@@ -33,11 +33,10 @@ const loadHaComponents = (version: string) => {
 };
 
 const CLIMATE_LABELS = [
+    "theme",
     "autoStartStopEnableEntity",
     "powerEntity",
     "disable_name",
-    "disable_circle",
-    "disable_background_color",
     "disable_window",
     "disable_autoStartStop",
     "disable_overpowering",
@@ -64,9 +63,10 @@ const CLIMATE_LABELS = [
 ] as string[];
 
 const computeSchema = memoizeOne(
-    (): any[] => [
+    (themeOptions: any): any[] => [
         { name: "entity", selector: { entity: { domain: ["climate"] } } },
         { name: "name", selector: { text: {} } },
+        { name: "theme", selector: { select: { options: themeOptions } } },
         {
             type: "grid",
             name: "",
@@ -80,8 +80,6 @@ const computeSchema = memoizeOne(
             name: "",
             schema: [
                 { name: "disable_name", selector: { boolean: {} } },
-                { name: "disable_circle", selector: { boolean: {} } },
-                { name: "disable_background_color", selector: { boolean: {} } },
                 { name: "disable_window", selector: { boolean: {} } },
                 { name: "disable_autoStartStop", selector: { boolean: {} } },
                 { name: "disable_overpowering", selector: { boolean: {} } },
@@ -142,8 +140,15 @@ export class ClimateCardEditor extends LitElement implements LovelaceCardEditor 
             return html``;
         }
 
+        const customLocalize = setupCustomlocalize(this.hass!);
+        const themeOptions = [
+            { value: "classic", label: customLocalize("editor.card.climate.theme_classic") || "Classic" },
+            { value: "vtherm", label: customLocalize("editor.card.climate.theme_vtherm") || "VTherm" },
+            { value: "uncolored", label: customLocalize("editor.card.climate.theme_uncolored") || "Uncolored" },
+            { value: "gunmalmg", label: customLocalize("editor.card.climate.theme_gunmalmg") || "Gunmalmg" },
+        ];
 
-        const schema = computeSchema();
+        const schema = computeSchema(themeOptions);
 
         return html`
             <ha-form
@@ -157,7 +162,17 @@ export class ClimateCardEditor extends LitElement implements LovelaceCardEditor 
     }
 
     private _valueChanged(ev: CustomEvent): void {
-        fireEvent(this, "config-changed", { config: ev.detail.value });
-        fireEvent(this, "hass", { config: ev.detail.value });
+        const cfg = ev.detail.value as ClimateCardConfig;
+        // If theme not explicitly set, derive it from flags for a better UX
+        if (!cfg.theme) {
+            const disableCircle = !!cfg.disable_circle;
+            const disableBg = !!cfg.disable_background_color;
+            if (!disableCircle) cfg.theme = 'classic';
+            else if (disableCircle && !disableBg) cfg.theme = 'vtherm';
+            else if (disableCircle && disableBg) cfg.theme = 'uncolored';
+        }
+
+        fireEvent(this, "config-changed", { config: cfg });
+        fireEvent(this, "hass", { config: cfg });
     }
 }

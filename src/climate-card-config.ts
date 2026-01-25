@@ -1,4 +1,4 @@
-import { Infer, array, assign, boolean, object, optional, any, number, string } from "superstruct";
+import { Infer, array, assign, boolean, object, optional, any, number, string, literal, union } from "superstruct";
 import { HvacMode, LovelaceCardConfig } from "./ha";
 
 const lovelaceCardConfigStruct = object({
@@ -27,9 +27,13 @@ export const HVAC_MODES: HvacMode[] = [
     "off",
 ];
 
+export type Theme = 'classic' | 'vtherm' | 'uncolored' | 'gunmalmg';
+
 export type ClimateCardConfig = LovelaceCardConfig &
     EntitySharedConfig &
     {
+        /** Theme: classic | vtherm | uncolored | gunmalmg */
+        theme?: Theme;
         disable_name?: boolean;
         disable_circle?: boolean;
         disable_background_color?: boolean;
@@ -87,6 +91,7 @@ export const climateCardConfigStruct = assign(
         allow_lock_toggle: optional(boolean()),
         lock_relock_delay: optional(number()),
         disable_presets: optional(boolean()),
+        theme: optional(union([literal('classic'), literal('vtherm'), literal('uncolored'), literal('gunmalmg')])),
         disable_timed_preset: optional(boolean()),
         use_manual_duration_input: optional(boolean())
     })

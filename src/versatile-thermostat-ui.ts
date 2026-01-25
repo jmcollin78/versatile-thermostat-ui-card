@@ -83,9 +83,11 @@ import { ClimateCardConfig } from './climate-card-config';
 import './ha/ha-control-circular-slider';
 import { SensorEntity } from './ha/data/sensor';
 import { map } from 'superstruct';
+import { gunmalmgStyles, renderGunmalmg } from './themes/gunmalmg-theme';
+import { vthermStyles, renderVtherm } from './themes/vtherm-theme';
 
 const UNAVAILABLE = "unavailable";
-const DEBUG=false;
+const DEBUG=true;
 const modeIcons: {
   [mode in any]: string
 } = {
@@ -150,6 +152,13 @@ const autoStartStopLevels=["auto_start_stop_slow", "auto_start_stop_medium", "au
 
 const minPowerWatt=7;
 
+const THEMES = {
+  CLASSIC: 'classic',
+  VTHERM: 'vtherm',
+  UNCOLORED: 'uncolored',
+  GUNMALMG: 'gunmalmg'
+};
+
 interface RegisterCardParams {
   type: string;
   name: string;
@@ -193,6 +202,8 @@ function roundNumber(nb, precision) {
 
 @customElement('versatile-thermostat-ui-card')
 export class VersatileThermostatUi extends LitElement implements LovelaceCard {
+  /** Sauvegarde temporaire des options de config lors du passage gunmalmg <-> autre thème */
+  private _originalConfigOptions: Partial<ClimateCardConfig> | undefined;
   @property({
       attribute: false
   }) public hass! : HomeAssistant;
@@ -325,6 +336,29 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     this._debouncedCallService(target);
   }
 
+    /** Incrémente la température cible principale */
+  private _handleTempUp() {
+    if (this.isUserLocked) return;
+    const step = this.step || 0.5;
+    let temp = typeof this.value?.value === 'number' ? this.value.value : this.min;
+    temp += step;
+    temp = Math.min(temp, this.max);
+    this.value = { ...this.value, value: temp };
+    this._callService('value');
+  }
+
+  /** Décrémente la température cible principale */
+  private _handleTempDown() {
+    if (this.isUserLocked) return;
+    const step = this.step || 0.5;
+    let temp = typeof this.value?.value === 'number' ? this.value.value : this.min;
+    temp -= step;
+    temp = Math.max(temp, this.min);
+    this.value = { ...this.value, value: temp };
+    this._callService('value');
+  }
+
+
   private _handleSelectTemp(ev) {
     if (this.isUserLocked) {
       return;
@@ -368,6 +402,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
 
   @state() private _config?: ClimateCardConfig;
+  @state() private _showThemeMenu: boolean = false;
+  @property({ type: String }) public theme: string = "";
   @state() private isLocked: boolean = false;
   @state() private isUserLocked: boolean = false;
   @state() private isAutomationLocked: boolean = false;
@@ -390,22 +426,138 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         },
         ...config,
     };
+    // apply theme attribute on host for CSS selection
+    const themeFromConfig = (this._config && this._config.theme) ? this._config.theme : "";
+    this.theme = themeFromConfig;
+    if (this.theme) {
+      this.setAttribute('theme', this.theme);
+    } else {
+      // derive default theme from effective flags (use getters for compatibility)
+      if (!this.effectiveDisableCircle) {
+        this.setAttribute('theme', 'classic');
+      } else if (this.effectiveDisableCircle && !this.effectiveDisableBackgroundColor) {
+        this.setAttribute('theme', 'vtherm');
+      } else if (this.effectiveDisableCircle && this.effectiveDisableBackgroundColor) {
+        this.setAttribute('theme', 'uncolored');
+      }
+    }
+
+
+    // Si on passe en gunmalmg, sauvegarder les options d'origine
+    if (this._config && this._config.theme === THEMES.GUNMALMG) {
+      if (!this._originalConfigOptions) {
+        this._originalConfigOptions = {
+          disable_circle: this._config.disable_circle,
+          disable_background_color: this._config.disable_background_color,
+          disable_buttons: this._config.disable_buttons,
+          disable_power_infos: this._config.disable_power_infos,
+          disable_auto_fan_infos: this._config.disable_auto_fan_infos,
+          disable_target_icon: this._config.disable_target_icon,
+          disable_window: this._config.disable_window,
+          disable_overpowering: this._config.disable_overpowering,
+          allow_lock_toggle: this._config.allow_lock_toggle,
+          disable_presets: this._config.disable_presets,
+        };
+      }
+      // Appliquer les overrides gunmalmg
+      this._config.disable_circle = true;
+      this._config.disable_background_color = true;
+      this._config.disable_buttons = true;
+      this._config.disable_power_infos = true;
+      this._config.disable_auto_fan_infos = true;
+      this._config.disable_target_icon = true;
+      this._config.disable_window = true;
+      this._config.disable_overpowering = true;
+      // preserve allow_lock_toggle from user config for gunmalmg
+      this._config.disable_presets = this._config.disable_presets ?? false;
+    } else if (this._originalConfigOptions) {
+      // Si on quitte gunmalmg, restaurer les options d'origine
+      Object.assign(this._config, this._originalConfigOptions);
+      this._originalConfigOptions = undefined;
+      // Force une nouvelle référence pour déclencher le cycle Lit
+      this._config = { ...this._config };
+      // Force le recalcul des propriétés dépendantes de la config
+      this.willUpdate(new Map([['_config', undefined]]));
+      this.requestUpdate();
+    }
+
+    // ensure overrides applied to host attribute
+    if (this._config && this._config.theme) {
+      this.setAttribute('theme', this._config.theme);
+    }
+  }
+
+  private _applyThemeOverrides(theme: string) {
+    if (!this._config) this._config = {} as ClimateCardConfig;
+    if (theme === THEMES.GUNMALMG) {
+      if (!this._originalConfigOptions) {
+        this._originalConfigOptions = {
+          disable_circle: this._config.disable_circle,
+          disable_background_color: this._config.disable_background_color,
+          disable_buttons: this._config.disable_buttons,
+          disable_power_infos: this._config.disable_power_infos,
+          disable_auto_fan_infos: this._config.disable_auto_fan_infos,
+          disable_target_icon: this._config.disable_target_icon,
+          disable_window: this._config.disable_window,
+          disable_overpowering: this._config.disable_overpowering,
+          allow_lock_toggle: this._config.allow_lock_toggle,
+          disable_presets: this._config.disable_presets,
+        };
+      }
+      this._config.disable_circle = true;
+      this._config.disable_background_color = true;
+      this._config.disable_buttons = true;
+      this._config.disable_power_infos = true;
+      this._config.disable_auto_fan_infos = true;
+      this._config.disable_target_icon = true;
+      this._config.disable_window = true;
+      this._config.disable_overpowering = true;
+      // preserve allow_lock_toggle from user config for gunmalmg
+      this._config.disable_presets = this._config.disable_presets ?? false;
+    } else if (this._originalConfigOptions) {
+      Object.assign(this._config, this._originalConfigOptions);
+      this._originalConfigOptions = undefined;
+      this._config = { ...this._config };
+      this.willUpdate(new Map([['_config', undefined]]));
+      this.requestUpdate();
+    }
+  }
+
+
+  private get effectiveDisableCircle(): boolean {
+    const theme = (this._config && this._config.theme) ? this._config.theme : undefined;
+    if (theme === THEMES.CLASSIC) return false;
+    if (theme === THEMES.VTHERM) return true;
+    if (theme === THEMES.UNCOLORED) return true;
+    if (theme === THEMES.GUNMALMG) return true;
+    // fallback to legacy flag
+    return !!this._config?.disable_circle;
+  }
+
+  private get effectiveDisableBackgroundColor(): boolean {
+    const theme = (this._config && this._config.theme) ? this._config.theme : undefined;
+    if (theme === THEMES.CLASSIC) return false;
+    if (theme === THEMES.VTHERM) return false;
+    if (theme === THEMES.UNCOLORED) return true;
+    if (theme === THEMES.GUNMALMG) return true;
+    // fallback to legacy flag
+    return !!this._config?.disable_background_color;
   }
 
   getCardSize(): number | Promise<number> {
     return 1;
   }
 
-  public static styles: CSSResultGroup = css `
+    public static styles: CSSResultGroup = [css `
       :host {
           display: block;
           box-sizing: border-box;
           position: relative;
-          container: vt-card / inline-size;
+        container: vt-card / inline-size;
       }
 
       ha-card {
-        overflow: hidden;
+        overflow: visible;
         height: 100%;
         width: 100%;
         vertical-align: middle;
@@ -1004,6 +1156,61 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           --mdc-theme-surface: var(--card-background-color);
       }
 
+      /* Theme menu styles */
+      .theme-menu {
+        position: absolute;
+        right: 8px;
+        top: 36px;
+        background: var(--card-background-color, #fff);
+        border: 1px solid var(--divider-color, #e0e0e0);
+        border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 10;
+        min-width: 160px;
+        max-height: 60vh;
+        overflow-y: auto;
+        box-sizing: border-box;
+      }
+      .theme-menu-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--divider-color, #e0e0e0);
+      }
+      .theme-menu-title {
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .menu-backdrop {
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9;
+        background: transparent;
+      }
+      /* theme-menu-close removed: menu header no longer contains a close button */
+      .theme-menu-item {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      .theme-menu-item:hover { background: var(--divider-color, #f1f1f1); }
+
+        /* Theme variations ------------------------------------------------- */
+        :host([theme="classic"]) vt-ha-control-circular-slider { display: block; }
+          :host([theme="classic"]) .disabled-circle-container { display: none !important; }
+
+        :host([theme="vtherm"]) vt-ha-control-circular-slider { display: none !important; }
+          :host([theme="vtherm"]) .disabled-circle-container { display: block !important; background: radial-gradient(var(--hvac-mode-color), transparent 50%); }
+
+        :host([theme="uncolored"]) vt-ha-control-circular-slider { display: none; }
+          :host([theme="uncolored"]) .disabled-circle-container { display: block !important; background: none !important; }
+
+        /* gunmalmg theme rules moved to src/themes/gunmalmg.ts */
+
+
       .dialog-content {
         display: flex;
         flex-direction: column;
@@ -1102,12 +1309,80 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
         40%, 60% { transform: translate3d(4px, 0, 0); }
       }
-  `;
+      }
+
+      @keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
+      }
+  `, gunmalmgStyles, vthermStyles];
+  // Additional theme styles
+  static additionalThemeStyles = [vthermStyles];
 
   private _vibrate(delay:number) {
     try {
       navigator.vibrate(delay);
     } catch(e){}
+  }
+
+  private _toggleThemeMenu() {
+    this._showThemeMenu = !this._showThemeMenu;
+  }
+
+  private _closeThemeMenu() {
+    this._showThemeMenu = false;
+  }
+
+  private _applyTheme(theme: string) {
+    if (!this._config) this._config = {} as ClimateCardConfig;
+    this._config.theme = theme as any;
+    // persist the change via config-changed event so Lovelace editor can save it
+    fireEvent(this, 'config-changed', { config: this._config });
+    this._closeThemeMenu();
+    // apply to host attribute
+    this.setAttribute('theme', theme);
+    this._applyThemeOverrides(theme);
+  }
+
+  // Toggle lock action callable from the menu (bypasses allow_lock_toggle check)
+  private async _menuLockToggle() {
+    if (!this._config?.entity || !this.hass || !this.stateObj) return;
+    // If lock code is required, open keypad modal
+    if (this._hasLockCode) {
+      this.isLocking = this._isLocked ? false : true;
+      this.showDigicodeModal = true;
+      this.enteredCode = "";
+      return;
+    }
+    try {
+      if (this._isLocked) {
+        if (this._isLockConfigured) {
+          await this.hass.callService("versatile_thermostat", "unlock", { entity_id: this._config!.entity });
+          this._startRelockTimeout();
+        } else {
+          this._isLocked = this.isUserLocked = false;
+          this.requestUpdate();
+          this._startRelockTimeout();
+        }
+      } else {
+        if (this._isLockConfigured) {
+          await this.hass.callService("versatile_thermostat", "lock", { entity_id: this._config!.entity });
+        } else {
+          this._isLocked = this.isUserLocked = true;
+          this.requestUpdate();
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private _menuCancelTimedPreset() {
+    if (this.timedPresetActive) {
+      this._handleCancelTimedPreset();
+    }
   }
 
   protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -1201,7 +1476,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           if (DEBUG) console.log(`No change return`);
           return;
         }
-  
+      // const stateObj = this.hass.states[entity_id] as ClimateEntity;
+      // if (!stateObj) {
+      //     if (DEBUG) console.log(`No state`);
+      //     return;
+      // }
         if (DEBUG) console.log(`Something may have change`);
         this.stateObj = stateObj;
         const attributes = this.stateObj.attributes;
@@ -1686,9 +1965,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderHVACAction(): TemplateResult {
-    if (this.hvacAction === 'heating' ||
-        this.hvacMode == "heat" ||
-        this.hvacMode == "heat_cool") {
+    // return empty when off
+    if (!this.hvacAction || this.hvacAction === 'off' || this.hvacAction === 'idle') {
+      return html``;
+    }
+    // heating: red wave
+    if (this.hvacAction === 'heating') {
       return svg`<path class="status ${this.isDeviceActive ? 'active':''}"  transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiHeatWave}" />`;
     }
     else if (this.hvacAction === 'cooling' ||
@@ -1698,24 +1980,63 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     else return svg`<path class="status" transform="translate(5,-4) scale(0.25)" fill="#9d9d9d"  d="${mdiClose}" />`;
   }
 
-  private _renderIcon(mode: string, currentMode: string): TemplateResult {
+  // Small badge SVG for gunmalmg theme (white icon, no wrapper)
+  private _renderHVACActionBadge(): TemplateResult {
+    if (!this.hvacAction || this.hvacAction === 'off' || this.hvacAction === 'idle') return html``;
+    if (this.hvacAction === 'heating') return svg`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${mdiHeatWave}"/></svg>`;
+    if (this.hvacAction === 'cooling') return svg`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${mdiAirConditioner}"/></svg>`;
+    return svg`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${mdiAlertBoxOutline}"/></svg>`;
+  }
+
+  private _renderIcon(mode: string, currentMode: string, isToggle?: boolean): TemplateResult {
     if (!modeIcons[mode]) {
         return html ``;
     }
     const localizeMode = this.hass!.localize(`component.climate.state._.${mode}`) || localize({ hass: this.hass, string: `extra_states.${mode}` });
     // if (DEBUG) console.log(`mode=${mode} currentMode=${currentMode} localizeMode=${localizeMode}`);
     return html `
-      <ha-icon-button
-        title="${currentMode === mode ? mode : ''}"
-        class=${classMap({ "selected-icon": currentMode === mode })}
-        .mode=${mode}
-        @click=${this._handleAction}
-        tabindex="0"
-        .path=${modeIcons[mode]}
-        .label=${localizeMode}
-      >
-      </ha-icon-button>
+      <div class="hvac-badge-container">
+        <ha-icon-button
+          title="${currentMode === mode ? mode : ''}"
+          class=${classMap({ "selected-icon": currentMode === mode })}
+          .mode=${mode}
+          @click=${isToggle ? this._cycleHvacMode : this._handleAction}
+          tabindex="0"
+          .path=${modeIcons[mode]}
+          .label=${localizeMode}
+        ></ha-icon-button>
+        ${(() => {
+          // only show badge for gunmalmg theme
+          if (this.theme !== THEMES.GUNMALMG) return html``;
+          let cls = '';
+          if (!this.hvacAction || this.hvacAction === 'off' || this.hvacAction === 'idle') return html``;
+          if (this.hvacAction === 'heating') cls = 'heating';
+          else if (this.hvacAction === 'cooling') cls = 'cooling';
+          else cls = 'warning';
+          return html`<div class="hvac-badge ${cls}">${this._renderHVACActionBadge()}</div>`;
+        })()}
+      </div>
     `;
+  }
+
+  // Cycle to the next HVAC mode in the available modes list
+  private async _cycleHvacMode() {
+    if (!this._config?.entity || !this.hass) return;
+    const modesList = Array.isArray(this.modes) && this.modes.length > 0 ? this.modes : [];
+    if (modesList.length === 0) return;
+    const current = this.hvacMode || '';
+    let idx = modesList.indexOf(current);
+    if (idx === -1) idx = 0; // if current not found, start at 0
+    const next = modesList[(idx + 1) % modesList.length];
+    try {
+      if (next === hvac_mode_sleep) {
+        await this.hass.callService("versatile_thermostat", "set_hvac_mode_sleep", { entity_id: this._config!.entity });
+      } else {
+        await this.hass.callService("climate", "set_hvac_mode", { entity_id: this._config!.entity, hvac_mode: next });
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   private _renderMessagesButton(): TemplateResult {
@@ -1774,7 +2095,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     // title="${currentPreset === preset ? preset : ''}"
 
     return html `
-      <div class="preset-label">
+      <div class="preset-label preset-${preset}">
           <ha-icon-button
             title="${currentPreset === preset ? preset : ''}"
             class=${classMap({ "selected-icon": currentPreset === preset })}
@@ -2011,11 +2332,20 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderTemperature(temperature, isMain: boolean, x: string, y: string, isTarget: boolean) {
-    const fontSize= isMain ? 15:6;
-    const dx = isMain ? -2:-1;
-    const dy = isMain ? -5.5:-2;
-    const uomSize = isMain ? 5:3;
+    // Default sizes
+    let fontSize= isMain ? 15:6;
+    let dx = isMain ? -2:-1;
+    let dy = isMain ? -5.5:-2;
+    let uomSize = isMain ? 5:3;
     
+    // gunmalmg: smaller, more centered
+    if (this._config?.theme === THEMES.GUNMALMG) {
+      fontSize = isMain ? 10 : 5;
+      dx = isMain ? -1 : -1;
+      dy = isMain ? -4 : -2;
+      uomSize = isMain ? 4 : 3;
+    }
+
     let targetPosX:number = 76, targetPosY: number = 57, targetScale=0.20;
 
     let value:string;
@@ -2032,13 +2362,13 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
 
     if (isTarget && isMain) {
-        targetPosX = 30;
-        targetPosY = 56;
-        targetScale = 0.25
+      targetPosX = this._config?.theme === THEMES.GUNMALMG ? 40 : 30;
+      targetPosY = this._config?.theme === THEMES.GUNMALMG ? 56 : 56;
+      targetScale = this._config?.theme === THEMES.GUNMALMG ? 0.22 : 0.25
     }
 
     return svg`
-      ${isTarget && !this._config?.disable_target_icon && this._config?.disable_circle ? svg`
+      ${isTarget && !this._config?.disable_target_icon && this.effectiveDisableCircle ? svg`
         <path 
           class="main-value" 
           transform="translate(${targetPosX}, ${targetPosY}) scale(${targetScale})" 
@@ -2057,7 +2387,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   public render: () => TemplateResult = (): TemplateResult => {
-   
+
+    if (this._config?.theme === THEMES.GUNMALMG) {
+      if (DEBUG) console.log(`Rendering Gunmalmg theme`);
+      return renderGunmalmg(this);
+    }
+
    return html `
    <ha-card class=${classMap({
      [this.hvacMode]: true,
@@ -2071,9 +2406,33 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           "ui.panel.lovelace.cards.show_more_info"
         )}
         .path=${mdiDotsVertical}
-        @click=${this._handleMoreInfo}
+        @click=${this._toggleThemeMenu}
         tabindex="0"
       ></ha-icon-button>
+      ${this._showThemeMenu ? html`
+        <div class="menu-backdrop" @click=${this._closeThemeMenu}></div>
+        <div class="theme-menu">
+          <div class="theme-menu-header">
+            <div class="theme-menu-title" @click=${() => { this._handleMoreInfo(); this._closeThemeMenu(); }}>${localize({ hass: this.hass, string: 'editor.card.climate.menu_system' })}</div>
+          </div>
+          <div class="theme-menu-item" style="border-top:1px solid var(--divider-color, #e0e0e0);"></div>
+          ${/* Lock control moved into menu for gunmalmg */''}
+          ${this._config?.theme === THEMES.GUNMALMG ? html`
+            <div class="theme-menu-item" @click=${() => { this._menuLockToggle(); this._closeThemeMenu(); }}>
+              ${this._isLocked ? localize({ hass: this.hass, string: 'extra_states.unlock' }) : localize({ hass: this.hass, string: 'extra_states.lock' })}
+            </div>
+            ${this.timedPresetActive ? html`
+              <div class="theme-menu-item" @click=${() => { this._menuCancelTimedPreset(); this._closeThemeMenu(); }}>
+                ${localize({ hass: this.hass, string: 'extra_states.cancel_timed_preset' })}
+              </div>
+            ` : ``}
+          ` : ``}
+          <div class="theme-menu-item" @click=${() => this._applyTheme('classic')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_classic' })}</div>
+          <div class="theme-menu-item" @click=${() => this._applyTheme('vtherm')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_vtherm' })}</div>
+          <div class="theme-menu-item" @click=${() => this._applyTheme('uncolored')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_uncolored' })}</div>
+          <div class="theme-menu-item" @click=${() => this._applyTheme('gunmalmg')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_gunmalmg' })}</div>
+        </div>
+      ` : ``}
       `}
 
       ${this.name.length > 0 ? html`
@@ -2099,9 +2458,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         </div>
       ` : ``}
 
-      <div title="${this.buildTitle()}" class="${this._config?.disable_circle ? 'disabled-circle-container' : ''} ${this._config?.disable_background_color ? 'no-background-color' : ''}  ${this.hvacMode}_${this.hvacAction} ${this._hasWindow ? 'window_open' : ''}  ${this.overpowering ? 'overpowering' : ''}">
+      <div title="${this.buildTitle()}" class="${this.effectiveDisableCircle ? 'disabled-circle-container' : ''} ${this.effectiveDisableBackgroundColor ? 'no-background-color' : ''}  ${this.hvacMode}_${this.hvacAction} ${this._hasWindow ? 'window_open' : ''}  ${this.overpowering ? 'overpowering' : ''}">
         ${
-          this._config?.disable_circle ? html`
+          this.effectiveDisableCircle ? html`
             <!-- No cicle configured -->
           `:
             (this.value.low != null &&
@@ -2155,19 +2514,19 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
                 ${(this._hasOverpowering && !this._config?.disable_overpowering) ? svg`
                   <path class="overpowering ${this.overpowering ? 'active': ''}" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
                 `: ``}
-                ${(this._hasPresence) ? svg`
+                ${(this._hasPresence && this._config?.theme !== THEMES.GUNMALMG) ? svg`
                   <path class="presence ${this.presence ? 'active': ''}" transform="${(this._hasPresence) ? 'translate(0.25,0)' :''}" id="overpowering" d=${mdiHomeAccount} />
                 `: ``}
                 ${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? svg`
                   <path class="auto-start-stop" transform="${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? 'translate(25.25,0)' :''}" id="autoStartStop" d=${mdiPowerSleep}/>
                 `: ``}
-                ${(this._hasMotion) ? svg`
+                ${(this._hasMotion && this._config?.theme !== THEMES.GUNMALMG) ? svg`
                   <path class="motion ${this.motion ? 'active': ''}" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
                 `: ``}
               </g>
 
               ${
-                this._config?.disable_circle ? svg`
+                this.effectiveDisableCircle ? svg`
                   ${this._renderTemperature(this._display_top, true, "55", "60%", ! this?._config?.set_current_as_main)}
                   ${this._renderTemperature(this._display_bottom, false, "90", "60%", this?._config?.set_current_as_main == true)}
                   <g class="current-info" transform="translate(100,65)">

@@ -8,6 +8,12 @@
 
 - [UI Card for Versatile Thermostat](#ui-card-for-versatile-thermostat)
   - [Goals](#goals)
+  - [Theme management](#theme-management)
+    - [The "Classical theme"](#the-classical-theme)
+    - [The "VTherm theme"](#the-vtherm-theme)
+    - [The "VTherm Uncolored theme"](#the-vtherm-uncolored-theme)
+    - [The "Gunmalmg theme"](#the-gunmalmg-theme)
+    - [Changing theme and contextual menu](#changing-theme-and-contextual-menu)
 - [Installation](#installation)
   - [Options](#options)
 - [Actions](#actions)
@@ -70,11 +76,51 @@ With all status icons:
 The card configuration:
 
 ![Versatile Thermostat UI Card configuration](/assets/configuration-window.png)
- 
+
 ## Goals
 
 - [X] Add versatile_thermostat support for showing the extra status
 - [X] Improve the UI for Touch devices
+
+## Theme management
+
+The 2.3 release adds a theme management option
+
+### The "Classical theme"
+
+The classical theme with the temperature selection circle and all _VTherm_ specificities displayed.
+
+![Versatile Thermostat UI Card classical theme](/assets/theme-classical.png)
+
+### The "VTherm theme"
+
+The VTherm theme is a full featured theme but more concise than the classical. All _VTherm_'s specificities are displayed in a smaller card. Basically it removes the big colored circle that takes place and add a colored ellipse in background allowing you to see immediatly the state of the thermostat.
+
+![Versatile Thermostat UI Card VTherm theme](/assets/theme-vtherm.png)
+
+### The "VTherm Uncolored theme"
+
+Juste like the _VTherm_ theme but without the colored ellipse in background.
+
+![Versatile Thermostat UI Card VTherm uncolored theme](/assets/theme-uncolored.png)
+
+### The "Gunmalmg theme"
+
+Inspired by the card developped by @Gunmalmg (see [here](https://github.com/jmcollin78/versatile_thermostat/issues/354#issuecomment-1961050097)), this theme is a minimal theme. The card only diplay omst common informations (name, mode, temperatures and presets).
+
+![Versatile Thermostat UI Card Gunmalmg theme](/assets/theme-gunmalmg.png)
+
+Note: in this theme many options are not usefull because not displayed. _VTherm_ specific functions are not available.
+
+### Changing theme and contextual menu
+
+You change the thème in two ways:
+1. in the configuration menu. The theme selected in the configuration will be the default theme applyed to the card,
+2. in the contextual menu of the card. At the top right of the card, the tree dot menu allows you to change the theme.
+
+![Versatile Thermostat UI Card 3 Dots menu](/assets/three-dot-menu.png)
+
+Note that the contextual menu has options that depends of the current theme and configuration options. In the *Gunmalmg* theme, you have some VTherm specific functions like, increase/decreasing temperatures, stopping the timed preset, lock management.
 
 # Installation
 
@@ -91,8 +137,6 @@ Note: those options should be improved with official release
 | entity               | string  | **Required** | The entity id of climate entity (must be a versatile_thermostat entity). Example: `climate.hvac`          |
 | name                | string/boolean  | **optional** | override the default entity name |
 | disable_name        | boolean  | **optional** | true to hide the name                                                                     |
-| disable_circle        | boolean  | **optional** | true to hide the circle for setpoint. If no checked, an colored ellipse on the background is displayed instead. This option save space                                                                     |
-| disable_background_color | boolean | **optional** | true to hide the colored background ellipse that shows the hvac_action and hvac_mode state |
 | disable_window       | boolean  | **optional** | turn off the window open indicator                                                                     |
 | disable_overpowering | boolean  | **optional** | turn off the overpowering indicator                                                                |
 | disable_heat        | boolean  | **optional** | turn off the on/heat button                                                                          |
@@ -116,22 +160,23 @@ Note: those options should be improved with official release
 | disable_presets           | boolean | **Optional** | true to hide all the preset icons and timed preset controls. |
 | disable_timed_preset      | boolean | **Optional** | true to hide the timed preset duration selector next to preset icons. |
 | use_manual_duration_input | boolean | **Optional** | true to use a manual input field instead of the preset duration selector (15min, 30min, 1h, 4h, 8h, 24h). |
+| theme | checbox | **Optional ** | The default theme that will be applied when the card loads |
 
 Example:
 ```
 type: custom:versatile-thermostat-ui-card
 entity: climate.multi_climate
 set_current_as_main: true
-disable_circle: true
 disable_menu: true
 autoStartStopEnableEntity: switch.multi_climate_enable_auto_start_stop
 powerEntity: sensor.multi_climate_power
+theme: gunmalmg
 ```
 
 ![configuration window](assets/configuration-window.png)
 
 # Actions
-Some actions are available directly on the card.
+Some actions are available directly on the card when the theme allows it.
 
 ## Disable the auto-fan mode
 For `over_climate` you have the possibility to configure the `auto-fan` mode feature. See [versatile_thermostat README](https://github.com/jmcollin78/versatile_thermostat/blob/main/README.md#auto-fan-mode).
