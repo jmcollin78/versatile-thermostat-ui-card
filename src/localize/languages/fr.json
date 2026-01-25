@@ -38,7 +38,8 @@
         "lock_relock_delay": "Délai de reverrouillage auto (secondes, 0 = désactivé)",
         "disable_presets": "Désactiver les presets",
         "disable_timed_preset": "Désactiver le champ de durée du preset temporisé",
-        "use_manual_duration_input": "Permettre la saisie manuelle de la durée"
+        "use_manual_duration_input": "Permettre la saisie manuelle de la durée",
+        "disable_menu": "Disable menu"
       }
     }
   },
@@ -124,6 +125,9 @@
     "heating_failure": "Défaut de chauffage détecté",
     "cooling_failure": "Défaut de refroidissement détecté",
     "increase_temp": "Augmenter la température",
-    "decrease_temp": "Diminuer la température"
+    "decrease_temp": "Diminuer la température",
+    "night_mode": "Night mode",
+    "undefined": "None",
+    "auto_fan_boost": "Boost"
   }
 }
