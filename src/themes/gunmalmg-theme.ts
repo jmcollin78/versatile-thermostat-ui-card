@@ -60,13 +60,13 @@ export function renderGunmalmg(ctx: any): TemplateResult {
       </div>
 
       <div class="gunmalmg-grid">
+        <div class="gunmalmg-name name">${ctx.name}</div>
         <div class="gunmalmg-left">
           <div class="hvac-mode-tile">
             ${ctx._renderIcon(ctx.hvacMode, ctx.hvacMode, true)}
           </div>
         </div>
         <div class="gunmalmg-center">
-          <div class="name">${ctx.name}</div>
           <div class="temps">
             ${(() => {
               const locale = ctx.hass?.locale || undefined;
@@ -108,7 +108,7 @@ export const gunmalmgStyles = css`
           padding: 0px 0px;
           box-shadow: none;
         }
-        :host([theme="gunmalmg"]) .name { font-weight: 600; color: #ffffff; font-size: 15px; text-align: left;}
+        :host([theme="gunmalmg"]) .name { font-weight: 600; color: #ffffff; font-size: 17px; text-align: left;}
         :host([theme="gunmalmg"]) .content { display: flex; position: relative; width: 100%; height: auto; max-width: none; transform: none; left: 0; top: 0; padding: 0; align-items: center; justify-content: center; }
         :host([theme="gunmalmg"]) .current-info, :host([theme="gunmalmg"]) #left-infos, :host([theme="gunmalmg"]) #vt-control-buttons { display: none !important; }
         :host([theme="gunmalmg"]) .disabled-circle-container { height: 64px; background: transparent; }
@@ -239,22 +239,36 @@ export const gunmalmgStyles = css`
 
         /* Inline temperature display (left-aligned) */
         :host([theme="gunmalmg"]) .gunmalmg-temps-inline { display: flex; gap: 8px; align-items: baseline; justify-content: flex-start; }
-        :host([theme="gunmalmg"]) .gunmalmg-temp-main { font-size: 20px; font-weight: 700; color: var(--secondary-text-color); }
-        :host([theme="gunmalmg"]) .gunmalmg-temp-secondary { font-size: 18px; color: var(--secondary-text-color); margin-left: 6px; }
+        :host([theme="gunmalmg"]) .gunmalmg-temp-main { font-size: 17px; font-weight: 700; color: var(--secondary-text-color); }
+        :host([theme="gunmalmg"]) .gunmalmg-temp-secondary { font-size: 13px; color: var(--secondary-text-color); margin-left: 6px; }
         :host([theme="gunmalmg"]) .gunmalmg-uom { font-size: 16px; color: var(--secondary-text-color); margin-left: 2px; }
 
         /* Hide timed preset controls for Gunmalmg */
         :host([theme="gunmalmg"]) .timed-preset-container { display: none !important; }
 
-        /* Grid layout: left 1/6, center 2/6, right 3/6 (i.e. 1/6, 2/6, 1/2) */
+        /* Grid layout: name spans columns 1-2 on first row; left/center/right on second row */
         :host([theme="gunmalmg"]) .gunmalmg-grid {
           display: grid;
-          grid-template-columns: 0.6fr 1.8fr 2.4fr;
-          grid-template-areas: "left center right";
+          grid-template-columns: 0.8fr 1.6fr 2.4fr;
+          grid-template-areas:
+            "name name right"
+            "left center right";
           gap: 6px;
           align-items: center;
         }
 
+        :host([theme="gunmalmg"]) .gunmalmg-name { 
+          grid-area: name; 
+          text-align: left; 
+          padding-left: 8px; 
+          display: -webkit-box; 
+          -webkit-line-clamp: 2; 
+          -webkit-box-orient: vertical; 
+          overflow: hidden; 
+          text-overflow: ellipsis; 
+          white-space: normal; 
+          line-height: 1.2;
+        }
         :host([theme="gunmalmg"]) .gunmalmg-left { grid-area: left; }
         :host([theme="gunmalmg"]) .gunmalmg-center { grid-area: center; }
         :host([theme="gunmalmg"]) .gunmalmg-right { grid-area: right; }
@@ -263,8 +277,8 @@ export const gunmalmgStyles = css`
           :host([theme="gunmalmg"]) .gunmalmg-grid {
             grid-template-columns: 1fr 1fr;
             grid-template-areas:
-              "left center"
-              "right right";
+              "name right"
+              "left center";
           }
           :host([theme="gunmalmg"]) .gunmalmg-right {
             margin-top: 8px;
