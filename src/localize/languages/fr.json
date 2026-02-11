@@ -126,8 +126,9 @@
     "cooling_failure": "Défaut de refroidissement détecté",
     "increase_temp": "Augmenter la température",
     "decrease_temp": "Diminuer la température",
-    "night_mode": "Night mode",
-    "undefined": "None",
-    "auto_fan_boost": "Boost"
+    "night_mode": "Mode nuit",
+    "undefined": "Aucun",
+    "auto_fan_boost": "Boost",
+    "not_initialized": "Erreur d'initialisation"
   }
 }

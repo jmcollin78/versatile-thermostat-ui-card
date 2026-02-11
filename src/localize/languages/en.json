@@ -127,6 +127,7 @@
     "heating_failure": "Heating failure detected",
     "cooling_failure": "Cooling failure detected",
     "increase_temp": "Increase temperature",
-    "decrease_temp": "Decrease temperature"
+    "decrease_temp": "Decrease temperature",
+    "not_initialized": "Initialisation error"
   }
 }

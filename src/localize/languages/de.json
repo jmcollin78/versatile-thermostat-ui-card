@@ -129,6 +129,7 @@
     "window-bypass-button": "Toggle window bypass",
     "timed_preset_title": "Duration in minutes (0 = permanent)",
     "timed_preset_active": "Timed preset active",
-    "cancel_timed_preset": "Cancel timed preset"
+    "cancel_timed_preset": "Cancel timed preset",
+    "not_initialized": "Initialisation error"
   }
 }

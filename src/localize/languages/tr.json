@@ -127,7 +127,8 @@
     "timed_preset_active": "Timed preset active",
     "cancel_timed_preset": "Cancel timed preset",
     "increase_temp": "Increase temperature",
-    "decrease_temp": "Decrease temperature"
+    "decrease_temp": "Decrease temperature",
+    "not_initialized": "Initialisation error"
   },
   "theme": "Tema",
   "theme_classic": "Klasik",
