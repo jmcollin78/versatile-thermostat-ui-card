@@ -1,8 +1,26 @@
 import { css } from 'lit';
 import { html } from 'lit';
-import { mdiDotsVertical, mdiClose, mdiLock, mdiLockOpen } from '@mdi/js';
+import { mdiClose, mdiLock, mdiLockOpen } from '@mdi/js';
 import type { TemplateResult } from 'lit';
 import { localize } from '../localize/localize';
+
+// Render the classic theme popup for gunmalmg
+export function renderClassicPopup(ctx: any): TemplateResult {
+  return html`
+    <div class="classic-popup-backdrop" @click=${() => ctx._closeClassicPopup()}></div>
+    <div class="classic-popup-container">
+      <ha-icon-button
+        class="classic-popup-close"
+        .path=${mdiClose}
+        @click=${() => ctx._closeClassicPopup()}
+        tabindex="0"
+      ></ha-icon-button>
+      <div class="classic-popup-content">
+        ${ctx._renderClassicContent()}
+      </div>
+    </div>
+  `;
+}
 
 // Render function for the gunmalmg theme. Accepts the component instance
 // so it can reuse helper render methods (icons, temperatures, presets).
@@ -10,42 +28,7 @@ export function renderGunmalmg(ctx: any): TemplateResult {
   // Layout: a grid with 3 columns: 1/6 | 2/6 | 3/6 (i.e. 1/6, 2/6, 1/2)
   return html`
     <ha-card class="gunmalmg-card ${ctx.hvacMode} ${ctx._isLocked ? 'locked' : ''}">
-      <ha-icon-button
-        class="more-info"
-        .label=${ctx.hass!.localize(
-          "ui.panel.lovelace.cards.show_more_info"
-        )}
-        .path=${mdiDotsVertical}
-        @click=${() => ctx._toggleThemeMenu()}
-        tabindex="0"
-      ></ha-icon-button>
-      ${ctx._showThemeMenu ? html`
-        <div class="menu-backdrop" @click=${() => ctx._closeThemeMenu()}></div>
-        <div class="theme-menu">
-          <div class="theme-menu-header">
-            <div class="theme-menu-title" @click=${() => { ctx._handleMoreInfo(); ctx._closeThemeMenu(); }}>${localize({ hass: ctx.hass, string: 'editor.card.climate.menu_system' })}</div>
-          </div>
-          <div class="theme-menu-item" style="border-top:1px solid var(--divider-color, #e0e0e0);"></div>
-          
-
-          <div class="theme-menu-item" @click=${() => ctx._applyTheme('classic')}>${localize({ hass: ctx.hass, string: 'editor.card.climate.theme_classic' })}</div>
-          <div class="theme-menu-item" @click=${() => ctx._applyTheme('vtherm')}>${localize({ hass: ctx.hass, string: 'editor.card.climate.theme_vtherm' })}</div>
-          <div class="theme-menu-item" @click=${() => ctx._applyTheme('uncolored')}>${localize({ hass: ctx.hass, string: 'editor.card.climate.theme_uncolored' })}</div>
-
-          <div class="theme-menu-item" style="border-top:1px solid var(--divider-color, #e0e0e0);"></div>
-          ${ctx.timedPresetActive ? html`
-            <div class="theme-menu-item" @click=${() => { ctx._menuCancelTimedPreset(); ctx._closeThemeMenu(); }}>
-              ${localize({ hass: ctx.hass, string: 'extra_states.cancel_timed_preset' })}
-            </div>
-          ` : ``}
-          <div class="theme-menu-item" @click=${() => { ctx._handleTempUp(); ctx._closeThemeMenu(); }}>
-              ${localize({ hass: ctx.hass, string: 'extra_states.increase_temp' }) || '+ Température'}
-          </div>
-          <div class="theme-menu-item" @click=${() => { ctx._handleTempDown(); ctx._closeThemeMenu(); }}>
-              ${localize({ hass: ctx.hass, string: 'extra_states.decrease_temp' }) || '- Température'}
-          </div>
-        </div>
-      ` : ''}
+      ${ctx._showClassicPopup ? renderClassicPopup(ctx) : ''}
 
       <div id="right-lock" style="margin-top: 4px; display: flex; justify-content: center;">
         ${ctx._config?.allow_lock_toggle ? html`
@@ -66,7 +49,7 @@ export function renderGunmalmg(ctx: any): TemplateResult {
             ${ctx._renderIcon(ctx.hvacMode, ctx.hvacMode, true)}
           </div>
         </div>
-        <div class="gunmalmg-center">
+        <div class="gunmalmg-center" @click=${() => ctx._openClassicPopup()}>
           <div class="temps">
             ${(() => {
               const locale = ctx.hass?.locale || undefined;
@@ -322,4 +305,187 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) .theme-menu-item { color: #e6e6e6; }
         :host([theme="gunmalmg"]) .theme-menu-header { display:flex; align-items:center; justify-content:space-between; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
         :host([theme="gunmalmg"]) .theme-menu-title { font-weight:600; cursor:pointer; }
+
+        /* Gunmalmg center clickable area */
+        :host([theme="gunmalmg"]) .gunmalmg-center {
+          cursor: pointer;
+        }
+
+        /* Classic popup styles */
+        :host([theme="gunmalmg"]) .classic-popup-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.7);
+          z-index: 1000;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-container {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 1001;
+          background: var(--card-background-color, #fff);
+          border-radius: 12px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+          max-width: 95vw;
+          max-height: 45vh;
+          overflow: auto;
+          min-width: 300px;
+        }
+
+        /* Mobile: full screen */
+        @media (max-width: 600px) {
+          :host([theme="gunmalmg"]) .classic-popup-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: 100vw;
+            max-height: 100vh;
+            border-radius: 0;
+            top: 0;
+            left: 0;
+            transform: none;
+          }
+        }
+
+        /* Desktop: similar to more-info dialog */
+        @media (min-width: 601px) {
+          :host([theme="gunmalmg"]) .classic-popup-container {
+            width: 450px;
+            max-height: 45vh;
+          }
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-close {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          z-index: 1002;
+          --mdc-icon-size: 24px;
+          color: var(--primary-text-color);
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content {
+          padding: 16px;
+        }
+
+        /* Classic content wrapper styles */
+        :host([theme="gunmalmg"]) .classic-content-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 1em;
+          gap: 8px;
+        }
+
+        :host([theme="gunmalmg"]) .classic-content-wrapper .name {
+          font-size: 18px;
+          font-weight: 500;
+          color: var(--primary-text-color);
+          margin-bottom: 8px;
+        }
+
+        :host([theme="gunmalmg"]) .classic-content-wrapper vt-ha-control-circular-slider {
+          display: block !important;
+        }
+
+        :host([theme="gunmalmg"]) .classic-content-wrapper .content {
+          position: relative;
+          width: calc(70% - 40px);
+          height: calc(70% - 100px);
+          box-sizing: border-box;
+          border-radius: 100%;
+          text-align: center;
+          overflow-wrap: break-word;
+          pointer-events: none;
+          display: flex;
+          align-items: center;
+          place-content: center;
+          flex-flow: wrap;
+          max-width: 155px;
+          margin: 0 auto;
+          margin-top: -230px;
+        }
+
+        :host([theme="gunmalmg"]) .classic-content-wrapper #main {
+          transform: scale(2.3);
+        }
+
+        :host([theme="gunmalmg"]) .classic-content-wrapper svg {
+          height: auto;
+          margin: auto;
+          display: block;
+          width: 100%;
+          -webkit-backface-visibility: hidden;
+          max-width: 233px;
+        }
+
+        :host([theme="gunmalmg"]) .classic-content-wrapper .main-value {
+          font-size: inherit;
+        }
+
+        :host([theme="gunmalmg"]) .classic-content-wrapper line {
+          stroke: #e7e7e8;
+          stroke-width: 0.5;
+        }
+
+        :host([theme="gunmalmg"]) .classic-content-wrapper #modes {
+          display: flex !important;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 8px;
+        }
+
+        :host([theme="gunmalmg"]) .classic-content-wrapper #vt-control-buttons {
+          display: flex !important;
+          justify-content: center;
+          gap: 16px;
+          margin-top: 8px;
+        }
+
+        :host([theme="gunmalmg"]) .classic-content-wrapper #presets {
+          display: flex !important;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 8px;
+        }
+
+        :host([theme="gunmalmg"]) .classic-content-wrapper #left-infos {
+          display: flex !important;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 4px;
+          margin-top: 8px;
+          width: 100%;
+        }
+
+        /* Reset styles for classic content inside popup
+        :host([theme="gunmalmg"]) .classic-popup-content .content {
+          position: relative !important;
+          width: 100% !important;
+          height: auto !important;
+          max-width: none !important;
+          transform: none !important;
+          left: 0 !important;
+          top: 0 !important;
+        }
+        */
+
+        :host([theme="gunmalmg"]) .classic-popup-content .disabled-circle-container {
+          display: none !important;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content #modes,
+        :host([theme="gunmalmg"]) .classic-popup-content #presets,
+        :host([theme="gunmalmg"]) .classic-popup-content #vt-control-buttons,
+        :host([theme="gunmalmg"]) .classic-popup-content #left-infos,
+        :host([theme="gunmalmg"]) .classic-popup-content .current-info {
+          display: flex !important;
+        }
 `;
