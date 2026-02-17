@@ -408,7 +408,7 @@ export const gunmalmgStyles = css`
           flex-flow: wrap;
           max-width: 155px;
           margin: 0 auto;
-          margin-top: -230px;
+          top: -200px;
         }
 
         :host([theme="gunmalmg"]) .classic-content-wrapper #main {
@@ -424,8 +424,18 @@ export const gunmalmgStyles = css`
           max-width: 233px;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper .main-value {
-          font-size: inherit;
+        /* Temperature styles for classic popup - use same as classic theme */
+        :host([theme="gunmalmg"]) .classic-content-wrapper .temp-main {
+          font-size: 15px;
+        }
+        :host([theme="gunmalmg"]) .classic-content-wrapper .temp-main .uom {
+          font-size: 5px;
+        }
+        :host([theme="gunmalmg"]) .classic-content-wrapper .temp-secondary {
+          font-size: 6px;
+        }
+        :host([theme="gunmalmg"]) .classic-content-wrapper .temp-secondary .uom {
+          font-size: 3px;
         }
 
         :host([theme="gunmalmg"]) .classic-content-wrapper line {
@@ -434,35 +444,42 @@ export const gunmalmgStyles = css`
         }
 
         :host([theme="gunmalmg"]) .classic-content-wrapper #modes {
-          display: flex !important;
-          flex-wrap: wrap;
+          position: relative;
+          display: flex;
+          width: auto;
           justify-content: center;
-          gap: 8px;
-          margin-top: 8px;
+          margin-top: -3em;
+          margin-bottom: 1em;
         }
 
         :host([theme="gunmalmg"]) .classic-content-wrapper #vt-control-buttons {
-          display: flex !important;
+          position: absolute;
+          display: block;
+          width: auto;
           justify-content: center;
-          gap: 16px;
-          margin-top: 8px;
+          padding-bottom: 0.2em;
+          left: 90%;
+          top: 35%;
         }
 
         :host([theme="gunmalmg"]) .classic-content-wrapper #presets {
-          display: flex !important;
-          flex-wrap: wrap;
+          position: relative;
+          display: flex;
+          width: 100%;
           justify-content: center;
-          gap: 8px;
-          margin-top: 8px;
+          align-items: center;
+          margin-top: -1em;
+          margin-bottom: 1em;
         }
 
         :host([theme="gunmalmg"]) .classic-content-wrapper #left-infos {
-          display: flex !important;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 4px;
-          margin-top: 8px;
-          width: 100%;
+          position: absolute;
+          display: block;
+          width: auto;
+          justify-content: center;
+          padding-bottom: 0.2em;
+          left: 0%;
+          top: 15%;
         }
 
         /* Reset styles for classic content inside popup

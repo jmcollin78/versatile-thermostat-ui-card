@@ -731,6 +731,20 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       text {
         fill: var(--primary-text-color);
       }
+
+      /* Temperature display styles */
+      .temp-main {
+        font-size: 15px;
+      }
+      .temp-main .uom {
+        font-size: 5px;
+      }
+      .temp-secondary {
+        font-size: 6px;
+      }
+      .temp-secondary .uom {
+        font-size: 3px;
+      }
       
       .auto,
       .heat_cool {
@@ -1414,20 +1428,20 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
                       <path class="window window-by-pass ${this._hasWindowByPass ? 'active': ''}" id="window-by-pass" d=${mdiWindowShutterAlert}/>
                     </g>
                   `: ``}
-                  ${(!this._hasWindowByPass && this._hasWindow) ? svg`
-                    <g transform="${(this._hasWindow) ? 'translate(-50.25,0)' :''}" @click=${this._handleToggleWindowByPass} class="icon-group">
+                  ${(!this._hasWindowByPass && this._hasWindow && !this._config?.disable_window) ? svg`
+                    <g transform="${(this._hasWindow && !this._config?.disable_window) ? 'translate(-50.25,0)' :''}" @click=${this._handleToggleWindowByPass} class="icon-group">
                       <rect width="24" height="24" fill="transparent" style="cursor: pointer;"/>
                       <path class="window ${this._hasWindow ? 'active': ''}" id="window" d=${mdiWindowOpenVariant}/>
                     </g>
                   `: ``}
-                  ${(this._hasOverpowering) ? svg`
-                    <path class="overpowering ${this.overpowering ? 'active': ''}" transform="${(this._hasOverpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
+                  ${(this._hasOverpowering && !this._config?.disable_overpowering) ? svg`
+                    <path class="overpowering ${this.overpowering ? 'active': ''}" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
                   `: ``}
                   ${(this._hasPresence) ? svg`
                     <path class="presence ${this.presence ? 'active': ''}" transform="${(this._hasPresence) ? 'translate(0.25,0)' :''}" id="overpowering" d=${mdiHomeAccount} />
                   `: ``}
-                  ${(this._hasAutoStartStop) ? svg`
-                    <path class="auto-start-stop" transform="${(this._hasAutoStartStop) ? 'translate(25.25,0)' :''}" id="autoStartStop" d=${mdiPowerSleep}/>
+                  ${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? svg`
+                    <path class="auto-start-stop" transform="${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? 'translate(25.25,0)' :''}" id="autoStartStop" d=${mdiPowerSleep}/>
                   `: ``}
                   ${(this._hasMotion) ? svg`
                     <path class="motion ${this.motion ? 'active': ''}" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
@@ -1462,36 +1476,85 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           `}
         </div>
 
-        <div id="vt-control-buttons" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
-          <div class="button">
-            <vt-ha-outlined-icon-button 
-              .target=${this.target}
-              .step=${this.step}
-              @click=${this._handleButton}
-            >
-              <ha-svg-icon .path=${mdiPlus}></ha-svg-icon>
-            </vt-ha-outlined-icon-button>
+        ${!this._config?.disable_buttons ? html`
+          <div id="vt-control-buttons" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
+            <div class="button">
+              <vt-ha-outlined-icon-button 
+                .target=${this.target}
+                .step=${this.step}
+                @click=${this._handleButton}
+              >
+                <ha-svg-icon .path=${mdiPlus}></ha-svg-icon>
+              </vt-ha-outlined-icon-button>
+            </div>
+            <div class="button">
+              <vt-ha-outlined-icon-button
+                .target=${this.target}
+                .step=${-this.step}
+                @click=${this._handleButton}
+              >
+                <ha-svg-icon .path=${mdiMinus}></ha-svg-icon>
+              </vt-ha-outlined-icon-button>
+            </div>
           </div>
-          <div class="button">
-            <vt-ha-outlined-icon-button
-              .target=${this.target}
-              .step=${-this.step}
-              @click=${this._handleButton}
-            >
-              <ha-svg-icon .path=${mdiMinus}></ha-svg-icon>
-            </vt-ha-outlined-icon-button>
+        ` : ``}
+
+        ${!this._config?.disable_presets ? html`
+          <div id="presets" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
+            ${svg`
+              ${this.presets.map((preset) => {
+                return this._renderPreset(preset, this.preset);
+              })}
+            `}
+            ${!this._config?.disable_timed_preset ? html`
+              <div class="timed-preset-container">
+                ${this.timedPresetActive ? html`
+                  <span class="timed-preset-remaining" title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_active' })}">
+                    ${this._formatRemainingTime(this.timedPresetRemainingTime)}
+                  </span>
+                  ${(this.timedPresetRemainingTime ?? 0) < 60 ? html`
+                    <span class="timed-preset-label">${localize({ hass: this.hass, string: 'extra_states.minutes' })}</span>
+                  ` : ''}
+                  <ha-icon-button
+                    class="timed-preset-cancel"
+                    @click=${this._handleCancelTimedPreset}
+                    title="${localize({ hass: this.hass, string: 'extra_states.cancel_timed_preset' })}"
+                    .path=${mdiClose}
+                  ></ha-icon-button>
+                ` : this._config?.use_manual_duration_input ? html`
+                  <input
+                    type="number"
+                    class="timed-preset-input ${this.timedPresetDuration ? 'active' : ''}"
+                    .value=${this.timedPresetDuration ?? ''}
+                    @input=${this._handleTimedPresetDurationChange}
+                    placeholder="0"
+                    min="0"
+                    max="1440"
+                    title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_title' })}"
+                  />
+                  <span class="timed-preset-label">${localize({ hass: this.hass, string: 'extra_states.minutes' })}</span>
+                ` : html`
+                  <select
+                    class="timed-preset-select ${this.timedPresetDuration ? 'active' : ''}"
+                    @change=${this._handleTimedPresetSelectChange}
+                    title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_title' })}"
+                  >
+                    <option value="" ?selected=${!this.timedPresetDuration}>--</option>
+                    <option value="15" ?selected=${this.timedPresetDuration === 15}>15 ${localize({ hass: this.hass, string: 'extra_states.minutes' })}</option>
+                    <option value="30" ?selected=${this.timedPresetDuration === 30}>30 ${localize({ hass: this.hass, string: 'extra_states.minutes' })}</option>
+                    <option value="60" ?selected=${this.timedPresetDuration === 60}>1 h</option>
+                    <option value="120" ?selected=${this.timedPresetDuration === 120}>2 h</option>
+                    <option value="240" ?selected=${this.timedPresetDuration === 240}>4 h</option>
+                    <option value="480" ?selected=${this.timedPresetDuration === 480}>8 h</option>
+                    <option value="1440" ?selected=${this.timedPresetDuration === 1440}>24 h</option>
+                  </select>
+                `}
+              </div>
+            ` : ''}
           </div>
-        </div>
+        ` : ''}
 
-        <div id="presets" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
-          ${svg`
-            ${this.presets.map((preset) => {
-              return this._renderPreset(preset, this.preset);
-            })}
-          `}
-        </div>
-
-        <div id="left-infos">
+        <div id="left-infos" class="${this._config?.disable_presets ? 'no-presets' : ''}">
           ${this.isRecalculateScheduled ? svg`${this._renderRecalculateScheduledButton()}` : ''}
           ${this.messages.length > 0 ? svg`${this._renderMessagesButton()}` : ''}
           ${this._config!.autoStartStopEnableEntity && this._isAutoStartStopConfigured ? svg`${this._renderAutoStartStopEnable()}` : ''}
@@ -1510,6 +1573,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
               return this._renderAutoFanInfo(infos);
             })}
           `}
+        </div>
+
+        <div id="right-lock">
+          ${this._config?.allow_lock_toggle ? html`
+            <ha-icon-button
+              class="lock-icon ${this._isLocked ? 'locked' : 'unlocked'}"
+              .path=${this._isLocked ? mdiLock : mdiLockOpen}
+              @click=${this._handleLockToggle}
+              tabindex="0"
+            ></ha-icon-button>
+          ` : ''}
         </div>
       </div>
     `;
@@ -2512,21 +2586,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderTemperature(temperature, isMain: boolean, x: string, y: string, isTarget: boolean) {
-    // Default sizes
-    let fontSize= isMain ? 15:6;
-    let dx = isMain ? -2:-1;
-    let dy = isMain ? -5.5:-2;
-    let uomSize = isMain ? 5:3;
-    
-    // gunmalmg: smaller, more centered
-    if (this._config?.theme === THEMES.GUNMALMG) {
-      fontSize = isMain ? 10 : 5;
-      dx = isMain ? -1 : -1;
-      dy = isMain ? -4 : -2;
-      uomSize = isMain ? 4 : 3;
-    }
-
     let targetPosX:number = 76, targetPosY: number = 57, targetScale=0.20;
+    // Offsets for unit of measure tspan
+    const dx = isMain ? -2 : -1;
+    const dy = isMain ? -5.5 : -2;
 
     let value:string;
 
@@ -2542,22 +2605,24 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
 
     if (isTarget && isMain) {
-      targetPosX = this._config?.theme === THEMES.GUNMALMG ? 40 : 30;
-      targetPosY = this._config?.theme === THEMES.GUNMALMG ? 56 : 56;
-      targetScale = this._config?.theme === THEMES.GUNMALMG ? 0.22 : 0.25
+      targetPosX = 30;
+      targetPosY = 56;
+      targetScale = 0.25;
     }
+
+    const tempClass = isMain ? 'temp-main' : 'temp-secondary';
 
     return svg`
       ${isTarget && !this._config?.disable_target_icon && this.effectiveDisableCircle ? svg`
         <path 
-          class="main-value" 
+          class="target-icon" 
           transform="translate(${targetPosX}, ${targetPosY}) scale(${targetScale})" 
           fill="#ffffff" 
           d="${mdiBullseyeArrow}" 
         />` : ''}
-      <text class="main-value" x="${x}" y="${y}" dominant-baseline="middle" text-anchor="middle" style="font-size:${fontSize}px;">
+      <text class="main-value ${tempClass}" x="${x}" y="${y}" dominant-baseline="middle" text-anchor="middle">
         ${svg`${value}`}
-        <tspan dx="${dx}" dy="${dy}" style="font-size: ${uomSize}px;">
+        <tspan class="uom" dx="${dx}" dy="${dy}">
           ${svg`
             ${this.hass.config.unit_system.temperature}
           `}
