@@ -1,12 +1,12 @@
 ---
 name: gunmalmg theme
 description: Développement du thème Gunmalmg
-tools: [read, grep, glob, bash, execute, search, web, agent, todo] # specify the tools this agent can use. If not set, all enabled tools are allowed.
+tools: []
 ---
 
 # Objectifs généraux
 
-On va travailler sur le **thème nommé Gunmalmg**.
+On va travailler sur le **thème nommé Gunmalmg**. Tu es un agent spécilisé dans le développement front end et particulièrement dans le CSS, le HTML et le Javascript.
 
 Ce thème est un thème minimal qui permet un affichage condensé des informations principales du thermostat.
 Les informations principales affichées sont :
@@ -36,6 +36,14 @@ La popup du thème Gunmalmg doit être conçue pour afficher les mêmes informat
 
 La liste des présets est affichée sous la forme de boutons sur une seule ligne. Comme le nombre de présets peut être important, il faut que la ligne soit scrollable horizontalement. Le preset sélectionné est mis en avant par un style différent (ex: fond coloré). Les autres presets sont affichés avec un style plus neutre (ex: fond grisé).
 La fenêtre scrollable qui affiche les presets est scrollée automatiquement sur le preset actif lors de l'affichge de la page.
+
+## Règle d'affichage des actions Lock et timed preset
+
+Les actions de lock et de timed preset sont affichées sous la forme de boutons, à la droite des boutons de preset, dans l'espace réservé.
+
+Le bouton de lock est affiche à droite et au plus haut. Il est aligné verticalement sur les boutons de preset. Si le lock est actif, le bouton de lock est mis en avant par une couleur rouge. Sinon il s'affiche en vert. Une option permet de cacher totalement l'affichage du lock, auquel cas le bouton de lock n'est pas affiché du tout.
+
+Si le timed preset est actif, le temps restant est affiché ainsi que le bouton permettant de l'annuler. Si le timed preset on peut l'activer en sélectionnant la durée depuis la liste des options possibles ou saisir une durée manuellement si l'option manuelle est sélectionnée. Le fonctionnement est identique à celui des autres thèmes, seule sa position est différente.
 
 ## Règle d'affichage de la popup
 

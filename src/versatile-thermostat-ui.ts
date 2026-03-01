@@ -902,17 +902,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         color: var(--primary-color);
         min-width: 30px;
         text-align: center;
-      }
-
-      .timed-preset-cancel {
-        --mdc-icon-size: 20px;
-        color: var(--error-color);
-        margin-left: 4px;
         cursor: pointer;
+        user-select: none;
+        border-radius: 8px;
+        padding: 2px 6px;
+        transition: background-color 200ms ease;
       }
 
-      .timed-preset-cancel:hover {
-        color: var(--primary-color);
+      .timed-preset-remaining:hover {
+        background: rgba(var(--rgb-primary-color, 33, 150, 243), 0.12);
       }
 
       .preset-label {
@@ -1487,18 +1485,14 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             ${!this._config?.disable_timed_preset ? html`
               <div class="timed-preset-container">
                 ${this.timedPresetActive ? html`
-                  <span class="timed-preset-remaining" title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_active' })}">
+                  <span class="timed-preset-remaining" 
+                    title="${localize({ hass: this.hass, string: 'extra_states.cancel_timed_preset' })}"
+                    @click=${this._handleCancelTimedPreset}>
                     ${this._formatRemainingTime(this.timedPresetRemainingTime)}
                   </span>
                   ${(this.timedPresetRemainingTime ?? 0) < 60 ? html`
                     <span class="timed-preset-label">${localize({ hass: this.hass, string: 'extra_states.minutes' })}</span>
                   ` : ''}
-                  <ha-icon-button
-                    class="timed-preset-cancel"
-                    @click=${this._handleCancelTimedPreset}
-                    title="${localize({ hass: this.hass, string: 'extra_states.cancel_timed_preset' })}"
-                    .path=${mdiClose}
-                  ></ha-icon-button>
                 ` : this._config?.use_manual_duration_input ? html`
                   <input
                     type="number"
@@ -2835,18 +2829,14 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         ${!this._config?.disable_timed_preset ? html`
           <div class="timed-preset-container">
             ${this.timedPresetActive ? html`
-              <span class="timed-preset-remaining" title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_active' })}">
+              <span class="timed-preset-remaining" 
+                title="${localize({ hass: this.hass, string: 'extra_states.cancel_timed_preset' })}"
+                @click=${this._handleCancelTimedPreset}>
                 ${this._formatRemainingTime(this.timedPresetRemainingTime)}
               </span>
               ${(this.timedPresetRemainingTime ?? 0) < 60 ? html`
                 <span class="timed-preset-label">${localize({ hass: this.hass, string: 'extra_states.minutes' })}</span>
               ` : ''}
-              <ha-icon-button
-                class="timed-preset-cancel"
-                @click=${this._handleCancelTimedPreset}
-                title="${localize({ hass: this.hass, string: 'extra_states.cancel_timed_preset' })}"
-                .path=${mdiClose}
-              ></ha-icon-button>
             ` : this._config?.use_manual_duration_input ? html`
               <input
                 type="number"

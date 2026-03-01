@@ -22,6 +22,52 @@ export function renderClassicPopup(ctx: any): TemplateResult {
   `;
 }
 
+// Render the timed preset controls for gunmalmg theme
+function renderGunmalmgTimedPreset(ctx: any): TemplateResult {
+  if (ctx._config?.disable_timed_preset) return html``;
+  return html`
+    <div class="gunmalmg-timed-preset">
+      ${ctx.timedPresetActive ? html`
+        <span class="gunmalmg-timed-remaining" 
+          title="${localize({ hass: ctx.hass, string: 'extra_states.cancel_timed_preset' })}"
+          @click=${ctx._handleCancelTimedPreset}>
+          ${ctx._formatRemainingTime(ctx.timedPresetRemainingTime)}
+        </span>
+        ${(ctx.timedPresetRemainingTime ?? 0) < 60 ? html`
+          <span class="gunmalmg-timed-label">${localize({ hass: ctx.hass, string: 'extra_states.minutes' })}</span>
+        ` : ''}
+      ` : ctx._config?.use_manual_duration_input ? html`
+        <input
+          type="number"
+          class="gunmalmg-timed-input ${ctx.timedPresetDuration ? 'active' : ''}"
+          .value=${ctx.timedPresetDuration ?? ''}
+          @input=${ctx._handleTimedPresetDurationChange}
+          placeholder="0"
+          min="0"
+          max="1440"
+          title="${localize({ hass: ctx.hass, string: 'extra_states.timed_preset_title' })}"
+        />
+        <span class="gunmalmg-timed-label">${localize({ hass: ctx.hass, string: 'extra_states.minutes' })}</span>
+      ` : html`
+        <select
+          class="gunmalmg-timed-select ${ctx.timedPresetDuration ? 'active' : ''}"
+          @change=${ctx._handleTimedPresetSelectChange}
+          title="${localize({ hass: ctx.hass, string: 'extra_states.timed_preset_title' })}"
+        >
+          <option value="" ?selected=${!ctx.timedPresetDuration}>--</option>
+          <option value="15" ?selected=${ctx.timedPresetDuration === 15}>15 ${localize({ hass: ctx.hass, string: 'extra_states.minutes' })}</option>
+          <option value="30" ?selected=${ctx.timedPresetDuration === 30}>30 ${localize({ hass: ctx.hass, string: 'extra_states.minutes' })}</option>
+          <option value="60" ?selected=${ctx.timedPresetDuration === 60}>1 h</option>
+          <option value="120" ?selected=${ctx.timedPresetDuration === 120}>2 h</option>
+          <option value="240" ?selected=${ctx.timedPresetDuration === 240}>4 h</option>
+          <option value="480" ?selected=${ctx.timedPresetDuration === 480}>8 h</option>
+          <option value="1440" ?selected=${ctx.timedPresetDuration === 1440}>24 h</option>
+        </select>
+      `}
+    </div>
+  `;
+}
+
 // Render function for the gunmalmg theme. Accepts the component instance
 // so it can reuse helper render methods (icons, temperatures, presets).
 export function renderGunmalmg(ctx: any): TemplateResult {
@@ -29,18 +75,6 @@ export function renderGunmalmg(ctx: any): TemplateResult {
   return html`
     <ha-card class="gunmalmg-card ${ctx.hvacMode} ${ctx._isLocked ? 'locked' : ''}">
       ${ctx._showClassicPopup ? renderClassicPopup(ctx) : ''}
-
-      <div id="right-lock" style="margin-top: 4px; display: flex; justify-content: center;">
-        ${ctx._config?.allow_lock_toggle ? html`
-            <ha-icon-button
-                class="lock-icon ${ctx._isLocked ? 'locked' : 'unlocked'}"
-                .path=${ctx._isLocked ? mdiLock : mdiLockOpen}
-                @click=${ctx._handleLockToggle}
-                tabindex="0"
-            ></ha-icon-button>
-            `
-        : ''}
-      </div>
 
       <div class="gunmalmg-grid">
         <div class="gunmalmg-name name">${ctx.name}</div>
@@ -69,8 +103,21 @@ export function renderGunmalmg(ctx: any): TemplateResult {
           </div>
         </div>
         <div class="gunmalmg-right">
-          <div id="presets" class="gunmalmg-presets">
-            ${!ctx._config?.disable_presets ? ctx.presets.map((p: any) => html`${ctx._renderPreset(p, ctx.preset)}`) : ''}
+          <div class="gunmalmg-presets-scroll">
+            <div id="presets" class="gunmalmg-presets">
+              ${!ctx._config?.disable_presets ? ctx.presets.map((p: any) => html`${ctx._renderPreset(p, ctx.preset)}`) : ''}
+            </div>
+          </div>
+          <div class="gunmalmg-actions">
+            ${ctx._config?.allow_lock_toggle ? html`
+              <ha-icon-button
+                class="gunmalmg-lock-btn ${ctx._isLocked ? 'locked' : 'unlocked'}"
+                .path=${ctx._isLocked ? mdiLock : mdiLockOpen}
+                @click=${ctx._handleLockToggle}
+                tabindex="0"
+              ></ha-icon-button>
+            ` : ''}
+            ${renderGunmalmgTimedPreset(ctx)}
           </div>
         </div>
       </div>
@@ -233,7 +280,7 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) .gunmalmg-temp-secondary { font-size: 13px; color: var(--secondary-text-color); margin-left: 4px; white-space: nowrap; }
         :host([theme="gunmalmg"]) .gunmalmg-uom { font-size: 11px; color: var(--secondary-text-color); margin-left: 1px; }
 
-        /* Hide timed preset controls for Gunmalmg */
+        /* Hide the classic timed-preset-container (we use our own gunmalmg-timed-preset) */
         :host([theme="gunmalmg"]) .timed-preset-container { display: none !important; }
 
         /* Grid layout: name spans columns 1-2 on first row; left/center/right on second row */
@@ -258,7 +305,7 @@ export const gunmalmgStyles = css`
           text-overflow: ellipsis; 
           white-space: normal; 
           line-height: 1.2;
-          margin-bottom: 1em;
+          margin: 0.5em;
         }
         :host([theme="gunmalmg"]) .gunmalmg-left { grid-area: left; }
         :host([theme="gunmalmg"]) .gunmalmg-center { grid-area: center; }
@@ -282,17 +329,36 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) .gunmalmg-center { text-align: left; max-width: 100%; display:flex; flex-direction:column; justify-content:left; }
         :host([theme="gunmalmg"]) .gunmalmg-right {
           padding: 0;
-          display: block;
+          display: flex;
+          flex-direction: row;
+          align-items: stretch;
+          min-width: 0;
+        }
+
+        /* Scrollable presets zone */
+        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll {
+          flex: 1 1 0;
           overflow-x: auto;
           overflow-y: hidden;
           min-width: 0;
-          margin-right: 48px;
           scrollbar-width: thin;
           scrollbar-color: rgba(255,255,255,0.15) transparent;
         }
-        :host([theme="gunmalmg"]) .gunmalmg-right::-webkit-scrollbar { height: 3px; }
-        :host([theme="gunmalmg"]) .gunmalmg-right::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-        :host([theme="gunmalmg"]) .gunmalmg-right::-webkit-scrollbar-track { background: transparent; }
+        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar { height: 3px; }
+        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar-track { background: transparent; }
+
+        /* Fixed actions zone (lock + timed preset) */
+        :host([theme="gunmalmg"]) .gunmalmg-actions {
+          flex: 0 0 auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          padding: 4px 4px;
+          gap: 4px;
+          min-width: 48px;
+        }
 
         :host([theme="gunmalmg"]) .hvac-mode-tile { display: flex; align-items: center; justify-content: center; padding: 0; background: transparent; }
 
@@ -301,7 +367,8 @@ export const gunmalmgStyles = css`
         /* Dim hvac mode and preset icons when locked */
         :host([theme="gunmalmg"]) ha-card.locked .hvac-mode-tile ha-icon-button,
         :host([theme="gunmalmg"]) ha-card.locked #presets ha-icon-button,
-        :host([theme="gunmalmg"]) ha-card.locked #presets .preset-label {
+        :host([theme="gunmalmg"]) ha-card.locked #presets .preset-label,
+        :host([theme="gunmalmg"]) ha-card.locked .gunmalmg-timed-preset {
           opacity: 0.5;
           color: var(--disabled-text-color);
           pointer-events: none;
@@ -321,15 +388,98 @@ export const gunmalmgStyles = css`
 
         /* Make the more-info icon more visible on dark background */
         :host([theme="gunmalmg"]) .more-info { color: #e6e6e6; z-index: 6; }
-        :host([theme="gunmalmg"]) #right-lock {
-          position: absolute;
-          top: 60px; /* place under the menu button */
-          right: 0px;
-          z-index: 8; /* above some elements but below the menu overlay */
-          display: flex;
+
+        /* Lock button styles */
+        :host([theme="gunmalmg"]) .gunmalmg-lock-btn {
+          --mdc-icon-size: 24px;
+          width: 40px;
+          height: 40px;
+          border-radius: 12px;
+          display: inline-flex;
           align-items: center;
           justify-content: center;
-          pointer-events: auto;
+          transition: background-color 200ms ease, color 200ms ease;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-lock-btn.locked {
+          background: rgba(244, 67, 54, 0.20);
+          color: #f44336;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-lock-btn.unlocked {
+          background: rgba(76, 175, 80, 0.20);
+          color: #4CAF50;
+        }
+
+        /* Timed preset styles for gunmalmg */
+        :host([theme="gunmalmg"]) .gunmalmg-timed-preset {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2px;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-remaining {
+          font-size: 13px;
+          font-weight: 600;
+          color: #f9a21f;
+          white-space: nowrap;
+          cursor: pointer;
+          user-select: none;
+          border-radius: 8px;
+          padding: 2px 6px;
+          transition: background-color 200ms ease;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-remaining:hover {
+          background: rgba(249, 162, 31, 0.15);
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-label {
+          font-size: 9px;
+          color: var(--secondary-text-color);
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-input {
+          width: 35px;
+          height: 25px;
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 8px;
+          background: #2b2b2b;
+          color: #e6e6e6;
+          font-size: 12px;
+          text-align: center;
+          outline: none;
+          -moz-appearance: textfield;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-input:focus {
+          border-color: #f9a21f;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-input.active {
+          border-color: #f9a21f;
+          color: #f9a21f;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-input::-webkit-outer-spin-button,
+        :host([theme="gunmalmg"]) .gunmalmg-timed-input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-select {
+          width: 40px;
+          height: 30px;
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 8px;
+          background: #2b2b2b;
+          color: #e6e6e6;
+          font-size: 10px;
+          text-align: center;
+          outline: none;
+          cursor: pointer;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          padding: 0 4px;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-select:focus {
+          border-color: #f9a21f;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-select.active {
+          border-color: #f9a21f;
+          color: #f9a21f;
         }
         :host([theme="gunmalmg"]) .theme-menu { background: #1b1b1b; color: #e6e6e6; border-color: rgba(255,255,255,0.06); }
         :host([theme="gunmalmg"]) .theme-menu-item { color: #e6e6e6; }
