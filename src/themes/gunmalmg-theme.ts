@@ -1,6 +1,6 @@
 import { css } from 'lit';
 import { html } from 'lit';
-import { mdiClose, mdiLock, mdiLockOpen } from '@mdi/js';
+import { mdiClose, mdiDotsVertical, mdiLock, mdiLockOpen } from '@mdi/js';
 import type { TemplateResult } from 'lit';
 import { localize } from '../localize/localize';
 
@@ -15,9 +15,64 @@ export function renderClassicPopup(ctx: any): TemplateResult {
         @click=${() => ctx._closeClassicPopup()}
         tabindex="0"
       ></ha-icon-button>
+      ${!ctx._config?.disable_menu ? html`
+        <ha-icon-button
+          class="classic-popup-more-info"
+          .label=${ctx.hass!.localize("ui.panel.lovelace.cards.show_more_info")}
+          .path=${mdiDotsVertical}
+          @click=${() => { ctx._closeClassicPopup(); ctx._handleMoreInfo(); }}
+          tabindex="0"
+        ></ha-icon-button>
+      ` : ''}
       <div class="classic-popup-content">
-        ${ctx._renderClassicContent()}
+        ${ctx._renderClassicContent(true)}
       </div>
+    </div>
+  `;
+}
+
+// Render the timed preset controls for gunmalmg theme
+function renderGunmalmgTimedPreset(ctx: any): TemplateResult {
+  if (ctx._config?.disable_timed_preset) return html``;
+  return html`
+    <div class="gunmalmg-timed-preset">
+      ${ctx.timedPresetActive ? html`
+        <span class="gunmalmg-timed-remaining" 
+          title="${localize({ hass: ctx.hass, string: 'extra_states.cancel_timed_preset' })}"
+          @click=${ctx._handleCancelTimedPreset}>
+          ${ctx._formatRemainingTime(ctx.timedPresetRemainingTime)}
+        </span>
+        ${(ctx.timedPresetRemainingTime ?? 0) < 60 ? html`
+          <span class="gunmalmg-timed-label">${localize({ hass: ctx.hass, string: 'extra_states.minutes' })}</span>
+        ` : ''}
+      ` : ctx._config?.use_manual_duration_input ? html`
+        <input
+          type="number"
+          class="gunmalmg-timed-input ${ctx.timedPresetDuration ? 'active' : ''}"
+          .value=${ctx.timedPresetDuration ?? ''}
+          @input=${ctx._handleTimedPresetDurationChange}
+          placeholder="0"
+          min="0"
+          max="1440"
+          title="${localize({ hass: ctx.hass, string: 'extra_states.timed_preset_title' })}"
+        />
+        <span class="gunmalmg-timed-label">${localize({ hass: ctx.hass, string: 'extra_states.minutes' })}</span>
+      ` : html`
+        <select
+          class="gunmalmg-timed-select ${ctx.timedPresetDuration ? 'active' : ''}"
+          @change=${ctx._handleTimedPresetSelectChange}
+          title="${localize({ hass: ctx.hass, string: 'extra_states.timed_preset_title' })}"
+        >
+          <option value="" ?selected=${!ctx.timedPresetDuration}>--</option>
+          <option value="15" ?selected=${ctx.timedPresetDuration === 15}>15 ${localize({ hass: ctx.hass, string: 'extra_states.minutes' })}</option>
+          <option value="30" ?selected=${ctx.timedPresetDuration === 30}>30 ${localize({ hass: ctx.hass, string: 'extra_states.minutes' })}</option>
+          <option value="60" ?selected=${ctx.timedPresetDuration === 60}>1 h</option>
+          <option value="120" ?selected=${ctx.timedPresetDuration === 120}>2 h</option>
+          <option value="240" ?selected=${ctx.timedPresetDuration === 240}>4 h</option>
+          <option value="480" ?selected=${ctx.timedPresetDuration === 480}>8 h</option>
+          <option value="1440" ?selected=${ctx.timedPresetDuration === 1440}>24 h</option>
+        </select>
+      `}
     </div>
   `;
 }
@@ -29,18 +84,6 @@ export function renderGunmalmg(ctx: any): TemplateResult {
   return html`
     <ha-card class="gunmalmg-card ${ctx.hvacMode} ${ctx._isLocked ? 'locked' : ''}">
       ${ctx._showClassicPopup ? renderClassicPopup(ctx) : ''}
-
-      <div id="right-lock" style="margin-top: 4px; display: flex; justify-content: center;">
-        ${ctx._config?.allow_lock_toggle ? html`
-            <ha-icon-button
-                class="lock-icon ${ctx._isLocked ? 'locked' : 'unlocked'}"
-                .path=${ctx._isLocked ? mdiLock : mdiLockOpen}
-                @click=${ctx._handleLockToggle}
-                tabindex="0"
-            ></ha-icon-button>
-            `
-        : ''}
-      </div>
 
       <div class="gunmalmg-grid">
         <div class="gunmalmg-name name">${ctx.name}</div>
@@ -61,7 +104,7 @@ export function renderGunmalmg(ctx: any): TemplateResult {
               const bottomLabel = (bottom === null || bottom === undefined) ? null : fmt.format(bottom);
               return html`
                 <div class="gunmalmg-temps-inline">
-                  <span class="gunmalmg-temp-main">${topLabel}<span class="gunmalmg-uom"> ${unit}</span></span>
+                  <span class="gunmalmg-temp-main ${ctx._hasError ? 'has-error' : ''}">${topLabel}<span class="gunmalmg-uom"> ${unit}</span></span>
                   ${bottomLabel ? html`<span class="gunmalmg-temp-secondary">(${bottomLabel}<span class="gunmalmg-uom"> ${unit}</span>)</span>` : ``}
                 </div>
               `;
@@ -69,8 +112,21 @@ export function renderGunmalmg(ctx: any): TemplateResult {
           </div>
         </div>
         <div class="gunmalmg-right">
-          <div id="presets" class="gunmalmg-presets">
-            ${!ctx._config?.disable_presets ? ctx.presets.map((p: any) => html`${ctx._renderPreset(p, ctx.preset)}`) : ''}
+          <div class="gunmalmg-presets-scroll">
+            <div id="presets" class="gunmalmg-presets">
+              ${!ctx._config?.disable_presets ? ctx.presets.map((p: any) => html`${ctx._renderPreset(p, ctx.preset)}`) : ''}
+            </div>
+          </div>
+          <div class="gunmalmg-actions">
+            ${ctx._config?.allow_lock_toggle ? html`
+              <ha-icon-button
+                class="gunmalmg-lock-btn ${ctx._isLocked ? 'locked' : 'unlocked'}"
+                .path=${ctx._isLocked ? mdiLock : mdiLockOpen}
+                @click=${ctx._handleLockToggle}
+                tabindex="0"
+              ></ha-icon-button>
+            ` : ''}
+            ${renderGunmalmgTimedPreset(ctx)}
           </div>
         </div>
       </div>
@@ -94,26 +150,33 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) .name { font-weight: 600; color: #ffffff; font-size: 17px; text-align: left;}
         :host([theme="gunmalmg"]) .content { display: flex; position: relative; width: 100%; height: auto; max-width: none; transform: none; left: 0; top: 0; padding: 0; align-items: center; justify-content: center; }
         :host([theme="gunmalmg"]) .current-info, :host([theme="gunmalmg"]) #left-infos, :host([theme="gunmalmg"]) #vt-control-buttons { display: none !important; }
-        :host([theme="gunmalmg"]) .disabled-circle-container { height: 64px; background: transparent; }
+        :host([theme="gunmalmg"]) .disabled-circle-container { height: 84px; background: transparent; }
 
-        /* Presets as pill buttons */
+        /* Presets as pill buttons - single horizontal row */
         :host([theme="gunmalmg"]) #presets {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(56px, 1fr));
-          margin-top: 8px;
-          justify-items: center;
+          display: flex;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          margin-top: 0;
           align-items: center;
+          gap: 6px;
+          margin-bottom: 0em;
+          width: max-content;
         }
         :host([theme="gunmalmg"]) .preset-label {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin: 0; padding: 0;
+            flex-shrink: 0;
+            height: 70px;
         }
 
         :host([theme="gunmalmg"]) .preset-label ha-icon-button {
-          --mdc-icon-size: 22px; /* ~20% larger */
-          border-radius: 10px;
+          --mdc-icon-size: 50px;
+          width: 70px;
+          height: 70px;
+          border-radius: 16px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -220,13 +283,15 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) #current { font-size: 12px; }
         :host([theme="gunmalmg"]) .content .name + * { color: var(--secondary-text-color); font-size: 10px; }
 
-        /* Inline temperature display (left-aligned) */
-        :host([theme="gunmalmg"]) .gunmalmg-temps-inline { display: flex; gap: 8px; align-items: baseline; justify-content: flex-start; }
-        :host([theme="gunmalmg"]) .gunmalmg-temp-main { font-size: 17px; font-weight: 700; color: var(--secondary-text-color); }
-        :host([theme="gunmalmg"]) .gunmalmg-temp-secondary { font-size: 13px; color: var(--secondary-text-color); margin-left: 6px; }
-        :host([theme="gunmalmg"]) .gunmalmg-uom { font-size: 16px; color: var(--secondary-text-color); margin-left: 2px; }
+        /* Inline temperature display (left-aligned, no wrapping) */
+        :host([theme="gunmalmg"]) .gunmalmg-temps-inline { display: flex; gap: 4px; align-items: baseline; justify-content: flex-start; flex-wrap: nowrap; white-space: nowrap; }
+        :host([theme="gunmalmg"]) .gunmalmg-temp-main { font-size: 17px; font-weight: 700; color: var(--secondary-text-color); white-space: nowrap; }
+        :host([theme="gunmalmg"]) .gunmalmg-temp-main.has-error { color: var(--error-color, #db4437); }
+        :host([theme="gunmalmg"]) .gunmalmg-temp-main.has-error .gunmalmg-uom { color: var(--error-color, #db4437); }
+        :host([theme="gunmalmg"]) .gunmalmg-temp-secondary { font-size: 13px; color: var(--secondary-text-color); margin-left: 4px; white-space: nowrap; }
+        :host([theme="gunmalmg"]) .gunmalmg-uom { font-size: 11px; color: var(--secondary-text-color); margin-left: 1px; }
 
-        /* Hide timed preset controls for Gunmalmg */
+        /* Hide the classic timed-preset-container (we use our own gunmalmg-timed-preset) */
         :host([theme="gunmalmg"]) .timed-preset-container { display: none !important; }
 
         /* Grid layout: name spans columns 1-2 on first row; left/center/right on second row */
@@ -251,6 +316,7 @@ export const gunmalmgStyles = css`
           text-overflow: ellipsis; 
           white-space: normal; 
           line-height: 1.2;
+          margin: 0.5em;
         }
         :host([theme="gunmalmg"]) .gunmalmg-left { grid-area: left; }
         :host([theme="gunmalmg"]) .gunmalmg-center { grid-area: center; }
@@ -272,7 +338,38 @@ export const gunmalmgStyles = css`
 
         :host([theme="gunmalmg"]) .gunmalmg-left { background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; }
         :host([theme="gunmalmg"]) .gunmalmg-center { text-align: left; max-width: 100%; display:flex; flex-direction:column; justify-content:left; }
-        :host([theme="gunmalmg"]) .gunmalmg-right { padding-right: 30px; display: flex; justify-content: flex-end; }
+        :host([theme="gunmalmg"]) .gunmalmg-right {
+          padding: 0;
+          display: flex;
+          flex-direction: row;
+          align-items: stretch;
+          min-width: 0;
+        }
+
+        /* Scrollable presets zone */
+        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll {
+          flex: 1 1 0;
+          overflow-x: auto;
+          overflow-y: hidden;
+          min-width: 0;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255,255,255,0.15) transparent;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar { height: 3px; }
+        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar-track { background: transparent; }
+
+        /* Fixed actions zone (lock + timed preset) */
+        :host([theme="gunmalmg"]) .gunmalmg-actions {
+          flex: 0 0 auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          padding: 4px 4px;
+          gap: 4px;
+          min-width: 48px;
+        }
 
         :host([theme="gunmalmg"]) .hvac-mode-tile { display: flex; align-items: center; justify-content: center; padding: 0; background: transparent; }
 
@@ -281,25 +378,118 @@ export const gunmalmgStyles = css`
         /* Dim hvac mode and preset icons when locked */
         :host([theme="gunmalmg"]) ha-card.locked .hvac-mode-tile ha-icon-button,
         :host([theme="gunmalmg"]) ha-card.locked #presets ha-icon-button,
-        :host([theme="gunmalmg"]) ha-card.locked #presets .preset-label {
-          opacity: 0.5;
+        :host([theme="gunmalmg"]) ha-card.locked #presets .preset-label,
+        :host([theme="gunmalmg"]) ha-card.locked .gunmalmg-timed-preset {
           color: var(--disabled-text-color);
           pointer-events: none;
         }
 
-        :host([theme="gunmalmg"]) .gunmalmg-presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; justify-items: center; }
+        :host([theme="gunmalmg"]) .gunmalmg-presets {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          gap: 6px;
+          align-items: center;
+          justify-content: flex-start;
+          padding: 4px 4px;
+          min-height: 80px;
+          width: max-content;
+        }
 
         /* Make the more-info icon more visible on dark background */
         :host([theme="gunmalmg"]) .more-info { color: #e6e6e6; z-index: 6; }
-        :host([theme="gunmalmg"]) #right-lock {
-          position: absolute;
-          top: 60px; /* place under the menu button */
-          right: 0px;
-          z-index: 8; /* above some elements but below the menu overlay */
-          display: flex;
+
+        /* Lock button styles */
+        :host([theme="gunmalmg"]) .gunmalmg-lock-btn {
+          --mdc-icon-size: 24px;
+          width: 40px;
+          height: 40px;
+          border-radius: 12px;
+          display: inline-flex;
           align-items: center;
           justify-content: center;
-          pointer-events: auto;
+          transition: background-color 200ms ease, color 200ms ease;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-lock-btn.locked {
+          background: rgba(244, 67, 54, 0.20);
+          color: #f44336;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-lock-btn.unlocked {
+          background: rgba(76, 175, 80, 0.20);
+          color: #4CAF50;
+        }
+
+        /* Timed preset styles for gunmalmg */
+        :host([theme="gunmalmg"]) .gunmalmg-timed-preset {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2px;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-remaining {
+          font-size: 13px;
+          font-weight: 600;
+          color: #f9a21f;
+          white-space: nowrap;
+          cursor: pointer;
+          user-select: none;
+          border-radius: 8px;
+          padding: 2px 6px;
+          transition: background-color 200ms ease;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-remaining:hover {
+          background: rgba(249, 162, 31, 0.15);
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-label {
+          font-size: 9px;
+          color: var(--secondary-text-color);
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-input {
+          width: 35px;
+          height: 25px;
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 8px;
+          background: #2b2b2b;
+          color: #e6e6e6;
+          font-size: 12px;
+          text-align: center;
+          outline: none;
+          -moz-appearance: textfield;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-input:focus {
+          border-color: #f9a21f;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-input.active {
+          border-color: #f9a21f;
+          color: #f9a21f;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-input::-webkit-outer-spin-button,
+        :host([theme="gunmalmg"]) .gunmalmg-timed-input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-select {
+          width: 40px;
+          height: 30px;
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 8px;
+          background: #2b2b2b;
+          color: #e6e6e6;
+          font-size: 10px;
+          text-align: center;
+          outline: none;
+          cursor: pointer;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          padding: 0 4px;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-select:focus {
+          border-color: #f9a21f;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-timed-select.active {
+          border-color: #f9a21f;
+          color: #f9a21f;
         }
         :host([theme="gunmalmg"]) .theme-menu { background: #1b1b1b; color: #e6e6e6; border-color: rgba(255,255,255,0.06); }
         :host([theme="gunmalmg"]) .theme-menu-item { color: #e6e6e6; }
@@ -332,7 +522,7 @@ export const gunmalmgStyles = css`
           border-radius: 12px;
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
           max-width: 95vw;
-          max-height: 45vh;
+          max-height: 90vh;
           overflow: auto;
           min-width: 300px;
         }
@@ -355,67 +545,91 @@ export const gunmalmgStyles = css`
         @media (min-width: 601px) {
           :host([theme="gunmalmg"]) .classic-popup-container {
             width: 450px;
-            max-height: 45vh;
+            max-height: 90vh;
           }
         }
 
         :host([theme="gunmalmg"]) .classic-popup-close {
           position: absolute;
           top: 8px;
-          right: 8px;
+          left: 8px;
           z-index: 1002;
           --mdc-icon-size: 24px;
           color: var(--primary-text-color);
         }
 
-        :host([theme="gunmalmg"]) .classic-popup-content {
-          padding: 16px;
+        :host([theme="gunmalmg"]) .classic-popup-more-info {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          z-index: 1002;
+          --mdc-icon-size: 24px;
+          color: var(--secondary-text-color);
+          cursor: pointer;
+          border-radius: 100%;
         }
 
-        /* Classic content wrapper styles */
-        :host([theme="gunmalmg"]) .classic-content-wrapper {
+        /* ===== Popup content: reset ALL gunmalmg overrides to classic appearance ===== */
+        :host([theme="gunmalmg"]) .classic-popup-content {
+          position: relative;
+          padding: 1em;
+          padding-top: 1.5em;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 1em;
-          gap: 8px;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper .name {
-          font-size: 18px;
-          font-weight: 500;
+        /* Name */
+        :host([theme="gunmalmg"]) .classic-popup-content .name {
+          display: block;
+          width: 100%;
+          text-align: center;
+          font-size: 20px;
+          word-break: keep-all;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
           color: var(--primary-text-color);
-          margin-bottom: 8px;
+          font-weight: normal;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper vt-ha-control-circular-slider {
+        /* Circular slider: force visible */
+        :host([theme="gunmalmg"]) .classic-popup-content vt-ha-control-circular-slider {
           display: block !important;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper .content {
-          position: relative;
-          width: calc(70% - 40px);
-          height: auto;
+        /* Content overlay inside slider: reset to classic absolute positioning */
+        :host([theme="gunmalmg"]) .classic-popup-content .content {
+          position: absolute !important;
+          width: calc(70% - 40px) !important;
+          height: calc(70% - 100px) !important;
           box-sizing: border-box;
           border-radius: 100%;
+          left: 50% !important;
+          top: calc(50% - 40px) !important;
           text-align: center;
           overflow-wrap: break-word;
           pointer-events: none;
-          display: flex;
+          display: flex !important;
           align-items: center;
           place-content: center;
           flex-flow: wrap;
-          max-width: 155px;
-          margin: 0 auto;
-          top: -200px;
+          transform: translate(-50%,-50%) !important;
+          max-width: 155px !important;
+          padding: 0;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper #main {
+        :host([theme="gunmalmg"]) .classic-popup-content .content.no-presets {
+          top: calc(60% - 30px) !important;
+        }
+
+        /* SVG inside popup */
+        :host([theme="gunmalmg"]) .classic-popup-content #main {
           transform: scale(2.3);
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper svg {
+        :host([theme="gunmalmg"]) .classic-popup-content svg {
           height: auto;
           margin: auto;
           display: block;
@@ -424,85 +638,159 @@ export const gunmalmgStyles = css`
           max-width: 233px;
         }
 
-        /* Temperature styles for classic popup - use same as classic theme */
-        :host([theme="gunmalmg"]) .classic-content-wrapper .temp-main {
+        /* current-info: force visible */
+        :host([theme="gunmalmg"]) .classic-popup-content .current-info {
+          display: flex !important;
+        }
+
+        /* Reset font overrides to classic values */
+        :host([theme="gunmalmg"]) .classic-popup-content .main-value {
+          font-size: inherit !important;
+          font-weight: normal !important;
+        }
+        :host([theme="gunmalmg"]) .classic-popup-content .main-value.temp-main {
+          font-size: 15px !important;
+        }
+        :host([theme="gunmalmg"]) .classic-popup-content .main-value.temp-secondary {
+          font-size: 6px !important;
+        }
+
+        /* Hide gunmalmg badges in popup (classic has its own hvac action icon) */
+        :host([theme="gunmalmg"]) .classic-popup-content .hvac-badge {
+          display: none !important;
+        }
+
+        /* Temperature styles: reset to classic */
+        :host([theme="gunmalmg"]) .classic-popup-content .temp-main {
           font-size: 15px;
         }
-        :host([theme="gunmalmg"]) .classic-content-wrapper .temp-main .uom {
+        :host([theme="gunmalmg"]) .classic-popup-content .temp-main .uom {
           font-size: 5px;
         }
-        :host([theme="gunmalmg"]) .classic-content-wrapper .temp-secondary {
+        :host([theme="gunmalmg"]) .classic-popup-content .temp-secondary {
           font-size: 6px;
         }
-        :host([theme="gunmalmg"]) .classic-content-wrapper .temp-secondary .uom {
+        :host([theme="gunmalmg"]) .classic-popup-content .temp-secondary .uom {
           font-size: 3px;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper line {
+        :host([theme="gunmalmg"]) .classic-popup-content line {
           stroke: #e7e7e8;
           stroke-width: 0.5;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper #modes {
+        /* Modes: reset to classic */
+        :host([theme="gunmalmg"]) .classic-popup-content #modes {
+          z-index: 0;
           position: relative;
           display: flex;
           width: auto;
           justify-content: center;
-          margin-top: 0.5em;
-          margin-bottom: 0.5em;
-          top: -165px;
+          margin-top: -3em;
+          margin-bottom: 1em;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper #vt-control-buttons {
-          position: relative;
-          display: flex;
+        /* Control buttons +/-: reset to classic absolute positioning */
+        :host([theme="gunmalmg"]) .classic-popup-content #vt-control-buttons {
+          z-index: 0;
+          position: absolute !important;
+          display: block !important;
           width: auto;
           justify-content: center;
-          gap: 16px;
-          margin-top: 0.5em;
+          padding-bottom: 0.2em;
+          left: 90%;
+          top: 35%;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper #presets {
+        /* Presets: reset to classic */
+        :host([theme="gunmalmg"]) .classic-popup-content #presets {
+          z-index: 0;
           position: relative;
           display: flex;
           width: 100%;
           justify-content: center;
           align-items: center;
-          margin-top: 0.5em;
-          margin-bottom: 0.5em;
-          top: -165px;
+          margin-top: -1em;
+          margin-bottom: 1em;
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 0;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper #left-infos {
-          position: relative;
+        /* Preset labels: reset to classic style */
+        :host([theme="gunmalmg"]) .classic-popup-content .preset-label {
+          cursor: pointer;
+          user-select: none;
           display: flex;
-          flex-direction: column;
-          width: 100%;
-          align-items: flex-start;
-          margin-top: 0.5em;
+          position: relative;
+          align-items: center;
+          justify-content: flex-start;
+          overflow: hidden;
+          padding: 0 5px;
+          outline: 0px;
+          height: 48px;
+          margin: 0 5px;
+          border-radius: 0;
+          flex-shrink: initial;
         }
 
-        /* Reset styles for classic content inside popup
-        :host([theme="gunmalmg"]) .classic-popup-content .content {
-          position: relative !important;
-          width: 100% !important;
-          height: auto !important;
-          max-width: none !important;
-          transform: none !important;
-          left: 0 !important;
-          top: 0 !important;
-        }
-        */
-
-        :host([theme="gunmalmg"]) .classic-popup-content .disabled-circle-container {
-          display: none !important;
+        /* Preset icon buttons: reset to classic (no gunmalmg pill background) */
+        :host([theme="gunmalmg"]) .classic-popup-content .preset-label ha-icon-button {
+          --mdc-icon-size: 24px;
+          width: auto;
+          height: auto;
+          border-radius: 100%;
+          background: transparent !important;
+          border: none !important;
+          box-shadow: none !important;
         }
 
-        :host([theme="gunmalmg"]) .classic-popup-content #modes,
-        :host([theme="gunmalmg"]) .classic-popup-content #presets,
-        :host([theme="gunmalmg"]) .classic-popup-content #vt-control-buttons,
-        :host([theme="gunmalmg"]) .classic-popup-content #left-infos,
-        :host([theme="gunmalmg"]) .classic-popup-content .current-info {
+        /* Reset selected preset icon colors to classic */
+        :host([theme="gunmalmg"]) .classic-popup-content .preset-label ha-icon-button.selected-icon {
+          background: transparent !important;
+          color: var(--label-badge-yellow) !important;
+        }
+
+        /* Timed preset container: force visible */
+        :host([theme="gunmalmg"]) .classic-popup-content .timed-preset-container {
           display: flex !important;
+        }
+
+        /* Left infos: reset to classic absolute positioning */
+        :host([theme="gunmalmg"]) .classic-popup-content #left-infos {
+          z-index: 3;
+          position: absolute !important;
+          display: block !important;
+          width: auto;
+          justify-content: center;
+          padding-bottom: 0.2em;
+          left: 0%;
+          top: 15%;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content #left-infos.no-presets {
+          top: 30%;
+        }
+
+        /* Right lock: align center with +/- buttons */
+        :host([theme="gunmalmg"]) .classic-popup-content #right-lock {
+          z-index: 0;
+          position: absolute;
+          left: 86%;
+          top: 15%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding-right: 0;
+        }
+
+        /* Disabled circle container fallback (when no slider) */
+        :host([theme="gunmalmg"]) .classic-popup-content .disabled-circle-container {
+          height: 145px !important;
+          background: radial-gradient(var(--hvac-mode-color), transparent 50%) !important;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content .disabled-circle-container.no-background-color {
+          background: none !important;
         }
 `;

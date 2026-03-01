@@ -35,8 +35,6 @@ export type ClimateCardConfig = LovelaceCardConfig &
         /** Theme: classic | vtherm | uncolored | gunmalmg */
         theme?: Theme;
         disable_name?: boolean;
-        disable_circle?: boolean;
-        disable_background_color?: boolean;
         disable_window?: boolean;
         disable_autoStartStop?: boolean;
         disable_overpowering?: boolean;
@@ -67,8 +65,6 @@ export const climateCardConfigStruct = assign(
     entitySharedConfigStruct,
     object({
         disable_name: optional(boolean()),
-        disable_circle: optional(boolean()),
-        disable_background_color: optional(boolean()),
         disable_window: optional(boolean()),
         disable_autoStartStop: optional(boolean()),
         disable_overpowering: optional(boolean()),

@@ -1,12 +1,52 @@
 ---
 name: gunmalmg theme
 description: Développement du thème Gunmalmg
-tools: [read, grep, glob, bash, execute, search, web, agent, todo] # specify the tools this agent can use. If not set, all enabled tools are allowed.
+tools:
+    [
+        vscode/getProjectSetupInfo,
+        vscode/installExtension,
+        vscode/newWorkspace,
+        vscode/openSimpleBrowser,
+        vscode/runCommand,
+        vscode/askQuestions,
+        vscode/vscodeAPI,
+        vscode/extensions,
+        execute/runNotebookCell,
+        execute/testFailure,
+        execute/getTerminalOutput,
+        execute/awaitTerminal,
+        execute/killTerminal,
+        execute/createAndRunTask,
+        execute/runTests,
+        execute/runInTerminal,
+        read/getNotebookSummary,
+        read/problems,
+        read/readFile,
+        read/readNotebookCellOutput,
+        read/terminalSelection,
+        read/terminalLastCommand,
+        agent/runSubagent,
+        edit/createDirectory,
+        edit/createFile,
+        edit/createJupyterNotebook,
+        edit/editFiles,
+        edit/editNotebook,
+        search/changes,
+        search/codebase,
+        search/fileSearch,
+        search/listDirectory,
+        search/searchResults,
+        search/textSearch,
+        search/usages,
+        web/fetch,
+        web/githubRepo,
+        todo,
+    ]
 ---
 
 # Objectifs généraux
 
-On va travailler sur le **thème nommé Gunmalmg**.
+On va travailler sur le **thème nommé Gunmalmg**. Tu es un agent spécilisé dans le développement front end et particulièrement dans le CSS, le HTML et le Javascript.
 
 Ce thème est un thème minimal qui permet un affichage condensé des informations principales du thermostat.
 Les informations principales affichées sont :
@@ -34,11 +74,16 @@ La popup du thème Gunmalmg doit être conçue pour afficher les mêmes informat
 
 ## Règle de gestion des presets
 
-La liste des principaux présets est affichée sous la forme de boutons. Les principaux présets sont : le preset actif et Eco, Comfort et Boost.
-Par exemple si le preset actif est Eco, les boutons affichés sont : Eco (actif), Comfort, Boost.
-Si le preset actif est Activity, les boutons affichés sont : Eco, Comfort, Boost, Activity (actif).
-Si le preset actif est 'Frost ' (hors gel) alors les presets affichés sont : Frost (actif), Eco, Comfort, Boost.
-Il ne doit jamais y avoir plus de 4 boutons de preset affichés, et le preset actif doit toujours être affiché. Si aucun prers
+La liste des présets est affichée sous la forme de boutons sur une seule ligne. Comme le nombre de présets peut être important, il faut que la ligne soit scrollable horizontalement. Le preset sélectionné est mis en avant par un style différent (ex: fond coloré). Les autres presets sont affichés avec un style plus neutre (ex: fond grisé).
+La fenêtre scrollable qui affiche les presets est scrollée automatiquement sur le preset actif lors de l'affichge de la page.
+
+## Règle d'affichage des actions Lock et timed preset
+
+Les actions de lock et de timed preset sont affichées sous la forme de boutons, à la droite des boutons de preset, dans l'espace réservé.
+
+Le bouton de lock est affiche à droite et au plus haut. Il est aligné verticalement sur les boutons de preset. Si le lock est actif, le bouton de lock est mis en avant par une couleur rouge. Sinon il s'affiche en vert. Une option permet de cacher totalement l'affichage du lock, auquel cas le bouton de lock n'est pas affiché du tout.
+
+Si le timed preset est actif, le temps restant est affiché ainsi que le bouton permettant de l'annuler. Si le timed preset on peut l'activer en sélectionnant la durée depuis la liste des options possibles ou saisir une durée manuellement si l'option manuelle est sélectionnée. Le fonctionnement est identique à celui des autres thèmes, seule sa position est différente.
 
 ## Règle d'affichage de la popup
 
@@ -52,16 +97,32 @@ La popup est équipée d'un bouton de fermeture en haut à gauche comme les popu
 
 ## Les options de configuration
 
-La carte a beaucoup d'options. Certaines option ne s'appliquent pas au thème Gunmalmg. Il s'agit de :
+La carte a beaucoup d'options et elles méritent un sérieux nettoyage.
+
+### Options obsolètes
+
+Certaines options sont obsolètes puisque forcées par le thème courant :
 
 1. disable_circle,
 2. disable_background_color,
+
+### Options inutiles
+
+Certaines options sont inutiles et doivent être supprimées :
+
+1. eco_temperature
+
+### Options non applicables au thème Gunmalmg
+
+Certaines option ne s'appliquent pas au thème Gunmalmg. Il s'agit de :
+
 3. disable_window,
 4. disable_autoStartStop,
 5. disable_overpowering,
 6. disable_heat, disable_cool, disable_auto, disable_off, disable_dry, disable_fan_only, disable_menu, disable_power_infos, disable_auto_fan_infos, disable_target_icon, disable_buttons, disable_presets
-7. eco_temperature
-8. disable_buttons
+7. disable_buttons
+
+### Options communes à tous les thèmes
 
 Donc seules les options suivantes sont applicables aussi au thème Gunmalmg :
 
@@ -75,5 +136,5 @@ Donc seules les options suivantes sont applicables aussi au thème Gunmalmg :
 
 Les options de configuration doivent être organisées pour que l'utilisateur comprenne ce qui est applicable au thème :
 
-1. Une section "Pour tous les thèmes" doit regrouper les options communes. Cette liste correspond à la liste ci-dessus "applicables aussi au théme Gunmalmg".
+1. Une section "Pour tous les thèmes" doit regrouper les options communes. Cette liste correspond à la liste ci-dessus "applicables aussi au thème Gunmalmg".
 2. Une section "Pour thème Classique, VTherm et Non coloré" doit regrouper les options non applicables au thème Gunmalmg. Cette liste correspond à la liste ci-dessus "ne s'appliquent pas au thème Gunmalmg".

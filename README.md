@@ -6,6 +6,7 @@
 
 ![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/icon.png?raw=true)
 
+- [Upgrading to v3](#upgrading-to-v3)
 - [UI Card for Versatile Thermostat](#ui-card-for-versatile-thermostat)
   - [Goals](#goals)
   - [Theme management](#theme-management)
@@ -13,9 +14,15 @@
     - [The "VTherm theme"](#the-vtherm-theme)
     - [The "VTherm Uncolored theme"](#the-vtherm-uncolored-theme)
     - [The "Gunmalmg theme"](#the-gunmalmg-theme)
-    - [Changing theme and contextual menu](#changing-theme-and-contextual-menu)
+      - [Preset display](#preset-display)
+      - [Lock and timed preset controls](#lock-and-timed-preset-controls)
+      - [Popup](#popup)
+      - [Warning and safety display](#warning-and-safety-display)
+      - [Applicable options](#applicable-options)
 - [Installation](#installation)
   - [Options](#options)
+    - [Common options (all themes)](#common-options-all-themes)
+    - [Classical, VTherm and Uncolored themes only](#classical-vtherm-and-uncolored-themes-only)
 - [Actions](#actions)
   - [Disable the auto-fan mode](#disable-the-auto-fan-mode)
   - [By-pass the window detection](#by-pass-the-window-detection)
@@ -34,6 +41,21 @@
   - [Translations](#translations)
   - [Support me](#support-me)
 
+
+# Upgrading to v3
+
+> **⚠️ Important:** Version 3 introduces breaking changes to the card configuration. After upgrading, please review and update your card options.
+
+**What changed:**
+- The **[Gunmalmg theme](#the-gunmalmg-theme)** has been **completely redesigned** with a new condensed layout, preset scrollable row, lock/timed preset controls, a detailed popup, and warning/safety visual indicators. See the [Gunmalmg theme section](#the-gunmalmg-theme) for full details.
+- **Configuration options have been reorganized** into two sections: [Common options (all themes)](#common-options-all-themes) and [Classical, VTherm and Uncolored themes only](#classical-vtherm-and-uncolored-themes-only). Some options that were previously available are no longer applicable to the Gunmalmg theme.
+- **Obsolete options removed:** `disable_circle` and `disable_background_color` are no longer supported (they are now enforced by the selected theme).
+- **Unused option removed:** `eco_temperature` has been removed.
+
+**What you should do:**
+1. Open each card configuration that uses this card.
+2. Check that your options are still valid — unused or obsolete options will be silently ignored but should be cleaned up to be able to use the UI configuration window.
+3. If you use the Gunmalmg theme, review the [applicable options](#applicable-options) to see which settings are supported.
 
 # UI Card for Versatile Thermostat 
 
@@ -106,21 +128,52 @@ Juste like the _VTherm_ theme but without the colored ellipse in background.
 
 ### The "Gunmalmg theme"
 
-Inspired by the card developped by @Gunmalmg (see [here](https://github.com/jmcollin78/versatile_thermostat/issues/354#issuecomment-1961050097)), this theme is a minimal theme. The card only diplay omst common informations (name, mode, temperatures and presets).
+Inspired by the card developed by @Gunmalmg (see [here](https://github.com/jmcollin78/versatile_thermostat/issues/354#issuecomment-1961050097)), this theme is a **minimal, condensed theme** designed to be easily readable even from a distance.
 
 ![Versatile Thermostat UI Card Gunmalmg theme](/assets/theme-gunmalmg.png)
 
-Note: in this theme many options are not usefull because not displayed. _VTherm_ specific functions are not available.
+**Displayed information:**
+- Current temperature (`current_temperature`)
+- Target temperature (`target_temperature`)
+- HVAC mode (`hvac_mode`)
+- HVAC action (`hvac_action`)
+- Lock state (`lock_state`)
+- Selected preset (`preset_mode`)
+- Timed preset (`timed_preset`)
 
-### Changing theme and contextual menu
+**Available actions from the card:**
+1. Turn on / turn off the thermostat (hvac_mode)
+2. Change the preset (preset_mode)
+3. Toggle the lock state
+4. Activate / deactivate the timed preset
+5. Open a detailed popup by clicking on a temperature
 
-You change the thème in two ways:
-1. in the configuration menu. The theme selected in the configuration will be the default theme applyed to the card,
-2. in the contextual menu of the card. At the top right of the card, the tree dot menu allows you to change the theme.
+#### Preset display
 
-![Versatile Thermostat UI Card 3 Dots menu](/assets/three-dot-menu.png)
+Presets are displayed as buttons on a single horizontally scrollable row. The active preset is highlighted with a colored background, while other presets have a neutral (greyed) background. The scrollable area automatically scrolls to the active preset when the card is displayed.
 
-Note that the contextual menu has options that depends of the current theme and configuration options. In the *Gunmalmg* theme, you have some VTherm specific functions like, increase/decreasing temperatures, stopping the timed preset, lock management.
+#### Lock and timed preset controls
+
+The lock and timed preset controls are displayed as buttons to the right of the preset buttons.
+
+- The **lock button** is displayed at the top-right, vertically aligned with the preset buttons. When the lock is active, the button is displayed in **red**; otherwise it is displayed in **green**. The lock button can be completely hidden via the `allow_lock_toggle` option.
+- The **timed preset** controls work identically to the other themes (duration selector or manual input), but are positioned next to the preset buttons instead of below them.
+
+#### Popup
+
+Clicking on a temperature opens a **popup** that displays the same detailed information as the Classical theme. The popup reuses the Classical theme code directly (no duplication).
+
+- The popup is **centered** on the screen.
+- On mobile, it can take the full page; on desktop, it is smaller but always easily readable.
+- A **close button** is available at the top-left corner (like standard Home Assistant popups).
+
+#### Warning and safety display
+
+If a warning message is present or if the thermostat is in **safety mode**, the main temperature is displayed in **red** to draw the user's attention. Clicking on it opens the popup with the warning/safety message already visible, as if the user had clicked on the red information icon.
+
+#### Applicable options
+
+Only the following options apply to the Gunmalmg theme: `disable_name`, `disable_safety_warning`, `set_current_as_main`, `allow_lock_toggle`, `lock_relock_delay`, `disable_timed_preset`, `use_manual_duration_input`. Other display options (window, overpowering, HVAC mode buttons, power infos, etc.) are not applicable since those elements are not displayed in this theme. See the [Options](#options) section for details.
 
 # Installation
 
@@ -130,37 +183,45 @@ Then you can add the new card into your dashboard.
 
 ## Options
 
-Note: those options should be improved with official release
+### Common options (all themes)
+
 | Name                 | Type    | Default      | Description                                                                                            |
 | -------------------- | ------- | ------------ | ------------------------------------------------------------------------------------------------------ |
 | type                 | string  | **Required** | `custom:versatile-thermostat-ui-card`                                                                     |
 | entity               | string  | **Required** | The entity id of climate entity (must be a versatile_thermostat entity). Example: `climate.hvac`          |
-| name                | string/boolean  | **optional** | override the default entity name |
-| disable_name        | boolean  | **optional** | true to hide the name                                                                     |
-| disable_window       | boolean  | **optional** | turn off the window open indicator                                                                     |
-| disable_overpowering | boolean  | **optional** | turn off the overpowering indicator                                                                |
-| disable_heat        | boolean  | **optional** | turn off the on/heat button                                                                          |
-| disable_cool        | boolean  | **optional** | turn off the on/cool button                                                                          |
-| disable_heat_cool   | boolean  | **optional** | turn off the on/heat_cool button                                                                     |
-| disable_auto        | boolean  | **optional** | turn off the on/auto button                                                                          |
-| disable_dry         | boolean  | **optional** | turn off the on/dry button                                                                           |
-| disable_fan_only    | boolean  | **optional** | turn off the on/fan_only button                                                                      |
-| disable_off         | boolean  | **optional** | turn off the off button                                                                         |
-| disable_sleep_mode     | boolean  | **optional** | turn off the sleep mode button                                                                        |
-| disable_buttons     | boolean  | **optional** | turn off the plus/minus buttons                                                                        |
-| disable_safety_warning     | boolean  | **optional** | turn off the security warning (when a temperature sensor is out)                              |
-| disable_power_infos | boolean  | **optional** | turn off the power informations                                                                        |
-| disable_auto_fan_infos | boolean  | **optional** | turn off the auto-fan informations                                                                  |
-| disable_target_icon | boolean  | **optional** | hide the target icon for the setpoint temperature (which can be confusing with the room temperature) |
-| set_current_as_main | boolean | **optional** | Exchange target temperature and room temperature |
-| autoStartStopEnableEntity               | string  | **Optional** | The entity id of auto-start/stop entity (must be a switch entity). Example: `switch.clim_salon_auto_start_stop`          |
-| powerEntity               | string  | **Optional** | The entity id of sensor entity which gives the real power consumed by the VTherm. Example: `sensor.clim_salon_power`          |
+| name                | string/boolean  | **Optional** | Override the default entity name |
+| theme                | string  | **Optional** | The default theme that will be applied when the card loads |
+| disable_name        | boolean  | **Optional** | true to hide the name                                                                     |
+| disable_safety_warning     | boolean  | **Optional** | Turn off the security warning (when a temperature sensor is out)                              |
+| set_current_as_main | boolean | **Optional** | Exchange target temperature and room temperature |
 | allow_lock_toggle         | boolean | **Optional** | true to display a lock icon to lock/unlock the thermostat. If a code is configured in VTherm, a keypad will be displayed. |
 | lock_relock_delay         | number  | **Optional** | Delay in seconds after which the card will automatically re-lock after being unlocked. Set to 0 or omit to disable auto-relock. |
-| disable_presets           | boolean | **Optional** | true to hide all the preset icons and timed preset controls. |
 | disable_timed_preset      | boolean | **Optional** | true to hide the timed preset duration selector next to preset icons. |
 | use_manual_duration_input | boolean | **Optional** | true to use a manual input field instead of the preset duration selector (15min, 30min, 1h, 4h, 8h, 24h). |
-| theme | checbox | **Optional ** | The default theme that will be applied when the card loads |
+
+### Classical, VTherm and Uncolored themes only
+
+These options are **not applicable** to the Gunmalmg theme.
+
+| Name                 | Type    | Default      | Description                                                                                            |
+| -------------------- | ------- | ------------ | ------------------------------------------------------------------------------------------------------ |
+| disable_window       | boolean  | **Optional** | Turn off the window open indicator                                                                     |
+| disable_overpowering | boolean  | **Optional** | Turn off the overpowering indicator                                                                |
+| disable_heat        | boolean  | **Optional** | Turn off the on/heat button                                                                          |
+| disable_cool        | boolean  | **Optional** | Turn off the on/cool button                                                                          |
+| disable_heat_cool   | boolean  | **Optional** | Turn off the on/heat_cool button                                                                     |
+| disable_auto        | boolean  | **Optional** | Turn off the on/auto button                                                                          |
+| disable_dry         | boolean  | **Optional** | Turn off the on/dry button                                                                           |
+| disable_fan_only    | boolean  | **Optional** | Turn off the on/fan_only button                                                                      |
+| disable_off         | boolean  | **Optional** | Turn off the off button                                                                         |
+| disable_sleep_mode     | boolean  | **Optional** | Turn off the sleep mode button                                                                        |
+| disable_buttons     | boolean  | **Optional** | Turn off the plus/minus buttons                                                                        |
+| disable_power_infos | boolean  | **Optional** | Turn off the power informations                                                                        |
+| disable_auto_fan_infos | boolean  | **Optional** | Turn off the auto-fan informations                                                                  |
+| disable_target_icon | boolean  | **Optional** | Hide the target icon for the setpoint temperature (which can be confusing with the room temperature) |
+| disable_presets           | boolean | **Optional** | true to hide all the preset icons and timed preset controls. |
+| autoStartStopEnableEntity               | string  | **Optional** | The entity id of auto-start/stop entity (must be a switch entity). Example: `switch.clim_salon_auto_start_stop`          |
+| powerEntity               | string  | **Optional** | The entity id of sensor entity which gives the real power consumed by the VTherm. Example: `sensor.clim_salon_power`          |
 
 Example:
 ```

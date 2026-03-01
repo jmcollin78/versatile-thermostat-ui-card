@@ -1,0 +1,9 @@
+{
+    "github.copilot.chat.agent.tools": {
+        "codebase": true,
+        "editFiles": true,
+        "readFile": true,
+        "runInTerminal": true,
+        "listDirectory": true
+    }
+}
