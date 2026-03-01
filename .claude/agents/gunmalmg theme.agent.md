@@ -34,11 +34,8 @@ La popup du thème Gunmalmg doit être conçue pour afficher les mêmes informat
 
 ## Règle de gestion des presets
 
-La liste des principaux présets est affichée sous la forme de boutons. Les principaux présets sont : le preset actif et Eco, Comfort et Boost.
-Par exemple si le preset actif est Eco, les boutons affichés sont : Eco (actif), Comfort, Boost.
-Si le preset actif est Activity, les boutons affichés sont : Eco, Comfort, Boost, Activity (actif).
-Si le preset actif est 'Frost ' (hors gel) alors les presets affichés sont : Frost (actif), Eco, Comfort, Boost.
-Il ne doit jamais y avoir plus de 4 boutons de preset affichés, et le preset actif doit toujours être affiché. Si aucun prers
+La liste des présets est affichée sous la forme de boutons sur une seule ligne. Comme le nombre de présets peut être important, il faut que la ligne soit scrollable horizontalement. Le preset sélectionné est mis en avant par un style différent (ex: fond coloré). Les autres presets sont affichés avec un style plus neutre (ex: fond grisé).
+La fenêtre scrollable qui affiche les presets est scrollée automatiquement sur le preset actif lors de l'affichge de la page.
 
 ## Règle d'affichage de la popup
 
