@@ -397,6 +397,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private messages: any = [];
   private displayMessages: boolean = false;
   @state() private _hasError: boolean = false;
+  // Flag to suppress gunmalmg-specific rendering (badges, etc.) when rendering as classic in popup
+  private _renderingAsClassic: boolean = false;
 
 
   @state() private _config?: ClimateCardConfig;
@@ -1279,7 +1281,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   _renderClassicContent(asClassic: boolean = false): TemplateResult {
     const disableCircle = asClassic ? false : this.effectiveDisableCircle;
     const disableBackgroundColor = asClassic ? false : this.effectiveDisableBackgroundColor;
-    return html`
+    this._renderingAsClassic = asClassic;
+    const result = html`
       ${this.name.length > 0 ? html`
         <div class="name">${this.name}</div>
       ` : ``}
@@ -1518,6 +1521,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         : ''}
     </div>
     `;
+    this._renderingAsClassic = false;
+    return result;
   }
 
   private _applyTheme(theme: string) {
@@ -2210,8 +2215,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           .label=${localizeMode}
         ></ha-icon-button>
         ${(() => {
-          // only show badge for gunmalmg theme
-          if (this.theme !== THEMES.GUNMALMG) return html``;
+          // only show badge for gunmalmg theme (not in popup/classic rendering)
+          if (this.theme !== THEMES.GUNMALMG || this._renderingAsClassic) return html``;
           let cls = '';
           if (!this.hvacAction || this.hvacAction === 'off' || this.hvacAction === 'idle') return html``;
           if (this.hvacAction === 'heating') cls = 'heating';
@@ -2536,7 +2541,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderTemperature(temperature, isMain: boolean, x: string, y: string, isTarget: boolean) {
-    let targetPosX:number = 76, targetPosY: number = 57, targetScale=0.20;
+    let targetPosX:number = 76, targetPosY: number = 56, targetScale=0.20;
     // Offsets for unit of measure tspan
     const dx = isMain ? -2 : -1;
     const dy = isMain ? -5.5 : -2;
@@ -2555,7 +2560,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
 
     if (isTarget && isMain) {
-      targetPosX = 30;
+      targetPosX = 35;
       targetPosY = 56;
       targetScale = 0.25;
     }
@@ -2563,11 +2568,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     const tempClass = isMain ? 'temp-main' : 'temp-secondary';
 
     return svg`
-      ${isTarget && !this._config?.disable_target_icon && this.effectiveDisableCircle ? svg`
+      ${isTarget && !this._config?.disable_target_icon ? svg`
         <path 
           class="target-icon" 
           transform="translate(${targetPosX}, ${targetPosY}) scale(${targetScale})" 
-          fill="#ffffff" 
+          fill="var(--primary-text-color)" 
           d="${mdiBullseyeArrow}" 
         />` : ''}
       <text class="main-value ${tempClass}" x="${x}" y="${y}" dominant-baseline="middle" text-anchor="middle">

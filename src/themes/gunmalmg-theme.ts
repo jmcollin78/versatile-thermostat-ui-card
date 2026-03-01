@@ -1,6 +1,6 @@
 import { css } from 'lit';
 import { html } from 'lit';
-import { mdiClose, mdiLock, mdiLockOpen } from '@mdi/js';
+import { mdiClose, mdiDotsVertical, mdiLock, mdiLockOpen } from '@mdi/js';
 import type { TemplateResult } from 'lit';
 import { localize } from '../localize/localize';
 
@@ -15,6 +15,15 @@ export function renderClassicPopup(ctx: any): TemplateResult {
         @click=${() => ctx._closeClassicPopup()}
         tabindex="0"
       ></ha-icon-button>
+      ${!ctx._config?.disable_menu ? html`
+        <ha-icon-button
+          class="classic-popup-more-info"
+          .label=${ctx.hass!.localize("ui.panel.lovelace.cards.show_more_info")}
+          .path=${mdiDotsVertical}
+          @click=${() => { ctx._closeClassicPopup(); ctx._handleMoreInfo(); }}
+          tabindex="0"
+        ></ha-icon-button>
+      ` : ''}
       <div class="classic-popup-content">
         ${ctx._renderClassicContent(true)}
       </div>
@@ -541,10 +550,21 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) .classic-popup-close {
           position: absolute;
           top: 8px;
-          right: 8px;
+          left: 8px;
           z-index: 1002;
           --mdc-icon-size: 24px;
           color: var(--primary-text-color);
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-more-info {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          z-index: 1002;
+          --mdc-icon-size: 24px;
+          color: var(--secondary-text-color);
+          cursor: pointer;
+          border-radius: 100%;
         }
 
         /* ===== Popup content: reset ALL gunmalmg overrides to classic appearance ===== */
@@ -619,6 +639,23 @@ export const gunmalmgStyles = css`
         /* current-info: force visible */
         :host([theme="gunmalmg"]) .classic-popup-content .current-info {
           display: flex !important;
+        }
+
+        /* Reset font overrides to classic values */
+        :host([theme="gunmalmg"]) .classic-popup-content .main-value {
+          font-size: inherit !important;
+          font-weight: normal !important;
+        }
+        :host([theme="gunmalmg"]) .classic-popup-content .main-value.temp-main {
+          font-size: 15px !important;
+        }
+        :host([theme="gunmalmg"]) .classic-popup-content .main-value.temp-secondary {
+          font-size: 6px !important;
+        }
+
+        /* Hide gunmalmg badges in popup (classic has its own hvac action icon) */
+        :host([theme="gunmalmg"]) .classic-popup-content .hvac-badge {
+          display: none !important;
         }
 
         /* Temperature styles: reset to classic */
@@ -733,16 +770,16 @@ export const gunmalmgStyles = css`
           top: 30%;
         }
 
-        /* Right lock: reset to classic */
+        /* Right lock: align center with +/- buttons */
         :host([theme="gunmalmg"]) .classic-popup-content #right-lock {
           z-index: 0;
           position: absolute;
-          right: 0;
+          left: 86%;
           top: 15%;
           display: flex;
           align-items: center;
-          justify-content: flex-end;
-          padding-right: 0.2em;
+          justify-content: center;
+          padding-right: 0;
         }
 
         /* Disabled circle container fallback (when no slider) */
