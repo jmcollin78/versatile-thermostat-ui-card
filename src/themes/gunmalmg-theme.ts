@@ -16,7 +16,7 @@ export function renderClassicPopup(ctx: any): TemplateResult {
         tabindex="0"
       ></ha-icon-button>
       <div class="classic-popup-content">
-        ${ctx._renderClassicContent()}
+        ${ctx._renderClassicContent(true)}
       </div>
     </div>
   `;
@@ -369,7 +369,6 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) ha-card.locked #presets ha-icon-button,
         :host([theme="gunmalmg"]) ha-card.locked #presets .preset-label,
         :host([theme="gunmalmg"]) ha-card.locked .gunmalmg-timed-preset {
-          opacity: 0.5;
           color: var(--disabled-text-color);
           pointer-events: none;
         }
@@ -512,7 +511,7 @@ export const gunmalmgStyles = css`
           border-radius: 12px;
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
           max-width: 95vw;
-          max-height: 45vh;
+          max-height: 90vh;
           overflow: auto;
           min-width: 300px;
         }
@@ -535,7 +534,7 @@ export const gunmalmgStyles = css`
         @media (min-width: 601px) {
           :host([theme="gunmalmg"]) .classic-popup-container {
             width: 450px;
-            max-height: 45vh;
+            max-height: 90vh;
           }
         }
 
@@ -548,54 +547,67 @@ export const gunmalmgStyles = css`
           color: var(--primary-text-color);
         }
 
+        /* ===== Popup content: reset ALL gunmalmg overrides to classic appearance ===== */
         :host([theme="gunmalmg"]) .classic-popup-content {
-          padding: 16px;
-        }
-
-        /* Classic content wrapper styles */
-        :host([theme="gunmalmg"]) .classic-content-wrapper {
+          position: relative;
+          padding: 1em;
+          padding-top: 1.5em;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 1em;
-          gap: 8px;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper .name {
-          font-size: 18px;
-          font-weight: 500;
+        /* Name */
+        :host([theme="gunmalmg"]) .classic-popup-content .name {
+          display: block;
+          width: 100%;
+          text-align: center;
+          font-size: 20px;
+          word-break: keep-all;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
           color: var(--primary-text-color);
-          margin-bottom: 8px;
+          font-weight: normal;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper vt-ha-control-circular-slider {
+        /* Circular slider: force visible */
+        :host([theme="gunmalmg"]) .classic-popup-content vt-ha-control-circular-slider {
           display: block !important;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper .content {
-          position: relative;
-          width: calc(70% - 40px);
-          height: auto;
+        /* Content overlay inside slider: reset to classic absolute positioning */
+        :host([theme="gunmalmg"]) .classic-popup-content .content {
+          position: absolute !important;
+          width: calc(70% - 40px) !important;
+          height: calc(70% - 100px) !important;
           box-sizing: border-box;
           border-radius: 100%;
+          left: 50% !important;
+          top: calc(50% - 40px) !important;
           text-align: center;
           overflow-wrap: break-word;
           pointer-events: none;
-          display: flex;
+          display: flex !important;
           align-items: center;
           place-content: center;
           flex-flow: wrap;
-          max-width: 155px;
-          margin: 0 auto;
-          top: -200px;
+          transform: translate(-50%,-50%) !important;
+          max-width: 155px !important;
+          padding: 0;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper #main {
+        :host([theme="gunmalmg"]) .classic-popup-content .content.no-presets {
+          top: calc(60% - 30px) !important;
+        }
+
+        /* SVG inside popup */
+        :host([theme="gunmalmg"]) .classic-popup-content #main {
           transform: scale(2.3);
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper svg {
+        :host([theme="gunmalmg"]) .classic-popup-content svg {
           height: auto;
           margin: auto;
           display: block;
@@ -604,85 +616,142 @@ export const gunmalmgStyles = css`
           max-width: 233px;
         }
 
-        /* Temperature styles for classic popup - use same as classic theme */
-        :host([theme="gunmalmg"]) .classic-content-wrapper .temp-main {
+        /* current-info: force visible */
+        :host([theme="gunmalmg"]) .classic-popup-content .current-info {
+          display: flex !important;
+        }
+
+        /* Temperature styles: reset to classic */
+        :host([theme="gunmalmg"]) .classic-popup-content .temp-main {
           font-size: 15px;
         }
-        :host([theme="gunmalmg"]) .classic-content-wrapper .temp-main .uom {
+        :host([theme="gunmalmg"]) .classic-popup-content .temp-main .uom {
           font-size: 5px;
         }
-        :host([theme="gunmalmg"]) .classic-content-wrapper .temp-secondary {
+        :host([theme="gunmalmg"]) .classic-popup-content .temp-secondary {
           font-size: 6px;
         }
-        :host([theme="gunmalmg"]) .classic-content-wrapper .temp-secondary .uom {
+        :host([theme="gunmalmg"]) .classic-popup-content .temp-secondary .uom {
           font-size: 3px;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper line {
+        :host([theme="gunmalmg"]) .classic-popup-content line {
           stroke: #e7e7e8;
           stroke-width: 0.5;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper #modes {
+        /* Modes: reset to classic */
+        :host([theme="gunmalmg"]) .classic-popup-content #modes {
+          z-index: 0;
           position: relative;
           display: flex;
           width: auto;
           justify-content: center;
-          margin-top: 0.5em;
-          margin-bottom: 0.5em;
-          top: -165px;
+          margin-top: -3em;
+          margin-bottom: 1em;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper #vt-control-buttons {
-          position: relative;
-          display: flex;
+        /* Control buttons +/-: reset to classic absolute positioning */
+        :host([theme="gunmalmg"]) .classic-popup-content #vt-control-buttons {
+          z-index: 0;
+          position: absolute !important;
+          display: block !important;
           width: auto;
           justify-content: center;
-          gap: 16px;
-          margin-top: 0.5em;
+          padding-bottom: 0.2em;
+          left: 90%;
+          top: 35%;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper #presets {
+        /* Presets: reset to classic */
+        :host([theme="gunmalmg"]) .classic-popup-content #presets {
+          z-index: 0;
           position: relative;
           display: flex;
           width: 100%;
           justify-content: center;
           align-items: center;
-          margin-top: 0.5em;
-          margin-bottom: 0.5em;
-          top: -165px;
+          margin-top: -1em;
+          margin-bottom: 1em;
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 0;
         }
 
-        :host([theme="gunmalmg"]) .classic-content-wrapper #left-infos {
-          position: relative;
+        /* Preset labels: reset to classic style */
+        :host([theme="gunmalmg"]) .classic-popup-content .preset-label {
+          cursor: pointer;
+          user-select: none;
           display: flex;
-          flex-direction: column;
-          width: 100%;
-          align-items: flex-start;
-          margin-top: 0.5em;
+          position: relative;
+          align-items: center;
+          justify-content: flex-start;
+          overflow: hidden;
+          padding: 0 5px;
+          outline: 0px;
+          height: 48px;
+          margin: 0 5px;
+          border-radius: 0;
+          flex-shrink: initial;
         }
 
-        /* Reset styles for classic content inside popup
-        :host([theme="gunmalmg"]) .classic-popup-content .content {
-          position: relative !important;
-          width: 100% !important;
-          height: auto !important;
-          max-width: none !important;
-          transform: none !important;
-          left: 0 !important;
-          top: 0 !important;
-        }
-        */
-
-        :host([theme="gunmalmg"]) .classic-popup-content .disabled-circle-container {
-          display: none !important;
+        /* Preset icon buttons: reset to classic (no gunmalmg pill background) */
+        :host([theme="gunmalmg"]) .classic-popup-content .preset-label ha-icon-button {
+          --mdc-icon-size: 24px;
+          width: auto;
+          height: auto;
+          border-radius: 100%;
+          background: transparent !important;
+          border: none !important;
+          box-shadow: none !important;
         }
 
-        :host([theme="gunmalmg"]) .classic-popup-content #modes,
-        :host([theme="gunmalmg"]) .classic-popup-content #presets,
-        :host([theme="gunmalmg"]) .classic-popup-content #vt-control-buttons,
-        :host([theme="gunmalmg"]) .classic-popup-content #left-infos,
-        :host([theme="gunmalmg"]) .classic-popup-content .current-info {
+        /* Reset selected preset icon colors to classic */
+        :host([theme="gunmalmg"]) .classic-popup-content .preset-label ha-icon-button.selected-icon {
+          background: transparent !important;
+          color: var(--label-badge-yellow) !important;
+        }
+
+        /* Timed preset container: force visible */
+        :host([theme="gunmalmg"]) .classic-popup-content .timed-preset-container {
           display: flex !important;
+        }
+
+        /* Left infos: reset to classic absolute positioning */
+        :host([theme="gunmalmg"]) .classic-popup-content #left-infos {
+          z-index: 3;
+          position: absolute !important;
+          display: block !important;
+          width: auto;
+          justify-content: center;
+          padding-bottom: 0.2em;
+          left: 0%;
+          top: 15%;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content #left-infos.no-presets {
+          top: 30%;
+        }
+
+        /* Right lock: reset to classic */
+        :host([theme="gunmalmg"]) .classic-popup-content #right-lock {
+          z-index: 0;
+          position: absolute;
+          right: 0;
+          top: 15%;
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          padding-right: 0.2em;
+        }
+
+        /* Disabled circle container fallback (when no slider) */
+        :host([theme="gunmalmg"]) .classic-popup-content .disabled-circle-container {
+          height: 145px !important;
+          background: radial-gradient(var(--hvac-mode-color), transparent 50%) !important;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content .disabled-circle-container.no-background-color {
+          background: none !important;
         }
 `;
