@@ -369,6 +369,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   private _init: boolean = true;
   private _firstRender: boolean = true;
+  private _gunmalmgPresetScrollDone: boolean = false;
   private _ignore: boolean = false;
   private _hasWindow: boolean = false;
   private _hasWindowByPass: boolean = false;
@@ -427,6 +428,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         },
         ...config,
     };
+    // Reset gunmalmg scroll flag so auto-scroll re-triggers on config change
+    this._gunmalmgPresetScrollDone = false;
     // apply theme attribute on host for CSS selection
     const themeFromConfig = (this._config && this._config.theme) ? this._config.theme : "";
     this.theme = themeFromConfig;
@@ -1602,19 +1605,20 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     super.updated(changedProperties);
     this._firstRender = false;
 
-    // Auto-scroll to active preset in gunmalmg theme (only on first render)
-    if (this._config?.theme === 'gunmalmg' && changedProperties.has('_config')) {
+    // Auto-scroll to active preset in gunmalmg theme (only once after presets are rendered)
+    if (this._config?.theme === 'gunmalmg' && !this._gunmalmgPresetScrollDone) {
       requestAnimationFrame(() => {
-        const scrollContainer = this.shadowRoot?.querySelector('.gunmalmg-right') as HTMLElement;
+        const scrollContainer = this.shadowRoot?.querySelector('.gunmalmg-presets-scroll') as HTMLElement;
         const activePreset = scrollContainer?.querySelector('.selected-icon') as HTMLElement;
         if (activePreset && scrollContainer) {
+          this._gunmalmgPresetScrollDone = true;
           const presetLabel = activePreset.closest('.preset-label') as HTMLElement;
           const target = presetLabel || activePreset;
           const targetLeft = target.offsetLeft;
           const targetWidth = target.offsetWidth;
           const containerWidth = scrollContainer.clientWidth;
-          // Add extra margin so the last preset is fully visible. TODO this doesn't work well with the last preset.
-          const extraMargin = targetWidth; //  * 0.5;
+          // Add extra margin so the last preset is fully visible.
+          const extraMargin = targetWidth;
           const scrollPos = Math.max(0, targetLeft - (containerWidth - targetWidth) / 2 + extraMargin);
           scrollContainer.scrollLeft = scrollPos;
         }
@@ -2693,7 +2697,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   connectedCallback() {
     super.connectedCallback();
-
+    // Reset scroll flag so auto-scroll re-triggers when navigating back to this view
+    this._gunmalmgPresetScrollDone = false;
   }
 
   disconnectedCallback() {
