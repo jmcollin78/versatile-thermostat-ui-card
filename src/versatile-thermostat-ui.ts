@@ -1268,11 +1268,16 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _openClassicPopup() {
+    // When there are errors, open the popup with messages already displayed
+    if (this._hasError) {
+      this.displayMessages = true;
+    }
     this._showClassicPopup = true;
   }
 
   private _closeClassicPopup() {
     this._showClassicPopup = false;
+    this.displayMessages = false;
   }
 
   /**

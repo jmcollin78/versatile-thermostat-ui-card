@@ -104,7 +104,7 @@ export function renderGunmalmg(ctx: any): TemplateResult {
               const bottomLabel = (bottom === null || bottom === undefined) ? null : fmt.format(bottom);
               return html`
                 <div class="gunmalmg-temps-inline">
-                  <span class="gunmalmg-temp-main">${topLabel}<span class="gunmalmg-uom"> ${unit}</span></span>
+                  <span class="gunmalmg-temp-main ${ctx._hasError ? 'has-error' : ''}">${topLabel}<span class="gunmalmg-uom"> ${unit}</span></span>
                   ${bottomLabel ? html`<span class="gunmalmg-temp-secondary">(${bottomLabel}<span class="gunmalmg-uom"> ${unit}</span>)</span>` : ``}
                 </div>
               `;
@@ -286,6 +286,8 @@ export const gunmalmgStyles = css`
         /* Inline temperature display (left-aligned, no wrapping) */
         :host([theme="gunmalmg"]) .gunmalmg-temps-inline { display: flex; gap: 4px; align-items: baseline; justify-content: flex-start; flex-wrap: nowrap; white-space: nowrap; }
         :host([theme="gunmalmg"]) .gunmalmg-temp-main { font-size: 17px; font-weight: 700; color: var(--secondary-text-color); white-space: nowrap; }
+        :host([theme="gunmalmg"]) .gunmalmg-temp-main.has-error { color: var(--error-color, #db4437); }
+        :host([theme="gunmalmg"]) .gunmalmg-temp-main.has-error .gunmalmg-uom { color: var(--error-color, #db4437); }
         :host([theme="gunmalmg"]) .gunmalmg-temp-secondary { font-size: 13px; color: var(--secondary-text-color); margin-left: 4px; white-space: nowrap; }
         :host([theme="gunmalmg"]) .gunmalmg-uom { font-size: 11px; color: var(--secondary-text-color); margin-left: 1px; }
 

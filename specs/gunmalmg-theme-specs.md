@@ -49,6 +49,10 @@ Elle doit être de la même taille que la carte du thème Classic, et doit être
 
 La popup est équipée d'un bouton de fermeture en haut à gauche comme les popup classiques de Home Assistant. En cliquant sur ce bouton, la popup doit se fermer et revenir à l'affichage du thème Gunmalmg.
 
+## Règle d'affichage des messages de warning
+
+Si un message de type warning (s'affiche avec un icone information rouge) est présent ou si le mode sécurité (safety mode) est présent, alors la température principale s'affiche en rouge. Ca va inciter l'utilisateur à cliquer dessus et à voir le message dans la popup. Je voudrais que la popup s'ouvre avec le message affiché, donc comme si l'utilisateur avait cliqué sur l'icone information rouge de la popup.
+
 ## Les options de configuration
 
 La carte a beaucoup d'options et elles méritent un sérieux nettoyage.
