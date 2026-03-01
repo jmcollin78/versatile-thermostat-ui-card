@@ -1644,6 +1644,25 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     super.updated(changedProperties);
     this._firstRender = false;
 
+    // Auto-scroll to active preset in gunmalmg theme (only on first render)
+    if (this._config?.theme === 'gunmalmg' && changedProperties.has('_config')) {
+      requestAnimationFrame(() => {
+        const scrollContainer = this.shadowRoot?.querySelector('.gunmalmg-right') as HTMLElement;
+        const activePreset = scrollContainer?.querySelector('.selected-icon') as HTMLElement;
+        if (activePreset && scrollContainer) {
+          const presetLabel = activePreset.closest('.preset-label') as HTMLElement;
+          const target = presetLabel || activePreset;
+          const targetLeft = target.offsetLeft;
+          const targetWidth = target.offsetWidth;
+          const containerWidth = scrollContainer.clientWidth;
+          // Add extra margin so the last preset is fully visible. TODO this doesn't work well with the last preset.
+          const extraMargin = targetWidth; //  * 0.5;
+          const scrollPos = Math.max(0, targetLeft - (containerWidth - targetWidth) / 2 + extraMargin);
+          scrollContainer.scrollLeft = scrollPos;
+        }
+      });
+    }
+
     if (changedProperties.has("showDigicodeModal")) {
       if (this.showDigicodeModal) {
         window.addEventListener("keydown", this._handleKeyDown);

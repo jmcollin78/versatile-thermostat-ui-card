@@ -94,26 +94,33 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) .name { font-weight: 600; color: #ffffff; font-size: 17px; text-align: left;}
         :host([theme="gunmalmg"]) .content { display: flex; position: relative; width: 100%; height: auto; max-width: none; transform: none; left: 0; top: 0; padding: 0; align-items: center; justify-content: center; }
         :host([theme="gunmalmg"]) .current-info, :host([theme="gunmalmg"]) #left-infos, :host([theme="gunmalmg"]) #vt-control-buttons { display: none !important; }
-        :host([theme="gunmalmg"]) .disabled-circle-container { height: 64px; background: transparent; }
+        :host([theme="gunmalmg"]) .disabled-circle-container { height: 84px; background: transparent; }
 
-        /* Presets as pill buttons */
+        /* Presets as pill buttons - single horizontal row */
         :host([theme="gunmalmg"]) #presets {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(56px, 1fr));
-          margin-top: 8px;
-          justify-items: center;
+          display: flex;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          margin-top: 0;
           align-items: center;
+          gap: 6px;
+          margin-bottom: 0em;
+          width: max-content;
         }
         :host([theme="gunmalmg"]) .preset-label {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin: 0; padding: 0;
+            flex-shrink: 0;
+            height: 70px;
         }
 
         :host([theme="gunmalmg"]) .preset-label ha-icon-button {
-          --mdc-icon-size: 22px; /* ~20% larger */
-          border-radius: 10px;
+          --mdc-icon-size: 50px;
+          width: 70px;
+          height: 70px;
+          border-radius: 16px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -220,11 +227,11 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) #current { font-size: 12px; }
         :host([theme="gunmalmg"]) .content .name + * { color: var(--secondary-text-color); font-size: 10px; }
 
-        /* Inline temperature display (left-aligned) */
-        :host([theme="gunmalmg"]) .gunmalmg-temps-inline { display: flex; gap: 8px; align-items: baseline; justify-content: flex-start; }
-        :host([theme="gunmalmg"]) .gunmalmg-temp-main { font-size: 17px; font-weight: 700; color: var(--secondary-text-color); }
-        :host([theme="gunmalmg"]) .gunmalmg-temp-secondary { font-size: 13px; color: var(--secondary-text-color); margin-left: 6px; }
-        :host([theme="gunmalmg"]) .gunmalmg-uom { font-size: 16px; color: var(--secondary-text-color); margin-left: 2px; }
+        /* Inline temperature display (left-aligned, no wrapping) */
+        :host([theme="gunmalmg"]) .gunmalmg-temps-inline { display: flex; gap: 4px; align-items: baseline; justify-content: flex-start; flex-wrap: nowrap; white-space: nowrap; }
+        :host([theme="gunmalmg"]) .gunmalmg-temp-main { font-size: 17px; font-weight: 700; color: var(--secondary-text-color); white-space: nowrap; }
+        :host([theme="gunmalmg"]) .gunmalmg-temp-secondary { font-size: 13px; color: var(--secondary-text-color); margin-left: 4px; white-space: nowrap; }
+        :host([theme="gunmalmg"]) .gunmalmg-uom { font-size: 11px; color: var(--secondary-text-color); margin-left: 1px; }
 
         /* Hide timed preset controls for Gunmalmg */
         :host([theme="gunmalmg"]) .timed-preset-container { display: none !important; }
@@ -251,6 +258,7 @@ export const gunmalmgStyles = css`
           text-overflow: ellipsis; 
           white-space: normal; 
           line-height: 1.2;
+          margin-bottom: 1em;
         }
         :host([theme="gunmalmg"]) .gunmalmg-left { grid-area: left; }
         :host([theme="gunmalmg"]) .gunmalmg-center { grid-area: center; }
@@ -272,7 +280,19 @@ export const gunmalmgStyles = css`
 
         :host([theme="gunmalmg"]) .gunmalmg-left { background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; }
         :host([theme="gunmalmg"]) .gunmalmg-center { text-align: left; max-width: 100%; display:flex; flex-direction:column; justify-content:left; }
-        :host([theme="gunmalmg"]) .gunmalmg-right { padding-right: 30px; display: flex; justify-content: flex-end; }
+        :host([theme="gunmalmg"]) .gunmalmg-right {
+          padding: 0;
+          display: block;
+          overflow-x: auto;
+          overflow-y: hidden;
+          min-width: 0;
+          margin-right: 48px;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255,255,255,0.15) transparent;
+        }
+        :host([theme="gunmalmg"]) .gunmalmg-right::-webkit-scrollbar { height: 3px; }
+        :host([theme="gunmalmg"]) .gunmalmg-right::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+        :host([theme="gunmalmg"]) .gunmalmg-right::-webkit-scrollbar-track { background: transparent; }
 
         :host([theme="gunmalmg"]) .hvac-mode-tile { display: flex; align-items: center; justify-content: center; padding: 0; background: transparent; }
 
@@ -287,7 +307,17 @@ export const gunmalmgStyles = css`
           pointer-events: none;
         }
 
-        :host([theme="gunmalmg"]) .gunmalmg-presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; justify-items: center; }
+        :host([theme="gunmalmg"]) .gunmalmg-presets {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          gap: 6px;
+          align-items: center;
+          justify-content: flex-start;
+          padding: 4px 4px;
+          min-height: 80px;
+          width: max-content;
+        }
 
         /* Make the more-info icon more visible on dark background */
         :host([theme="gunmalmg"]) .more-info { color: #e6e6e6; z-index: 6; }
