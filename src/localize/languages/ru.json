@@ -8,8 +8,6 @@
       "climate": {
         "autoStartStopEnableEntity": "Сущность автоматического старта/стопа",
         "powerEntity": "Сущность потребления энергии",
-        "disable_circle": "Отключить круг",
-        "disable_background_color": "Отключить цветной эллипс фона",
         "disable_window": "Отключить окно",
         "disable_autoStartStop": "Отключить автоматический старт/стоп",
         "disable_overpowering": "Отключить перегрузку",
@@ -35,6 +33,8 @@
         "theme_vtherm": "VTherm",
         "theme_uncolored": "Uncolored",
         "theme_gunmalmg": "Gunmalmg",
+        "section_all_themes": "For all themes",
+        "section_classic_only": "For Classic, VTherm and Uncolored themes",
         "menu_system": "System menu",
         "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
         "disable_presets": "Disable presets",

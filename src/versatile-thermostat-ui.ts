@@ -433,14 +433,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     if (this.theme) {
       this.setAttribute('theme', this.theme);
     } else {
-      // derive default theme from effective flags (use getters for compatibility)
-      if (!this.effectiveDisableCircle) {
-        this.setAttribute('theme', 'classic');
-      } else if (this.effectiveDisableCircle && !this.effectiveDisableBackgroundColor) {
-        this.setAttribute('theme', 'vtherm');
-      } else if (this.effectiveDisableCircle && this.effectiveDisableBackgroundColor) {
-        this.setAttribute('theme', 'uncolored');
-      }
+      // No explicit theme set: default to classic
+      this.setAttribute('theme', 'classic');
     }
 
 
@@ -448,8 +442,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     if (this._config && this._config.theme === THEMES.GUNMALMG) {
       if (!this._originalConfigOptions) {
         this._originalConfigOptions = {
-          disable_circle: this._config.disable_circle,
-          disable_background_color: this._config.disable_background_color,
           disable_buttons: this._config.disable_buttons,
           disable_power_infos: this._config.disable_power_infos,
           disable_auto_fan_infos: this._config.disable_auto_fan_infos,
@@ -461,8 +453,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         };
       }
       // Appliquer les overrides gunmalmg
-      this._config.disable_circle = true;
-      this._config.disable_background_color = true;
       this._config.disable_buttons = true;
       this._config.disable_power_infos = true;
       this._config.disable_auto_fan_infos = true;
@@ -493,8 +483,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     if (theme === THEMES.GUNMALMG) {
       if (!this._originalConfigOptions) {
         this._originalConfigOptions = {
-          disable_circle: this._config.disable_circle,
-          disable_background_color: this._config.disable_background_color,
           disable_buttons: this._config.disable_buttons,
           disable_power_infos: this._config.disable_power_infos,
           disable_auto_fan_infos: this._config.disable_auto_fan_infos,
@@ -505,8 +493,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           disable_presets: this._config.disable_presets,
         };
       }
-      this._config.disable_circle = true;
-      this._config.disable_background_color = true;
       this._config.disable_buttons = true;
       this._config.disable_power_infos = true;
       this._config.disable_auto_fan_infos = true;
@@ -526,23 +512,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
 
   private get effectiveDisableCircle(): boolean {
-    const theme = (this._config && this._config.theme) ? this._config.theme : undefined;
-    if (theme === THEMES.CLASSIC) return false;
-    if (theme === THEMES.VTHERM) return true;
-    if (theme === THEMES.UNCOLORED) return true;
-    if (theme === THEMES.GUNMALMG) return true;
-    // fallback to legacy flag
-    return !!this._config?.disable_circle;
+    const theme = (this._config && this._config.theme) ? this._config.theme : 'classic';
+    // Circle is only shown in the classic theme
+    return theme !== THEMES.CLASSIC;
   }
 
   private get effectiveDisableBackgroundColor(): boolean {
-    const theme = (this._config && this._config.theme) ? this._config.theme : undefined;
-    if (theme === THEMES.CLASSIC) return false;
-    if (theme === THEMES.VTHERM) return false;
-    if (theme === THEMES.UNCOLORED) return true;
-    if (theme === THEMES.GUNMALMG) return true;
-    // fallback to legacy flag
-    return !!this._config?.disable_background_color;
+    const theme = (this._config && this._config.theme) ? this._config.theme : 'classic';
+    // Background color is shown in classic and vtherm themes
+    return theme !== THEMES.CLASSIC && theme !== THEMES.VTHERM;
   }
 
   getCardSize(): number | Promise<number> {

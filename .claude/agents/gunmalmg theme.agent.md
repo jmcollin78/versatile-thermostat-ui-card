@@ -52,16 +52,32 @@ La popup est équipée d'un bouton de fermeture en haut à gauche comme les popu
 
 ## Les options de configuration
 
-La carte a beaucoup d'options. Certaines option ne s'appliquent pas au thème Gunmalmg. Il s'agit de :
+La carte a beaucoup d'options et elles méritent un sérieux nettoyage.
+
+### Options obsolètes
+
+Certaines options sont obsolètes puisque forcées par le thème courant :
 
 1. disable_circle,
 2. disable_background_color,
+
+### Options inutiles
+
+Certaines options sont inutiles et doivent être supprimées :
+
+1. eco_temperature
+
+### Options non applicables au thème Gunmalmg
+
+Certaines option ne s'appliquent pas au thème Gunmalmg. Il s'agit de :
+
 3. disable_window,
 4. disable_autoStartStop,
 5. disable_overpowering,
 6. disable_heat, disable_cool, disable_auto, disable_off, disable_dry, disable_fan_only, disable_menu, disable_power_infos, disable_auto_fan_infos, disable_target_icon, disable_buttons, disable_presets
-7. eco_temperature
-8. disable_buttons
+7. disable_buttons
+
+### Options communes à tous les thèmes
 
 Donc seules les options suivantes sont applicables aussi au thème Gunmalmg :
 
@@ -75,5 +91,5 @@ Donc seules les options suivantes sont applicables aussi au thème Gunmalmg :
 
 Les options de configuration doivent être organisées pour que l'utilisateur comprenne ce qui est applicable au thème :
 
-1. Une section "Pour tous les thèmes" doit regrouper les options communes. Cette liste correspond à la liste ci-dessus "applicables aussi au théme Gunmalmg".
+1. Une section "Pour tous les thèmes" doit regrouper les options communes. Cette liste correspond à la liste ci-dessus "applicables aussi au thème Gunmalmg".
 2. Une section "Pour thème Classique, VTherm et Non coloré" doit regrouper les options non applicables au thème Gunmalmg. Cette liste correspond à la liste ci-dessus "ne s'appliquent pas au thème Gunmalmg".
