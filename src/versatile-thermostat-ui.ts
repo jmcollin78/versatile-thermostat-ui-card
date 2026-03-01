@@ -403,6 +403,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   @state() private _config?: ClimateCardConfig;
   @state() private _showThemeMenu: boolean = false;
+  @state() private _showClassicPopup: boolean = false;
   @property({ type: String }) public theme: string = "";
   @state() private isLocked: boolean = false;
   @state() private isUserLocked: boolean = false;
@@ -729,6 +730,20 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
       text {
         fill: var(--primary-text-color);
+      }
+
+      /* Temperature display styles */
+      .temp-main {
+        font-size: 15px;
+      }
+      .temp-main .uom {
+        font-size: 5px;
+      }
+      .temp-secondary {
+        font-size: 6px;
+      }
+      .temp-secondary .uom {
+        font-size: 3px;
       }
       
       .auto,
@@ -1333,6 +1348,245 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   private _closeThemeMenu() {
     this._showThemeMenu = false;
+  }
+
+  private _openClassicPopup() {
+    this._showClassicPopup = true;
+  }
+
+  private _closeClassicPopup() {
+    this._showClassicPopup = false;
+  }
+
+  /** Renders the classic theme content for use in the popup */
+  private _renderClassicContent(): TemplateResult {
+    const UNAVAILABLE = "unavailable";
+    return html`
+      <div class="classic-content-wrapper">
+        ${this.name.length > 0 ? html`
+          <div class="name">${this.name}</div>
+        ` : ``}
+
+        ${this.safety_state?.length > 0 && !this.displayMessages ? html`
+          <div class="security">
+            <ha-icon-button class="alert" .path=${mdiThermometerAlert}>
+            </ha-icon-button>
+            ${html`
+              ${this.safety_state!.map((sec_msg) => {
+                return html`<span>${sec_msg.name}: ${sec_msg.security_msg}</span>`;
+              })}
+            `}
+          </div>
+        ` : ``}
+        ${this.messages.length > 0 && this.displayMessages ? html`
+          <div class="messages">
+            <ha-icon-button class="alert" .path=${this._hasError ? mdiAlertBoxOutline : mdiInformationBoxOutline}>
+            </ha-icon-button>
+            ${this.messages.map((message) => html`<span>${message}</span>`)}
+          </div>
+        ` : ``}
+
+        <div title="${this.buildTitle()}" class="${this.hvacMode}_${this.hvacAction} ${this._hasWindow ? 'window_open' : ''} ${this.overpowering ? 'overpowering' : ''}">
+          ${(this.value.low != null &&
+            this.value.high != null &&
+            this.stateObj?.state !== UNAVAILABLE) ? html`
+            <vt-ha-control-circular-slider
+              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''} ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''} ${this._hasWindowByPass ? 'windowByPass': ''}"
+              .inactive=${this._hasWindow}
+              dual
+              .low=${this.value.low}
+              .high=${this.value.high}
+              .min=${this.min}
+              .max=${this.max}
+              .step=${this.step}
+              .current=${this.current}
+              @low-changed=${this._highChanged}
+              @low-changing=${this._highChanging}
+              @high-changed=${this._highChanged}
+              @high-changing=${this._highChanging}
+            >
+          ` : html`
+            <vt-ha-control-circular-slider
+              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''} ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''} ${this._hasWindowByPass ? 'windowByPass': ''}"
+              .inactive=${this._hasWindow}
+              .mode="start"
+              @value-changed=${this._highChanged}
+              @value-changing=${this._highChanging}
+              .value=${this.value.value}
+              .current=${this.current}
+              step=${this.step}
+              min=${this.min}
+              max=${this.max}
+            >
+          `}
+            <div class="content ${this.name.length == 0 ? ' noname':''} ${this.safety_state !== null || this.displayMessages ? ' security_msg': ''} ${this._hasWindow ? ' window_open': ''} ${this.overpowering ? ' overpowering': ''} ${this.presence ? ' presence': ''} ${this.motion ? ' motion': ''} ${this._hasWindowByPass ? ' windowByPass': ''}">
+              <svg id="main" viewbox="0 0 125 100">
+                <g transform="translate(57.5,37) scale(0.35)">
+                  ${(this._hasWindowByPass) ? svg`
+                    <g transform="${(this._hasWindowByPass) ? 'translate(-50.25,0)' :''}" @click=${this._handleToggleWindowByPass} class="icon-group">
+                      <rect width="24" height="24" fill="transparent" style="cursor: pointer;"/>
+                      <path class="window window-by-pass ${this._hasWindowByPass ? 'active': ''}" id="window-by-pass" d=${mdiWindowShutterAlert}/>
+                    </g>
+                  `: ``}
+                  ${(!this._hasWindowByPass && this._hasWindow && !this._config?.disable_window) ? svg`
+                    <g transform="${(this._hasWindow && !this._config?.disable_window) ? 'translate(-50.25,0)' :''}" @click=${this._handleToggleWindowByPass} class="icon-group">
+                      <rect width="24" height="24" fill="transparent" style="cursor: pointer;"/>
+                      <path class="window ${this._hasWindow ? 'active': ''}" id="window" d=${mdiWindowOpenVariant}/>
+                    </g>
+                  `: ``}
+                  ${(this._hasOverpowering && !this._config?.disable_overpowering) ? svg`
+                    <path class="overpowering ${this.overpowering ? 'active': ''}" transform="${(this._hasOverpowering && !this._config?.disable_overpowering) ? 'translate(-25.25,0)' :''}" id="overpowering" d=${mdiFlashAlert} />
+                  `: ``}
+                  ${(this._hasPresence) ? svg`
+                    <path class="presence ${this.presence ? 'active': ''}" transform="${(this._hasPresence) ? 'translate(0.25,0)' :''}" id="overpowering" d=${mdiHomeAccount} />
+                  `: ``}
+                  ${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? svg`
+                    <path class="auto-start-stop" transform="${(this._hasAutoStartStop && !this._config?.disable_autoStartStop) ? 'translate(25.25,0)' :''}" id="autoStartStop" d=${mdiPowerSleep}/>
+                  `: ``}
+                  ${(this._hasMotion) ? svg`
+                    <path class="motion ${this.motion ? 'active': ''}" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
+                  `: ``}
+                </g>
+                ${svg`
+                  ${this._renderTemperature(this._display_top, true, "50%", "60%", !this?._config?.set_current_as_main)}
+                  <line x1="35" y1="72" x2="90" y2="72" stroke="#e7e7e8" stroke-width="0.5" />
+                  <g class="current-info" transform="translate(62.5,80)">
+                    ${this._renderTemperature(this._display_bottom, false, "-5%", "0%", this?._config?.set_current_as_main == true)}
+                    ${this._renderHVACAction()}
+                  </g>
+                `}
+              </svg>
+            </div>
+          </vt-ha-control-circular-slider>
+        </div>
+
+        <div id="modes" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
+          ${svg`
+            ${this.modes.map((mode) => {
+              if(this._config?.disable_heat && mode === "heat") return html ``;
+              if(this._config?.disable_auto && mode === "auto") return html ``;
+              if(this._config?.disable_cool && mode === "cool") return html ``;
+              if(this._config?.disable_heat_cool && mode === "heat_cool") return html ``;
+              if(this._config?.disable_dry && mode === "dry") return html ``;
+              if(this._config?.disable_fan_only && mode === "fan_only") return html ``;
+              if(this._config?.disable_off && mode === "off") return html ``;
+              if(this._config?.disable_sleep && mode === "sleep") return html ``;
+              return this._renderIcon(mode, this.hvacMode);
+            })}
+          `}
+        </div>
+
+        ${!this._config?.disable_buttons ? html`
+          <div id="vt-control-buttons" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
+            <div class="button">
+              <vt-ha-outlined-icon-button 
+                .target=${this.target}
+                .step=${this.step}
+                @click=${this._handleButton}
+              >
+                <ha-svg-icon .path=${mdiPlus}></ha-svg-icon>
+              </vt-ha-outlined-icon-button>
+            </div>
+            <div class="button">
+              <vt-ha-outlined-icon-button
+                .target=${this.target}
+                .step=${-this.step}
+                @click=${this._handleButton}
+              >
+                <ha-svg-icon .path=${mdiMinus}></ha-svg-icon>
+              </vt-ha-outlined-icon-button>
+            </div>
+          </div>
+        ` : ``}
+
+        ${!this._config?.disable_presets ? html`
+          <div id="presets" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
+            ${svg`
+              ${this.presets.map((preset) => {
+                return this._renderPreset(preset, this.preset);
+              })}
+            `}
+            ${!this._config?.disable_timed_preset ? html`
+              <div class="timed-preset-container">
+                ${this.timedPresetActive ? html`
+                  <span class="timed-preset-remaining" title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_active' })}">
+                    ${this._formatRemainingTime(this.timedPresetRemainingTime)}
+                  </span>
+                  ${(this.timedPresetRemainingTime ?? 0) < 60 ? html`
+                    <span class="timed-preset-label">${localize({ hass: this.hass, string: 'extra_states.minutes' })}</span>
+                  ` : ''}
+                  <ha-icon-button
+                    class="timed-preset-cancel"
+                    @click=${this._handleCancelTimedPreset}
+                    title="${localize({ hass: this.hass, string: 'extra_states.cancel_timed_preset' })}"
+                    .path=${mdiClose}
+                  ></ha-icon-button>
+                ` : this._config?.use_manual_duration_input ? html`
+                  <input
+                    type="number"
+                    class="timed-preset-input ${this.timedPresetDuration ? 'active' : ''}"
+                    .value=${this.timedPresetDuration ?? ''}
+                    @input=${this._handleTimedPresetDurationChange}
+                    placeholder="0"
+                    min="0"
+                    max="1440"
+                    title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_title' })}"
+                  />
+                  <span class="timed-preset-label">${localize({ hass: this.hass, string: 'extra_states.minutes' })}</span>
+                ` : html`
+                  <select
+                    class="timed-preset-select ${this.timedPresetDuration ? 'active' : ''}"
+                    @change=${this._handleTimedPresetSelectChange}
+                    title="${localize({ hass: this.hass, string: 'extra_states.timed_preset_title' })}"
+                  >
+                    <option value="" ?selected=${!this.timedPresetDuration}>--</option>
+                    <option value="15" ?selected=${this.timedPresetDuration === 15}>15 ${localize({ hass: this.hass, string: 'extra_states.minutes' })}</option>
+                    <option value="30" ?selected=${this.timedPresetDuration === 30}>30 ${localize({ hass: this.hass, string: 'extra_states.minutes' })}</option>
+                    <option value="60" ?selected=${this.timedPresetDuration === 60}>1 h</option>
+                    <option value="120" ?selected=${this.timedPresetDuration === 120}>2 h</option>
+                    <option value="240" ?selected=${this.timedPresetDuration === 240}>4 h</option>
+                    <option value="480" ?selected=${this.timedPresetDuration === 480}>8 h</option>
+                    <option value="1440" ?selected=${this.timedPresetDuration === 1440}>24 h</option>
+                  </select>
+                `}
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
+
+        <div id="left-infos" class="${this._config?.disable_presets ? 'no-presets' : ''}">
+          ${this.isRecalculateScheduled ? svg`${this._renderRecalculateScheduledButton()}` : ''}
+          ${this.messages.length > 0 ? svg`${this._renderMessagesButton()}` : ''}
+          ${this._config!.autoStartStopEnableEntity && this._isAutoStartStopConfigured ? svg`${this._renderAutoStartStopEnable()}` : ''}
+          ${svg`
+            ${this._externalPowerInfos.map((infos) => {
+              return this._renderPowerInfo(infos);
+            })}
+          `}
+          ${svg`
+            ${this.powerInfos.map((infos) => {
+              return this._renderPowerInfo(infos);
+            })}
+          `}
+          ${svg`
+            ${this.autoFanInfos.map((infos) => {
+              return this._renderAutoFanInfo(infos);
+            })}
+          `}
+        </div>
+
+        <div id="right-lock">
+          ${this._config?.allow_lock_toggle ? html`
+            <ha-icon-button
+              class="lock-icon ${this._isLocked ? 'locked' : 'unlocked'}"
+              .path=${this._isLocked ? mdiLock : mdiLockOpen}
+              @click=${this._handleLockToggle}
+              tabindex="0"
+            ></ha-icon-button>
+          ` : ''}
+        </div>
+      </div>
+    `;
   }
 
   private _applyTheme(theme: string) {
@@ -2332,21 +2586,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderTemperature(temperature, isMain: boolean, x: string, y: string, isTarget: boolean) {
-    // Default sizes
-    let fontSize= isMain ? 15:6;
-    let dx = isMain ? -2:-1;
-    let dy = isMain ? -5.5:-2;
-    let uomSize = isMain ? 5:3;
-    
-    // gunmalmg: smaller, more centered
-    if (this._config?.theme === THEMES.GUNMALMG) {
-      fontSize = isMain ? 10 : 5;
-      dx = isMain ? -1 : -1;
-      dy = isMain ? -4 : -2;
-      uomSize = isMain ? 4 : 3;
-    }
-
     let targetPosX:number = 76, targetPosY: number = 57, targetScale=0.20;
+    // Offsets for unit of measure tspan
+    const dx = isMain ? -2 : -1;
+    const dy = isMain ? -5.5 : -2;
 
     let value:string;
 
@@ -2362,22 +2605,24 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
 
     if (isTarget && isMain) {
-      targetPosX = this._config?.theme === THEMES.GUNMALMG ? 40 : 30;
-      targetPosY = this._config?.theme === THEMES.GUNMALMG ? 56 : 56;
-      targetScale = this._config?.theme === THEMES.GUNMALMG ? 0.22 : 0.25
+      targetPosX = 30;
+      targetPosY = 56;
+      targetScale = 0.25;
     }
+
+    const tempClass = isMain ? 'temp-main' : 'temp-secondary';
 
     return svg`
       ${isTarget && !this._config?.disable_target_icon && this.effectiveDisableCircle ? svg`
         <path 
-          class="main-value" 
+          class="target-icon" 
           transform="translate(${targetPosX}, ${targetPosY}) scale(${targetScale})" 
           fill="#ffffff" 
           d="${mdiBullseyeArrow}" 
         />` : ''}
-      <text class="main-value" x="${x}" y="${y}" dominant-baseline="middle" text-anchor="middle" style="font-size:${fontSize}px;">
+      <text class="main-value ${tempClass}" x="${x}" y="${y}" dominant-baseline="middle" text-anchor="middle">
         ${svg`${value}`}
-        <tspan dx="${dx}" dy="${dy}" style="font-size: ${uomSize}px;">
+        <tspan class="uom" dx="${dx}" dy="${dy}">
           ${svg`
             ${this.hass.config.unit_system.temperature}
           `}
