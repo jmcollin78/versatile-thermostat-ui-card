@@ -396,7 +396,7 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) .classic-content-wrapper .content {
           position: relative;
           width: calc(70% - 40px);
-          height: calc(70% - 100px);
+          height: auto;
           box-sizing: border-box;
           border-radius: 100%;
           text-align: center;
@@ -448,18 +448,18 @@ export const gunmalmgStyles = css`
           display: flex;
           width: auto;
           justify-content: center;
-          margin-top: -3em;
-          margin-bottom: 1em;
+          margin-top: 0.5em;
+          margin-bottom: 0.5em;
+          top: -165px;
         }
 
         :host([theme="gunmalmg"]) .classic-content-wrapper #vt-control-buttons {
-          position: absolute;
-          display: block;
+          position: relative;
+          display: flex;
           width: auto;
           justify-content: center;
-          padding-bottom: 0.2em;
-          left: 90%;
-          top: 35%;
+          gap: 16px;
+          margin-top: 0.5em;
         }
 
         :host([theme="gunmalmg"]) .classic-content-wrapper #presets {
@@ -468,18 +468,18 @@ export const gunmalmgStyles = css`
           width: 100%;
           justify-content: center;
           align-items: center;
-          margin-top: -1em;
-          margin-bottom: 1em;
+          margin-top: 0.5em;
+          margin-bottom: 0.5em;
+          top: -165px;
         }
 
         :host([theme="gunmalmg"]) .classic-content-wrapper #left-infos {
-          position: absolute;
-          display: block;
-          width: auto;
-          justify-content: center;
-          padding-bottom: 0.2em;
-          left: 0%;
-          top: 15%;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          align-items: flex-start;
+          margin-top: 0.5em;
         }
 
         /* Reset styles for classic content inside popup
