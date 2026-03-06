@@ -8,6 +8,14 @@
       "climate": {
         "autoStartStopEnableEntity": "Entità di avvio/arresto automatico",
         "powerEntity": "Entità di consumo energetico",
+        "theme": "Tema",
+        "theme_classic": "Classico",
+        "theme_vtherm": "VTherm",
+        "theme_uncolored": "Senza colore",
+        "theme_gunmalmg": "Gunmalmg",
+        "menu_system": "System menu",
+                "disable_circle": "Disabilita cerchio",
+        "disable_background_color": "Disabilita ellisse colore di sfondo",
         "disable_window": "Disabilita la finestra",
         "disable_autoStartStop": "Disabilita Avvio/Arresto automatico",
         "disable_overpowering": "Disabilita la sovralimentazione",
@@ -19,7 +27,6 @@
         "disable_dry": "Disabilita Deumidifica",
         "disable_off": "Disabilita off",
         "disable_sleep": "Disabilita modo riposo",
-        "disable_menu": "Disabilita menu",
         "set_current_as_main": "Scambia Setpoint con Temperatura ambiente",
         "disable_safety_warning": "Disabilita i messaggi di sicurezza",
         "disable_buttons": "Disabilita pulsanti Più/Meno",
@@ -28,25 +35,17 @@
         "disable_name": "Disabilita nome",
         "disable_target_icon": "Disabilita  icona obbiettivo",
         "allow_lock_toggle": "Allow lock/unlock from card",
+        "lock_relock_delay": "Ritardo di richiusura automatica (secondi, 0 = disattivato)",
+        "disable_presets": "Disabilita preimpostazioni",
         "disable_timed_preset": "Disattiva immissione durata preimpostata",
         "use_manual_duration_input": "Consenti l'inserimento manuale della durata invece della selezione",
-        "theme": "Tema",
-        "theme_classic": "Classico",
-        "theme_vtherm": "VTherm",
-        "theme_uncolored": "Senza colore",
-        "theme_gunmalmg": "Gunmalmg",
-        "section_all_themes": "For all themes",
-        "section_classic_only": "For Classic, VTherm and Uncolored themes",
-        "menu_system": "System menu",
-        "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
-        "disable_presets": "Disable presets"
+        "disable_menu": "Disabilita menu"
       }
     }
   },
   "extra_states": {
     "window_open": "Finestra aperta",
     "window_bypass": "Bypass finestra Attivo",
-    "night_mode": "Modalità notte",
     "eco": "Eco",
     "overpowering": "Rilevata Sovrapotenza",
     "none": "Manuale",
@@ -57,7 +56,6 @@
     "activity": "Rilevata Attività",
     "presence": "Rilevata Presenza",
     "motion": "Rilevato motimento",
-    "undefined": "Nulla",
     "auto_regulation_light": "Leggero",
     "auto_regulation_medium": "Medio",
     "auto_regulation_strong": "Forte",
@@ -128,12 +126,9 @@
     "cooling_failure": "Rilevato guasto al raffrescamento",
     "increase_temp": "Aumenta la temperatura",
     "decrease_temp": "Diminuisci la temperatura",
-    "fan_1": "Speed 1",
-    "fan_2": "Speed 2",
-    "fan_3": "Speed 3",
-    "fan_4": "Speed 4",
-    "fan_5": "Speed 5",
-    "target_temp_timed_preset": "Timed preset active",
-    "not_initialized": "Initialisation error"
+    "night_mode": "Modo notte",
+    "undefined": "Nessuno",
+    "auto_fan_boost": "Boost",
+    "not_initialized": "Errore d'inizializazione"
   }
 }
