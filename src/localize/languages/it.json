@@ -128,6 +128,7 @@
     "decrease_temp": "Diminuisci la temperatura",
     "night_mode": "Modalità notte",
     "undefined": "Nulla",
+    "auto_fan_boost": "Boost",
     "not_initialized": "Errore di inizializzazione"
   }
 }
