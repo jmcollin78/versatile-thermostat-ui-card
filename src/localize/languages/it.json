@@ -13,9 +13,9 @@
         "theme_vtherm": "VTherm",
         "theme_uncolored": "Senza colore",
         "theme_gunmalmg": "Gunmalmg",
+        "section_all_themes": "Per tutti i temi",
+        "section_classic_only": "Per i temi Classic, VTherm e Uncolored",
         "menu_system": "System menu",
-                "disable_circle": "Disabilita cerchio",
-        "disable_background_color": "Disabilita ellisse colore di sfondo",
         "disable_window": "Disabilita la finestra",
         "disable_autoStartStop": "Disabilita Avvio/Arresto automatico",
         "disable_overpowering": "Disabilita la sovralimentazione",
@@ -26,7 +26,7 @@
         "disable_fan_only": "Disabilita Ventilazione",
         "disable_dry": "Disabilita Deumidifica",
         "disable_off": "Disabilita off",
-        "disable_sleep": "Disabilita modo riposo",
+        "disable_menu": "Disabilita menu",
         "set_current_as_main": "Scambia Setpoint con Temperatura ambiente",
         "disable_safety_warning": "Disabilita i messaggi di sicurezza",
         "disable_buttons": "Disabilita pulsanti Più/Meno",
@@ -34,12 +34,12 @@
         "disable_auto_fan_infos": "Disabilita Info auto-fan",
         "disable_name": "Disabilita nome",
         "disable_target_icon": "Disabilita  icona obbiettivo",
-        "allow_lock_toggle": "Allow lock/unlock from card",
-        "lock_relock_delay": "Ritardo di richiusura automatica (secondi, 0 = disattivato)",
-        "disable_presets": "Disabilita preimpostazioni",
+        "allow_lock_toggle": "Consenti blocco/sblocco dalla card",
+        "lock_relock_delay": "Ritardo del blocco automatico (in secondi, 0 = disattivato)",
+        "disable_sleep": "Disabilita modo riposo",
         "disable_timed_preset": "Disattiva immissione durata preimpostata",
         "use_manual_duration_input": "Consenti l'inserimento manuale della durata invece della selezione",
-        "disable_menu": "Disabilita menu"
+        "disable_presets": "Disabilita preimpostazioni"
       }
     }
   },
@@ -55,7 +55,7 @@
     "power": "Sovrapotenza",
     "activity": "Rilevata Attività",
     "presence": "Rilevata Presenza",
-    "motion": "Rilevato motimento",
+    "motion": "Rilevato movimento",
     "auto_regulation_light": "Leggero",
     "auto_regulation_medium": "Medio",
     "auto_regulation_strong": "Forte",
@@ -110,7 +110,7 @@
     "target_temp_activity_detected": "Temp. impostata: rilevata atività",
     "target_temp_activity_not_detected": "Temp. impostata: attività non rilevata",
     "target_temp_absence_detected": "Temp. impostata: assenza rilevata",
-    "target_temp_timed_preset": "Preimpostazione temporizzata attiva",
+    "target_temp_timed_preset": "Preimpostazione a tempo attiva",
     "lock_users_active": "Controlli utente bloccati",
     "lock_automations_active": "Modifiche automazioni bloccate",
     "messages-button": "Perchè questo stato?",
@@ -126,9 +126,8 @@
     "cooling_failure": "Rilevato guasto al raffrescamento",
     "increase_temp": "Aumenta la temperatura",
     "decrease_temp": "Diminuisci la temperatura",
-    "night_mode": "Modo notte",
-    "undefined": "Nessuno",
-    "auto_fan_boost": "Boost",
-    "not_initialized": "Errore d'inizializazione"
+    "night_mode": "Modalità notte",
+    "undefined": "Nulla",
+    "not_initialized": "Errore di inizializzazione"
   }
 }
