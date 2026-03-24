@@ -109,7 +109,7 @@ const modeIcons: {
   activity: mdiMotionSensor,
   power: mdiHomeLightningBolt,
   flashAlert: mdiFlashAlert,
-  temperature:  mdiThermometer,
+  temperature: mdiThermometer,
   humidity: mdiWaterPercent,
   ok: mdiAirConditioner,
   thermometerAlert: mdiThermometerAlert,
@@ -166,12 +166,12 @@ interface RegisterCardParams {
 }
 export function registerCustomCard(params: RegisterCardParams) {
   const windowWithCards = window as unknown as Window & {
-      customCards: unknown[];
+    customCards: unknown[];
   };
   windowWithCards.customCards = windowWithCards.customCards || [];
   windowWithCards.customCards.push({
-      ...params,
-      preview: true,
+    ...params,
+    preview: true,
   });
 }
 
@@ -245,7 +245,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: String }) public fanMode: string = "";
   @property({ type: String }) public hvacOffReason: string = "";
   @property({ type: Boolean, reflect: true }) public dragging = false;
-  @property({ type: String}) public name: string = "";
+  @property({ type: String }) public name: string = "";
+  @property({ type: String }) public actionLabel: string = "";
 
   @state()
   private changingHigh?: number;
@@ -334,7 +335,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     this._debouncedCallService(target);
   }
 
-    /** Incrémente la température cible principale */
+  /** Incrémente la température cible principale */
   private _handleTempUp() {
     if (this.isUserLocked) return;
     const step = this.step || 0.5;
@@ -420,13 +421,13 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   setConfig(config: ClimateCardConfig): void {
     this._config = {
-        tap_action: {
-            action: "toggle",
-        },
-        hold_action: {
-            action: "more-info",
-        },
-        ...config,
+      tap_action: {
+        action: "toggle",
+      },
+      hold_action: {
+        action: "more-info",
+      },
+      ...config,
     };
     // Reset gunmalmg scroll flag so auto-scroll re-triggers on config change
     this._gunmalmgPresetScrollDone = false;
@@ -1249,7 +1250,31 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
         40%, 60% { transform: translate3d(4px, 0, 0); }
       }
-  `, gunmalmgStyles, vthermStyles];
+      
+      
+      /* Styles pour le texte de statut HVAC en SVG */
+      .hvac-action-text-svg {
+        text-anchor: middle;
+        // fill: var(--hvac-mode-color, #ffffff);
+        font-weight: var(--ha-font-weight-light);
+        // font-size: var(--ha-font-size-xs, 6px);
+        font-size: 6px;
+        text-align: center;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: var(--ha-line-height-normal);
+        min-height: 1.5em;
+        white-space: nowrap;
+      }
+      .hvac-action-text-svg.heating {
+        fill: var(--hvac-mode-color, #f44336);
+      }
+  `,
+    gunmalmgStyles,
+    vthermStyles,
+  ];
   // Additional theme styles
   static additionalThemeStyles = [vthermStyles];
 
@@ -1296,22 +1321,22 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       ` : ``}
 
       ${this.safety_state?.length > 0 && !this.displayMessages ? html`
-        <div class="security">
-          <ha-icon-button class="alert" .path=${mdiThermometerAlert}>
-          </ha-icon-button>
-          ${html`
-            ${this.safety_state!.map((sec_msg) => {
+            <div class="security">
+              <ha-icon-button class="alert" .path=${mdiThermometerAlert}>
+              </ha-icon-button>
+              ${html`
+                ${this.safety_state!.map((sec_msg) => {
               return html`<span>${sec_msg.name}: ${sec_msg.security_msg}</span>`;
-            })}
-           `}
-        </div>
+                })}
+              `}
+            </div>
       ` : ``}
       ${this.messages.length > 0 && this.displayMessages ? html`
-        <div class="messages">
+            <div class="messages">
           <ha-icon-button class="alert" .path=${this._hasError ? mdiAlertBoxOutline : mdiInformationBoxOutline}>
-          </ha-icon-button>
-          ${this.messages.map((message) => html`<span>${message}</span>`)}
-        </div>
+              </ha-icon-button>
+              ${this.messages.map((message) => html`<span>${message}</span>`)}
+            </div>
       ` : ``}
 
       <div title="${this.buildTitle()}" class="${disableCircle ? 'disabled-circle-container' : ''} ${disableBackgroundColor ? 'no-background-color' : ''}  ${this.hvacMode}_${this.hvacAction} ${this._hasWindow ? 'window_open' : ''}  ${this.overpowering ? 'overpowering' : ''}">
@@ -1322,39 +1347,39 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             (this.value.low != null &&
             this.value.high != null &&
             this.stateObj?.state !== UNAVAILABLE) ? html`
-            <vt-ha-control-circular-slider
+              <vt-ha-control-circular-slider
               class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} "
-              .inactive=${this._hasWindow}
-              dual
-              .low=${this.value.low}
-              .high=${this.value.high}
-              .min=${this.min}
-              .max=${this.max}
-              .step=${this.step}
-              .current=${this.current}
-              @low-changed=${this._highChanged}
-              @low-changing=${this._highChanging}
-              @high-changed=${this._highChanged}
-              @high-changing=${this._highChanging}
-            >
+                .inactive=${this._hasWindow}
+                dual
+                .low=${this.value.low}
+                .high=${this.value.high}
+                .min=${this.min}
+                .max=${this.max}
+                .step=${this.step}
+                .current=${this.current}
+                @low-changed=${this._highChanged}
+                @low-changing=${this._highChanging}
+                @high-changed=${this._highChanged}
+                @high-changing=${this._highChanging}
+              >
             ` : html`
-            <vt-ha-control-circular-slider
+              <vt-ha-control-circular-slider
               class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} "
-              .inactive=${this._hasWindow}
-              .mode="start"
-              @value-changed=${this._highChanged}
-              @value-changing=${this._highChanging}
-              .value=${this.value.value}
-              .current=${this.current}
-              step=${this.step}
-              min=${this.min}
-              max=${this.max}
-            >
+                .inactive=${this._hasWindow}
+                .mode="start"
+                @value-changed=${this._highChanged}
+                @value-changing=${this._highChanging}
+                .value=${this.value.value}
+                .current=${this.current}
+                step=${this.step}
+                min=${this.min}
+                max=${this.max}
+              >
             `
         }
           <div class="content${this._config?.disable_presets ? ' no-presets' : ''} ${this.name.length == 0 ? ' noname':''} ${this.safety_state !== null || this.displayMessages ? ' security_msg': ''} ${this._hasWindow ? ' window_open': ''}  ${this.overpowering ? ' overpowering': ''} ${this.presence ? ' presence': ''} ${this.motion ? ' motion': ''}  ${this._hasWindowByPass ? ' windowByPass': ''} " >
-            <svg id="main" viewbox="0 0 125 100">
-              <g transform="translate(57.5,37) scale(0.35)">
+          <svg id="main" viewbox="0 0 125 100">
+            <g transform="translate(57.5,37) scale(0.35)">
                 ${(this._hasWindowByPass) ? svg`
                   <g transform="${(this._hasWindowByPass) ? 'translate(-50.25,0)' :''}" @click=${this._handleToggleWindowByPass} class="icon-group">
                     <rect width="24" height="24" fill="transparent" style="cursor: pointer;"/>
@@ -1379,28 +1404,30 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
                 ${(this._hasMotion) ? svg`
                   <path class="motion ${this.motion ? 'active': ''}" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
                 `: ``}
-              </g>
+            </g>
 
               ${
                 disableCircle ? svg`
+                  ${this._renderStatusTextSVG("62.5", "44%")} 
                   ${this._renderTemperature(this._display_top, true, "55", "60%", ! this?._config?.set_current_as_main)}
                   ${this._renderTemperature(this._display_bottom, false, "90", "60%", this?._config?.set_current_as_main == true)}
                   <g class="current-info" transform="translate(100,65)">
                     ${this._renderHVACAction()}
                   </g>
                 `: svg`
+                  ${this._renderStatusTextSVG("62.5", "44%")} 
                   ${this._renderTemperature(this._display_top, true, "50%", "60%", ! this?._config?.set_current_as_main)}
                   <line x1="35" y1="72" x2="90" y2="72" stroke="#e7e7e8" stroke-width="0.5" />
                   <g class="current-info" transform="translate(62.5,80)">
                     ${this._renderTemperature(this._display_bottom, false, "-5%", "0%", this?._config?.set_current_as_main == true)}
                   ${this._renderHVACAction()}
                 </g>
-              `}              
+              `}
           </svg>
-          </div>
+        </div>
           ${!disableCircle ? html`
           </vt-ha-control-circular-slider>` : ``}
-        </div>
+      </div>
       <div id="modes" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
         ${svg`
           ${this.modes.map((mode) => {
@@ -1418,30 +1445,30 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       </div>
       ${this?._config?.disable_buttons ? html`` : html`
         <div id="vt-control-buttons" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
-            <div class="button">
-              <vt-ha-outlined-icon-button 
-                .target=${this.target}
-                .step=${this.step}
-                @click=${this._handleButton}
-              >
-                <ha-svg-icon .path=${mdiPlus}></ha-svg-icon>
-              </vt-ha-outlined-icon-button>
+              <div class="button">
+                <vt-ha-outlined-icon-button
+                  .target=${this.target}
+                  .step=${this.step}
+                  @click=${this._handleButton}
+                >
+                  <ha-svg-icon .path=${mdiPlus}></ha-svg-icon>
+                </vt-ha-outlined-icon-button>
+              </div>
+              <div class="button">
+                <vt-ha-outlined-icon-button
+                  .target=${this.target}
+                  .step=${-this.step}
+                  @click=${this._handleButton}
+                >
+                  <ha-svg-icon .path=${mdiMinus}></ha-svg-icon>
+                </vt-ha-outlined-icon-button>
+              </div>
             </div>
-            <div class="button">
-              <vt-ha-outlined-icon-button
-                .target=${this.target}
-                .step=${-this.step}
-                @click=${this._handleButton}
-              >
-                <ha-svg-icon .path=${mdiMinus}></ha-svg-icon>
-              </vt-ha-outlined-icon-button>
-            </div>
-        </div>
-      `}
+          `}
       
       ${!this._config?.disable_presets ? html`
       <div id="presets" class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''}">
-        ${svg`
+              ${svg`
           ${this.presets.map((preset) => {
             return this._renderPreset(preset, this.preset);
           })}
@@ -1500,7 +1527,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       ${ this._config!.autoStartStopEnableEntity && this._isAutoStartStopConfigured ? svg`
         ${ this._renderAutoStartStopEnable()}
         `:'' }
-      ${svg`
+        ${svg`
         ${this._externalPowerInfos.map((infos) => {
           return this._renderPowerInfo(infos);
         })}
@@ -1515,9 +1542,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           return this._renderAutoFanInfo(infos);
         })}
       `}
-    </div>
+      </div>
 
-    <div id="right-lock">
+      <div id="right-lock">
       ${this._config?.allow_lock_toggle ? html`
               <ha-icon-button
                 class="lock-icon ${this._isLocked ? 'locked' : 'unlocked'}"
@@ -1527,7 +1554,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
               ></ha-icon-button>
             `
         : ''}
-    </div>
+      </div>
     `;
     this._renderingAsClassic = false;
     return result;
@@ -1641,8 +1668,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     this?.shadowRoot?.querySelector('.security')?.addEventListener('click', () => {
       this?.shadowRoot?.querySelector('.security')?.remove();
       this?.shadowRoot?.querySelector('.content')?.classList.remove('security_msg');
-      this._vibrate(2);
-    });
+        this._vibrate(2);
+      });
   }
 
   private _willUpdatePower() {
@@ -1660,7 +1687,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       if (DEBUG) console.log(`Power found ${power} ${unit} for ${name}`);
     }
     
-    
+
     if (power) {
       if (DEBUG) console.log("J'ai pushé du power");
       this!._externalPowerInfos!.push({
@@ -1674,348 +1701,348 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   public willUpdate(changedProps: PropertyValues) {
       if (!this.hass || !this._config || (!changedProps.has("hass") && !changedProps.has("_config"))) {
-          return;
-      }
+      return;
+    }
 
       const entity_id:any = this._config!.entity;
 
-      this._willUpdatePower();
-      
-      const stateObj = this.hass.states[entity_id] as ClimateEntity;
-      if (!stateObj) {
-          if (DEBUG) console.log(`No state`);
-          return;
+    this._willUpdatePower();
+
+    const stateObj = this.hass.states[entity_id] as ClimateEntity;
+    if (!stateObj) {
+      if (DEBUG) console.log(`No state`);
+      return;
+    }
+
+    const oldHass = changedProps.get("hass") as HomeAssistant | undefined;
+
+    if (!oldHass || oldHass.states[entity_id] !== stateObj) {
+      if (!this._config || !this.hass || !this._config!.entity) {
+        if (DEBUG) console.log(`No change return`);
+        return;
       }
-
-      const oldHass = changedProps.get("hass") as HomeAssistant | undefined;
-
-      if (!oldHass || oldHass.states[entity_id] !== stateObj) {
-        if (!this._config || !this.hass || !this._config!.entity) {
-          if (DEBUG) console.log(`No change return`);
-          return;
-        }
       // const stateObj = this.hass.states[entity_id] as ClimateEntity;
       // if (!stateObj) {
       //     if (DEBUG) console.log(`No state`);
       //     return;
       // }
-        if (DEBUG) console.log(`Something may have change`);
-        this.stateObj = stateObj;
-        const attributes = this.stateObj.attributes;
-        const stateMode = this.stateObj.state;
+      if (DEBUG) console.log(`Something may have change`);
+      this.stateObj = stateObj;
+      const attributes = this.stateObj.attributes;
+      const stateMode = this.stateObj.state;
 
-        // Map all needed attributes
+      // Map all needed attributes
         this._isLockConfigured = (attributes?.is_lock_configured === true);
 
-        if (attributes?.lock_manager)
-          // if lock_manager attribute exist, use it to have the global lock state
-          this._isLocked = attributes?.lock_manager?.is_locked || false;
-          // else keep the current value to have a local lock state
+      if (attributes?.lock_manager)
+        // if lock_manager attribute exist, use it to have the global lock state
+        this._isLocked = attributes?.lock_manager?.is_locked || false;
+      // else keep the current value to have a local lock state
 
         this.isUserLocked = this._isLocked && (!this._isLockConfigured || attributes?.lock_manager?.lock_users || false);
         this.isAutomationLocked = this._isLocked && (attributes?.lock_manager?.lock_automations || false);
         this._hasLockCode = (attributes?.lock_manager?.lock_code === true);
 
 
-        // isLocked is the global lock state. isUserLocked is used for UI blocking.
+      // isLocked is the global lock state. isUserLocked is used for UI blocking.
         if (DEBUG) console.log(`Lock states. isConfigured:${this._isLockConfigured} isLocked=${this._isLocked} isUserLocked=${this.isUserLocked} isAutomationLocked=${this.isAutomationLocked} hasLockCode=${this._hasLockCode}`);
 
-        this.name = "";
-        this.hvacMode = stateMode || hvac_mode_OFF;
-        this.hvacAction = attributes?.hvac_action;
-        this.preset = attributes?.preset_mode;
+      this.name = "";
+      this.hvacMode = stateMode || hvac_mode_OFF;
+      this.hvacAction = attributes?.hvac_action;
+      this.preset = attributes?.preset_mode;
         this.modes = attributes?.hvac_modes ? Object.values(attributes.hvac_modes) : [];
         this.presets = attributes.preset_modes ? Object.values(attributes.preset_modes) : [];
         this.isSleeping = (attributes?.specific_states?.is_sleeping === true);
         this.powerPercent = attributes?.vtherm_over_switch?.power_percent || attributes?.vtherm_over_climate?.valve_regulation?.power_percent || 0;
-        if (attributes?.specific_states?.is_device_active === undefined) {
-           // for non Vtherm is_device_active will be undefined and then only hvac action will handle the hvac_action display
+      if (attributes?.specific_states?.is_device_active === undefined) {
+        // for non Vtherm is_device_active will be undefined and then only hvac action will handle the hvac_action display
           this.isDeviceActive = (this.hvacAction == hvacAction_heating || this.hvacAction == hvacAction_cooling);
           if (DEBUG) console.log(`is_device_active not found value=${this.isDeviceActive}`);
-        } else {
+      } else {
           this.isDeviceActive = (attributes?.specific_states?.is_device_active === true);
           if (DEBUG) console.log(`is_device_active found value=${this.isDeviceActive}`);
-        }
-        this.temperature = attributes?.temperature;
-        this.step = attributes?.configuration?.target_temperature_step || 0.5;
-        this.min = attributes?.min_temp || 7;
-        this.max = attributes?.max_temp || 35;
-        this.current = attributes?.current_temperature || 0;
+      }
+      this.temperature = attributes?.temperature;
+      this.step = attributes?.configuration?.target_temperature_step || 0.5;
+      this.min = attributes?.min_temp || 7;
+      this.max = attributes?.max_temp || 35;
+      this.current = attributes?.current_temperature || 0;
         this.windowState = attributes?.window_manager?.window_state
         this.windowAutoState = attributes?.window_manager?.window_auto_state
         this.humidity = attributes?.humidity ? parseFloat(attributes.humidity) : 0;
         this.overpoweringState = attributes?.power_manager?.overpowering_state || "off";
         this.presenceState = attributes?.presence_manager?.presence_state || "off";
-        this.motionState = attributes?.motion_manager?.motion_state || "off";
+      this.motionState = attributes?.motion_manager?.motion_state || "off";
         this._hasWindowByPass = (attributes?.window_manager?.is_window_bypass === true);
-        this.safetyState = attributes?.safety_manager?.safety_state || "off";
-        this.meanCyclePower = attributes?.power_manager?.mean_cycle_power || 0;
+      this.safetyState = attributes?.safety_manager?.safety_state || "off";
+      this.meanCyclePower = attributes?.power_manager?.mean_cycle_power || 0;
         this.valveOpenPercent = attributes?.vtherm_over_valve?.valve_open_percent || attributes?.vtherm_over_climate_valve?.valve_regulation?.valve_open_percent || 0;
-        this.devicePower = attributes?.power_manager?.device_power || 0;
+      this.devicePower = attributes?.power_manager?.device_power || 0;
         this.isRegulated = (attributes?.vtherm_over_climate?.is_regulated === true);
         this.regulatedTargetTemperature = attributes?.vtherm_over_climate?.regulation?.regulated_target_temperature || null;
         this.autoRegulationMode = attributes?.vtherm_over_climate?.regulation?.auto_regulation_mode || null;
         this.currentAutoFanMode = attributes?.vtherm_over_climate?.current_auto_fan_mode || null;
-        this.autoFanMode = attributes?.vtherm_over_climate?.auto_fan_mode || null;
-        this.fanMode = attributes?.fan_mode || null;
-        this.hvacOffReason = attributes?.specific_states?.hvac_off_reason || null;
+      this.autoFanMode = attributes?.vtherm_over_climate?.auto_fan_mode || null;
+      this.fanMode = attributes?.fan_mode || null;
+      this.hvacOffReason = attributes?.specific_states?.hvac_off_reason || null;
         this.isRecalculateScheduled = attributes?.specific_states?.is_recalculate_scheduled || null;
-        this.isOn = attributes?.specific_states?.is_on === true;
-        
-        // Timed preset manager state
+      this.isOn = attributes?.specific_states?.is_on === true;
+
+      // Timed preset manager state
         this.timedPresetActive = attributes?.timed_preset_manager?.is_active === true;
         this.timedPresetRemainingTime = attributes?.timed_preset_manager?.remaining_time_min || null;
-        this.timedPresetPreset = attributes?.timed_preset_manager?.preset || null;
-        
-        const requestedHvacMode = attributes?.requested_state?.hvac_mode || null;
-        let msgs = attributes?.specific_states?.messages || [];
-        if (msgs && !Array.isArray(msgs)) {
-            msgs = [msgs];
-        }
+      this.timedPresetPreset = attributes?.timed_preset_manager?.preset || null;
+
+      const requestedHvacMode = attributes?.requested_state?.hvac_mode || null;
+      let msgs = attributes?.specific_states?.messages || [];
+      if (msgs && !Array.isArray(msgs)) {
+        msgs = [msgs];
+      }
         const hasValveRegulation = (attributes?.vtherm_over_climate_valve?.have_valve_regulation == true);
 
-        if (!this._config?.disable_name) {
+      if (!this._config?.disable_name) {
           this.name = this._config!.name ? this._config!.name : attributes.friendly_name;
-        }
-  
-        if (this.hvacMode == hvac_mode_OFF && this.isSleeping === true) {
-          this.hvacMode = hvac_mode_sleep;
-        }
-        if (DEBUG) console.log(`Mode is ${this.hvacMode}`);
+      }
 
-        // hvac action
-        // Patch hvacAction if power_percent is > 0. This avoid the circle color to change at each switch for over switch vtherm
-        if (attributes?.is_over_switch === true && this.powerPercent > 0) {
+      if (this.hvacMode == hvac_mode_OFF && this.isSleeping === true) {
+        this.hvacMode = hvac_mode_sleep;
+      }
+      if (DEBUG) console.log(`Mode is ${this.hvacMode}`);
+
+      // hvac action
+      // Patch hvacAction if power_percent is > 0. This avoid the circle color to change at each switch for over switch vtherm
+      if (attributes?.is_over_switch === true && this.powerPercent > 0) {
           this.hvacAction = requestedHvacMode == hvac_mode_HEAT ? hvacAction_heating : hvacAction_cooling
-          if (DEBUG) console.log(`After hvac_action patch ${this.hvacAction}`);
-        }
+        if (DEBUG) console.log(`After hvac_action patch ${this.hvacAction}`);
+      }
 
 
-        // Sort modes to have "off" at the end
-        if (DEBUG) console.log(`Modes are ${this.modes}`);
-        if (this.modes.length > 1 && this.modes.includes(hvac_mode_OFF)) {
-          this.modes.sort((a, b) => {
-            if (a === "off") return 1; // Place "off" après tout le reste
-            if (b === "off") return -1; // Place tout le reste avant "off"
-            // keep the alphabetical order for other modes
-            return a.localeCompare(b);
-          });
-        }
-        if (DEBUG) console.log(`After sort modes are ${this.modes}`);
+      // Sort modes to have "off" at the end
+      if (DEBUG) console.log(`Modes are ${this.modes}`);
+      if (this.modes.length > 1 && this.modes.includes(hvac_mode_OFF)) {
+        this.modes.sort((a, b) => {
+          if (a === "off") return 1; // Place "off" après tout le reste
+          if (b === "off") return -1; // Place tout le reste avant "off"
+          // keep the alphabetical order for other modes
+          return a.localeCompare(b);
+        });
+      }
+      if (DEBUG) console.log(`After sort modes are ${this.modes}`);
 
-        // Remove some preset modes: remove manual and frost in cool mode
-        if (this.presets.length > 0) {
-          this.presets = this.presets.filter((preset: string) => {
+      // Remove some preset modes: remove manual and frost in cool mode
+      if (this.presets.length > 0) {
+        this.presets = this.presets.filter((preset: string) => {
             return preset != preset_manual && (stateMode != hvac_mode_COOL || preset != preset_frost);
-          });
-        }
+        });
+      }
 
-        // The temperature values
-        this.value = {
-          value: attributes?.temperature || 0,
-          low: attributes?.target_temp_low || null,
-          high: attributes?.target_temp_high || null,
-        };
-        
+      // The temperature values
+      this.value = {
+        value: attributes?.temperature || 0,
+        low: attributes?.target_temp_low || null,
+        high: attributes?.target_temp_high || null,
+      };
+
         if (this.windowState === 'on' || this.windowAutoState === 'on') {
-          this._hasWindow = true;
+        this._hasWindow = true;
         }
         else {
-          this._hasWindow = false;
-        }
-        
+        this._hasWindow = false;
+      }
+
         if (this.overpoweringState === 'on') {
-          this._hasOverpowering = true;
-          this.overpowering = true;
+        this._hasOverpowering = true;
+        this.overpowering = true;
         }
         else {
-          this._hasOverpowering = false;
-          this.overpowering = false;
-        }
+        this._hasOverpowering = false;
+        this.overpowering = false;
+      }
 
         if (this.presenceState === 'on') {
-          this._hasPresence = true;
-          this.presence = true;
+        this._hasPresence = true;
+        this.presence = true;
         }
         else {
-          this._hasPresence = false;
-          this.presence = false;
-        }
+        this._hasPresence = false;
+        this.presence = false;
+      }
 
         if (this.motionState === 'on') {
-          this._hasMotion = true;
-          this.motion = true;
+        this._hasMotion = true;
+        this.motion = true;
         }
         else {
-          this._hasMotion = false;
-          this.motion = false;
-        }
+        this._hasMotion = false;
+        this.motion = false;
+      }
 
-        // Build Security state
+      // Build Security state
         if (this.safetyState === 'on' && !this?._config?.disable_safety_warning) {
-          this.safety_state = [];
+        this.safety_state = [];
           this.safety_state.push(
             {
               name: localize({ hass: this.hass, string: `extra_states.safety_warning` }),
               security_msg:  localize({ hass: this.hass, string: `extra_states.safety_warning_msg` })
-            });
-          if (attributes.specific_states?.last_temperature_datetime) {
+        });
+        if (attributes.specific_states?.last_temperature_datetime) {
             let dif = dateDifferenceInMinutes(new Date(attributes.specific_states?.last_temperature_datetime));
-            if (dif > 0) {
+          if (dif > 0) {
               this.safety_state.push(
               {
                 name: localize({ hass: this.hass, string: `extra_states.room_temp` }),
                 security_msg:  dif+" "+localize({ hass: this.hass, string: `extra_states.minutes` })
-              });
-            }
+            });
           }
-          if (attributes.specific_states?.last_ext_temperature_datetime) {
+        }
+        if (attributes.specific_states?.last_ext_temperature_datetime) {
             let dif = dateDifferenceInMinutes(new Date(attributes.specific_states?.last_ext_temperature_datetime));
-            if (dif > 0) {
+          if (dif > 0) {
               this.safety_state.push(
               {
                 name: localize({ hass: this.hass, string: `extra_states.outdoor_temp` }),
                 security_msg:  dif+" "+localize({ hass: this.hass, string: `extra_states.minutes` })
-              });
-            }
+            });
           }
-        } else {
-          this.safety_state = null;
         }
+      } else {
+        this.safety_state = null;
+      }
 
-        // Build Messages
-        if (DEBUG) console.log(`Brut messages=${msgs}`);
-        this.messages = [];
-        this._hasError = false;
+      // Build Messages
+      if (DEBUG) console.log(`Brut messages=${msgs}`);
+      this.messages = [];
+      this._hasError = false;
 
-        // Add safety messages
-        if (this.safety_state) {
-             for (const safety of this.safety_state) {
-                this.messages.push(`${safety.name}: ${safety.security_msg}`);
-                this._hasError = true;
-            }
+      // Add safety messages
+      if (this.safety_state) {
+        for (const safety of this.safety_state) {
+          this.messages.push(`${safety.name}: ${safety.security_msg}`);
+          this._hasError = true;
         }
+      }
 
-        // Add existing messages from the attribute
-        for (const msg of msgs) {
+      // Add existing messages from the attribute
+      for (const msg of msgs) {
           this.messages.push(localize({ hass: this.hass, string: `extra_states.${msg}` }));
-        }
+      }
 
-        const failureManager = attributes?.heating_failure_detection_manager;
+      const failureManager = attributes?.heating_failure_detection_manager;
         const isHeatingFailure = failureManager?.heating_failure_state === 'on';
         const isCoolingFailure = failureManager?.cooling_failure_state === 'on';
 
-        if (isHeatingFailure) {
+      if (isHeatingFailure) {
             this.messages.push(localize({ hass: this.hass, string: `extra_states.heating_failure` }));
-            this._hasError = true;
-        }
-        if (isCoolingFailure) {
+        this._hasError = true;
+      }
+      if (isCoolingFailure) {
             this.messages.push(localize({ hass: this.hass, string: `extra_states.cooling_failure` }));
-            this._hasError = true;
-        }
+        this._hasError = true;
+      }
 
-        if (DEBUG) console.log(`Messages=${JSON.stringify(this.messages)}`);
+      if (DEBUG) console.log(`Messages=${JSON.stringify(this.messages)}`);
 
-        // Build Power Infos
-        this!.powerInfos = [];
+      // Build Power Infos
+      this!.powerInfos = [];
         if (DEBUG) console.log(`MeanCyclePower=${this.meanCyclePower} PowerPercent=${this.powerPercent} ValveOpenPercent=${this.valveOpenPercent} DevicePower=${this.devicePower}`);
 
         if (!this!._config?.disable_power_infos && (this.isOn || hasValveRegulation)) {
-          if (attributes?.is_over_switch) {
-            if (this.meanCyclePower && !this._config?.powerEntity) {
-              this!.powerInfos!.push({
-                name: "mean_power_cycle",
-                value: roundNumber(this.meanCyclePower, 1),
-                unit: this.meanCyclePower < minPowerWatt ? "kW" : "W",
+        if (attributes?.is_over_switch) {
+          if (this.meanCyclePower && !this._config?.powerEntity) {
+            this!.powerInfos!.push({
+              name: "mean_power_cycle",
+              value: roundNumber(this.meanCyclePower, 1),
+              unit: this.meanCyclePower < minPowerWatt ? "kW" : "W",
                 class: "vt-power-color"
-              });
-            }
-            this.powerInfos.push({
-              name: "power_percent",
-              value: this.powerPercent,
-              unit: "%",
+            });
+          }
+          this.powerInfos.push({
+            name: "power_percent",
+            value: this.powerPercent,
+            unit: "%",
               class: "vt-power-color"
+          });
+        }
+
+        if (attributes?.is_over_valve || hasValveRegulation) {
+          if (this.meanCyclePower && !this._config?.powerEntity) {
+            this!.powerInfos!.push({
+              name: "mean_power_cycle",
+              value: roundNumber(this.meanCyclePower, 1),
+              unit: this.meanCyclePower < minPowerWatt ? "kW" : "W",
+                class: "vt-power-color"
             });
           }
 
-          if (attributes?.is_over_valve || hasValveRegulation) {
-            if (this.meanCyclePower && !this._config?.powerEntity) {
-              this!.powerInfos!.push({
-                name: "mean_power_cycle",
-                value: roundNumber(this.meanCyclePower, 1),
-                unit: this.meanCyclePower < minPowerWatt ? "kW" : "W",
-                class: "vt-power-color"
-              });
-            }
-
-            this.powerInfos.push({
-              name: "valve_open_percent",
-              value: this.valveOpenPercent,
-              unit: "%",
+          this.powerInfos.push({
+            name: "valve_open_percent",
+            value: this.valveOpenPercent,
+            unit: "%",
               class: "vt-power-color"
-            });
-          }
+          });
+        }
 
-          if (attributes?.is_over_climate && !hasValveRegulation) {
-            if (this.devicePower && !this._config?.powerEntity) {
-              this.powerInfos.push({
-                name: "mean_power_cycle",
-                value: this.devicePower,
+        if (attributes?.is_over_climate && !hasValveRegulation) {
+          if (this.devicePower && !this._config?.powerEntity) {
+            this.powerInfos.push({
+              name: "mean_power_cycle",
+              value: this.devicePower,
                 unit:  this.devicePower < minPowerWatt ? "kW" : "W",
                 class: "vt-power-color"
-              });
-            }
-            if (this.isRegulated) {
-              this.powerInfos.push({
-                name: "regulated_target_temperature",
-                value: this.regulatedTargetTemperature,
-                unit: attributes?.configuration?.temperature_unit,
-                class: "vt-temp-color"
-              });
-              this.powerInfos.push({
-                name: "auto_regulation_mode",
-                value: localize({ hass: this.hass, string: `extra_states.${this.autoRegulationMode}` }),
-                unit: "",
-                class: "vt-label-color"
-              });
-            }
+            });
           }
+          if (this.isRegulated) {
+            this.powerInfos.push({
+              name: "regulated_target_temperature",
+              value: this.regulatedTargetTemperature,
+              unit: attributes?.configuration?.temperature_unit,
+                class: "vt-temp-color"
+            });
+            this.powerInfos.push({
+              name: "auto_regulation_mode",
+                value: localize({ hass: this.hass, string: `extra_states.${this.autoRegulationMode}` }),
+              unit: "",
+                class: "vt-label-color"
+            });
+          }
+        }
         }
         else if (DEBUG) console.log(`No power to disply is_on=${this.isOn} or disabled`);
 
-        // Build auto-fan infos
-        this.autoFanInfos = [];
+      // Build auto-fan infos
+      this.autoFanInfos = [];
         if (!this?._config?.disable_auto_fan_infos && attributes?.is_over_climate && !hasValveRegulation) {
           const name=this.currentAutoFanMode != auto_fan_none ? "auto_fan_mode" : "auto_fan_mode_off";
           if (DEBUG) console.log(`VersatileThermostat UI : auto_fan icon name ${name}`);
-          
-          this.autoFanInfos.push({
-            name: name,
-            value: localize({ hass: this.hass, string: `extra_states.${this.currentAutoFanMode}` }),
-            unit: "",
-            class: "vt-label-color"
-          });
 
-          if (this.fanMode) {
-            this.autoFanInfos.push({
-              name: "fan_mode",
+        this.autoFanInfos.push({
+          name: name,
+            value: localize({ hass: this.hass, string: `extra_states.${this.currentAutoFanMode}` }),
+          unit: "",
+            class: "vt-label-color"
+        });
+
+        if (this.fanMode) {
+          this.autoFanInfos.push({
+            name: "fan_mode",
               value: localize({ hass: this.hass, string: `extra_states.fan_${this.fanMode}` }), 
-              unit: "",
+            unit: "",
               class: "vt-label-color"
             })
-          }
-
         }
 
-        // Build autoStartStop infos
+      }
+
+      // Build autoStartStop infos
         this._hasAutoStartStop = ( this.hvacOffReason=== hvacOffReasonAutoStartStop);
-        // this._hasAutoStartStopEnable = autoStartStopLevels.includes(attributes?.auto_start_stop_level);
+      // this._hasAutoStartStopEnable = autoStartStopLevels.includes(attributes?.auto_start_stop_level);
         this._isAutoStartStopConfigured = (attributes?.is_auto_start_stop_configured === true);
         this._isAutoStartStopEnabled = (attributes?.auto_start_stop_manager?.auto_start_stop_enable === true);
         if (DEBUG) console.log(`_isAutoStartStopConfigured=${this._isAutoStartStopConfigured} _isAutoStartStopEnabled=${this._isAutoStartStopEnabled} hvac_off_reason=${this.hvacOffReason}`);
 
-        this._updateDisplay();
-      }
+      this._updateDisplay();
+    }
   }
 
   private _updateDisplay() {
@@ -2059,7 +2086,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
     this.last_target_temperature = this.temperature;
     const presetMode = (e.currentTarget as any).preset;
-    
+
     if (this.timedPresetDuration && this.timedPresetDuration > 0) {
       // Use timed preset service
       this.hass!.callService("versatile_thermostat", "set_timed_preset", {
@@ -2126,8 +2153,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
     if (DEBUG)console.info(
       `VersatileThermostatUI-CARD changing auto_fan_mode to ${newMode} (mapped=$${mappedNewMode}`
-    );
-    
+      );
+
     if (! mappedNewMode) {
       console.warn(
         `VersatileThermostatUI-CARD: auto_fan_mode ${newMode} has no mapping, aborting change.`
@@ -2149,7 +2176,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     console.info(
       `VersatileThermostatUI-CARD changing auto_start_stop_enable to ${newMode}`
     );
-    
+
     this.hass!.callService("switch", "toggle", {
       entity_id: this._config!.autoStartStopEnableEntity,
     });
@@ -2157,16 +2184,16 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   private _handleToggleWindowByPass(/*e: MouseEvent*/): void {
     // Activate or deactivate the window bypass
-	if (this.isUserLocked) {
-	        return;
-	}
+    if (this.isUserLocked) {
+      return;
+    }
     if (DEBUG) console.log(`_handleToggleWindowByPass called. Current windowByPass is ${this._hasWindowByPass}`);
     let newMode= ! this._hasWindowByPass;
 
     console.info(
       `VersatileThermostatUI-CARD changing windowByPass to ${newMode}`
     );
-    
+
     this.hass!.callService("versatile_thermostat", "set_window_bypass", {
       entity_id: this._config!.entity,
       window_bypass: newMode,
@@ -2180,6 +2207,23 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       else return this?.value?.low || 0;
     }
     return this?.value?.value || 0;
+  }
+
+  private _renderStatusTextSVG(x: string, y: string): TemplateResult {
+    if (!this._config?.show_status_text || !this.hvacAction) {
+      return svg``;
+    }
+
+    const localizedState =
+      this.hass!.localize(
+        `component.climate.entity_component._.state_attributes.hvac_action.state.${this.hvacAction}`,
+      ) || this.hvacAction;
+
+    return svg`
+      <text class="hvac-action-text-svg ${this.hvacAction}" x="${x}" y="${y}" dominant-baseline="middle" text-anchor="middle">
+        ${localizedState}
+      </text>
+    `;
   }
 
   private _renderHVACAction(): TemplateResult {
@@ -2314,15 +2358,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
     return html `
       <div class="preset-label preset-${preset}">
-          <ha-icon-button
+        <ha-icon-button
             title="${currentPreset === preset ? preset : ''}"
-            class=${classMap({ "selected-icon": currentPreset === preset })}
-            .preset=${preset}
-            @click=${this._handlePreset}
-            tabindex="0"
-            .path=${modeIcons[preset]}
-            .label=${localizePreset}
-          >
+          class=${classMap({ "selected-icon": currentPreset === preset })}
+          .preset=${preset}
+          @click=${this._handlePreset}
+          tabindex="0"
+          .path=${modeIcons[preset]}
+          .label=${localizePreset}
+        >
         </ha-icon-button>
       </div>
     `;
@@ -2335,13 +2379,13 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         <span>
           <ha-icon-button
             title="${localizeInfo}"
-            class=${info.class} 
+            class=${info.class}
             .name=${info.name}
             tabindex="0"
             .path=${modeIcons[info.name]}
             .label=${localizeInfo}
           >
-        </ha-icon-button>
+          </ha-icon-button>
         </span>
         <span>${info.value} ${info.unit}</span>
       </div>
@@ -2353,20 +2397,20 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       (this.hass!.localize(`component.climate.state._.${info.name}`) ||
        localize({ hass: this.hass, string: `extra_states.${info.name}` }))
       + "\n" + localize({ hass: this.hass, string: `extra_states.toggle_message` });
-      
+
     return html `
       <div class="left-info-label">
         <span>
           <ha-icon-button
             title="${localizeInfo}"
-            class=${info.class} 
+            class=${info.class}
             .name=${info.name}
             @click=${this._handleClickAutoFanInfo}
             tabindex="0"
             .path=${modeIcons[info.name]}
             .label=${localizeInfo}
           >
-        </ha-icon-button>
+          </ha-icon-button>
         </span>
         <span>${info.value} ${info.unit}</span>
       </div>
@@ -2395,7 +2439,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
   private _handleMoreInfo() {
     fireEvent(this, "hass-more-info", {
-        entityId: this._config!.entity,
+      entityId: this._config!.entity,
     });
   }
 
@@ -2470,7 +2514,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     if (!this._config?.entity || !this.hass) {
       return;
     }
-    
+
     if (this._isLockConfigured) {
       this.hass.callService("versatile_thermostat", "lock", {
         entity_id: this._config.entity,
@@ -2604,96 +2648,96 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
    return html `
    <ha-card class=${classMap({
-     [this.hvacMode]: true,
-     locked: this.isUserLocked,
-   })}
-   >
+          [this.hvacMode]: true,
+          locked: this.isUserLocked,
+        })}
+      >
     ${this._config?.disable_menu ? `` : html`
-      <ha-icon-button
-        class="more-info"
-        .label=${this.hass!.localize(
-          "ui.panel.lovelace.cards.show_more_info"
-        )}
-        .path=${mdiDotsVertical}
-        @click=${this._toggleThemeMenu}
-        tabindex="0"
-      ></ha-icon-button>
+              <ha-icon-button
+                class="more-info"
+                .label=${this.hass!.localize(
+                  "ui.panel.lovelace.cards.show_more_info"
+                )}
+                .path=${mdiDotsVertical}
+                @click=${this._toggleThemeMenu}
+                tabindex="0"
+              ></ha-icon-button>
       ${this._showThemeMenu ? html`
         <div class="menu-backdrop" @click=${this._closeThemeMenu}></div>
-        <div class="theme-menu">
-          <div class="theme-menu-header">
-            <div class="theme-menu-title" @click=${() => { this._handleMoreInfo(); this._closeThemeMenu(); }}>${localize({ hass: this.hass, string: 'editor.card.climate.menu_system' })}</div>
-          </div>
+                    <div class="theme-menu">
+                      <div class="theme-menu-header">
+                          <div class="theme-menu-title" @click=${() => { this._handleMoreInfo(); this._closeThemeMenu(); }}>${localize({ hass: this.hass, string: 'editor.card.climate.menu_system' })}</div>
+                        </div>
           <div class="theme-menu-item" style="border-top:1px solid var(--divider-color, #e0e0e0);"></div>
           ${/* Lock control moved into menu for gunmalmg */''}
           ${this._config?.theme === THEMES.GUNMALMG ? html`
             <div class="theme-menu-item" @click=${() => { this._menuLockToggle(); this._closeThemeMenu(); }}>
               ${this._isLocked ? localize({ hass: this.hass, string: 'extra_states.unlock' }) : localize({ hass: this.hass, string: 'extra_states.lock' })}
-            </div>
+                      </div>
             ${this.timedPresetActive ? html`
               <div class="theme-menu-item" @click=${() => { this._menuCancelTimedPreset(); this._closeThemeMenu(); }}>
                 ${localize({ hass: this.hass, string: 'extra_states.cancel_timed_preset' })}
-              </div>
+                            </div>
             ` : ``}
           ` : ``}
           <div class="theme-menu-item" @click=${() => this._applyTheme('classic')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_classic' })}</div>
           <div class="theme-menu-item" @click=${() => this._applyTheme('vtherm')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_vtherm' })}</div>
           <div class="theme-menu-item" @click=${() => this._applyTheme('uncolored')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_uncolored' })}</div>
           <div class="theme-menu-item" @click=${() => this._applyTheme('gunmalmg')}>${localize({ hass: this.hass, string: 'editor.card.climate.theme_gunmalmg' })}</div>
-        </div>
+                                  </div>
       ` : ``}
       `}
 
-      ${this._renderClassicContent()}
+        ${this._renderClassicContent()}
 
-    <ha-dialog
-      .open=${this.showDigicodeModal}
-      @closed=${this._handleModalClose}
-      hideActions
-      class="digicode-dialog"
-    >
-      <div class="dialog-content">
-        <h2 class="dialog-title">
-          ${this.isLocking 
-            ? localize({ hass: this.hass, string: `extra_states.lock` }) 
+        <ha-dialog
+          .open=${this.showDigicodeModal}
+          @closed=${this._handleModalClose}
+          hideActions
+          class="digicode-dialog"
+        >
+          <div class="dialog-content">
+            <h2 class="dialog-title">
+              ${this.isLocking
+                ? localize({ hass: this.hass, string: `extra_states.lock` })
             : localize({ hass: this.hass, string: `extra_states.unlock` })} ${this.name}
-        </h2>
+            </h2>
         <div class="code-display ${this.codeError ? 'error' : ''}">
           <span class="digit ${this.enteredCode.length > 0 ? 'filled' : ''}"></span>
           <span class="digit ${this.enteredCode.length > 1 ? 'filled' : ''}"></span>
           <span class="digit ${this.enteredCode.length > 2 ? 'filled' : ''}"></span>
           <span class="digit ${this.enteredCode.length > 3 ? 'filled' : ''}"></span>
-        </div>
+            </div>
         <div class="error-message ${this.codeError ? 'visible' : ''}">
           ${localize({ hass: this.hass, string: `extra_states.code_error` })}
-        </div>
+            </div>
 
-        <div class="keypad">
-          <div class="keypad-row">
+            <div class="keypad">
+              <div class="keypad-row">
             <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('1')}>1</mwc-button>
             <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('2')}>2</mwc-button>
             <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('3')}>3</mwc-button>
-          </div>
-          <div class="keypad-row">
+              </div>
+              <div class="keypad-row">
             <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('4')}>4</mwc-button>
             <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('5')}>5</mwc-button>
             <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('6')}>6</mwc-button>
-          </div>
-          <div class="keypad-row">
+              </div>
+              <div class="keypad-row">
             <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('7')}>7</mwc-button>
             <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('8')}>8</mwc-button>
             <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('9')}>9</mwc-button>
-          </div>
-          <div class="keypad-row">
-            <mwc-button class="keypad-btn spacer" disabled></mwc-button>
+              </div>
+              <div class="keypad-row">
+                <mwc-button class="keypad-btn spacer" disabled></mwc-button>
             <mwc-button class="keypad-btn" @click=${() => this._handleKeypadPress('0')}>0</mwc-button>
             <mwc-button class="keypad-btn action-btn clear" @click=${this._handleKeypadClear}><ha-svg-icon .path=${mdiBackspaceOutline}></ha-svg-icon></mwc-button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </ha-dialog>
-    </ha-card>
-  `;
+        </ha-dialog>
+      </ha-card>
+    `;
   };
 
   constructor() {
@@ -2717,12 +2761,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   public static async getStubConfig(hass: HomeAssistant): Promise<any> {
-      const entities = Object.keys(hass.states);
+    const entities = Object.keys(hass.states);
       const climates = entities.filter((e) => ["climate"].includes(e.split(".")[0]));
       const vt_climate:any = climates.filter((e) => hass.states[e].attributes?.specific_states);
-      return {
-          type: "custom:versatile-thermostat-ui-card",
+    return {
+      type: "custom:versatile-thermostat-ui-card",
           entity: vt_climate[0] || climates[0]
-      };
+    };
   }
 }

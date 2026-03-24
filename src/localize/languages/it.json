@@ -39,7 +39,8 @@
         "section_classic_only": "For Classic, VTherm and Uncolored themes",
         "menu_system": "System menu",
         "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
-        "disable_presets": "Disable presets"
+        "disable_presets": "Disable presets",
+        "show_status_text": "Mostra lo stato attuale come testo"
       }
     }
   },
@@ -128,12 +129,6 @@
     "cooling_failure": "Rilevato guasto al raffrescamento",
     "increase_temp": "Aumenta la temperatura",
     "decrease_temp": "Diminuisci la temperatura",
-    "fan_1": "Speed 1",
-    "fan_2": "Speed 2",
-    "fan_3": "Speed 3",
-    "fan_4": "Speed 4",
-    "fan_5": "Speed 5",
-    "target_temp_timed_preset": "Timed preset active",
     "not_initialized": "Initialisation error"
   }
 }
