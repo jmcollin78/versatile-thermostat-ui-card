@@ -1774,25 +1774,25 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       this.min = attributes?.min_temp || 7;
       this.max = attributes?.max_temp || 35;
       this.current = attributes?.current_temperature || 0;
-        this.windowState = attributes?.window_manager?.window_state
-        this.windowAutoState = attributes?.window_manager?.window_auto_state
-        this.humidity = attributes?.humidity ? parseFloat(attributes.humidity) : 0;
-        this.overpoweringState = attributes?.power_manager?.overpowering_state || "off";
-        this.presenceState = attributes?.presence_manager?.presence_state || "off";
+      this.windowState = attributes?.window_manager?.window_state
+      this.windowAutoState = attributes?.window_manager?.window_auto_state
+      this.humidity = attributes?.humidity ? parseFloat(attributes.humidity) : 0;
+      this.overpoweringState = attributes?.power_manager?.overpowering_state || "off";
+      this.presenceState = attributes?.presence_manager?.presence_state || "off";
       this.motionState = attributes?.motion_manager?.motion_state || "off";
-        this._hasWindowByPass = (attributes?.window_manager?.is_window_bypass === true);
+      this._hasWindowByPass = (attributes?.window_manager?.is_window_bypass === true);
       this.safetyState = attributes?.safety_manager?.safety_state || "off";
       this.meanCyclePower = attributes?.power_manager?.mean_cycle_power || 0;
-        this.valveOpenPercent = attributes?.vtherm_over_valve?.valve_open_percent || attributes?.vtherm_over_climate_valve?.valve_regulation?.valve_open_percent || 0;
+      this.valveOpenPercent = attributes?.vtherm_over_valve?.valve_open_percent || attributes?.vtherm_over_climate_valve?.valve_regulation?.valve_open_percent || 0;
       this.devicePower = attributes?.power_manager?.device_power || 0;
-        this.isRegulated = (attributes?.vtherm_over_climate?.is_regulated === true);
-        this.regulatedTargetTemperature = attributes?.vtherm_over_climate?.regulation?.regulated_target_temperature || null;
-        this.autoRegulationMode = attributes?.vtherm_over_climate?.regulation?.auto_regulation_mode || null;
-        this.currentAutoFanMode = attributes?.vtherm_over_climate?.current_auto_fan_mode || null;
+      this.isRegulated = (attributes?.vtherm_over_climate?.is_regulated === true);
+      this.regulatedTargetTemperature = attributes?.vtherm_over_climate?.regulation?.regulated_target_temperature || null;
+      this.autoRegulationMode = attributes?.vtherm_over_climate?.regulation?.auto_regulation_mode || null;
+      this.currentAutoFanMode = attributes?.vtherm_over_climate?.current_auto_fan_mode || null;
       this.autoFanMode = attributes?.vtherm_over_climate?.auto_fan_mode || null;
       this.fanMode = attributes?.fan_mode || null;
       this.hvacOffReason = attributes?.specific_states?.hvac_off_reason || null;
-        this.isRecalculateScheduled = attributes?.specific_states?.is_recalculate_scheduled || null;
+      this.isRecalculateScheduled = attributes?.specific_states?.is_recalculate_scheduled || null;
       this.isOn = attributes?.specific_states?.is_on === true;
 
       // Timed preset manager state
