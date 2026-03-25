@@ -524,9 +524,21 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       vt-ha-control-circular-slider.with-background-gradient {
+        z-index: 0;
+        position: relative;
+      }
+      vt-ha-control-circular-slider.with-background-gradient::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         background: radial-gradient(circle, var(--hvac-mode-color) 0%, transparent 65%);
         border-radius: 50%;
-        opacity: 0.85;
+        opacity: 0.45;
+        z-index: -1;
+        pointer-events: none;
       }
 
       vt-ha-outlined-icon-button {
@@ -1258,12 +1270,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
       
       
-      /* Styles pour le texte de statut HVAC en SVG */
       .hvac-action-text-svg {
         text-anchor: middle;
-        // fill: var(--hvac-mode-color, #ffffff);
         font-weight: var(--ha-font-weight-light);
-        // font-size: var(--ha-font-size-xs, 6px);
         font-size: 6px;
         text-align: center;
         display: -webkit-box;
@@ -1273,6 +1282,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         line-height: var(--ha-line-height-normal);
         min-height: 1.5em;
         white-space: nowrap;
+        filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.8));
       }
       .hvac-action-text-svg.heating {
         fill: var(--hvac-mode-color, #f44336);
@@ -1414,15 +1424,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
               ${
                 disableCircle ? svg`
-                  ${this._renderStatusTextSVG("62.5", "44%")} 
-                  ${this._renderTemperature(this._display_top, true, "55", "60%", ! this?._config?.set_current_as_main)}
-                  ${this._renderTemperature(this._display_bottom, false, "90", "60%", this?._config?.set_current_as_main == true)}
+                  ${this._renderStatusTextSVG("62.5", "50")} 
+                  ${this._renderTemperature(this._display_top, true, "55", "62%", ! this?._config?.set_current_as_main)}
+                  ${this._renderTemperature(this._display_bottom, false, "90", "62%", this?._config?.set_current_as_main == true)}
                   <g class="current-info" transform="translate(100,65)">
                     ${this._renderHVACAction()}
                   </g>
                 `: svg`
-                  ${this._renderStatusTextSVG("62.5", "44%")} 
-                  ${this._renderTemperature(this._display_top, true, "50%", "60%", ! this?._config?.set_current_as_main)}
+                  ${this._renderStatusTextSVG("62.5", "50")} 
+                  ${this._renderTemperature(this._display_top, true, "50%", "62%", ! this?._config?.set_current_as_main)}
                   <line x1="35" y1="72" x2="90" y2="72" stroke="#e7e7e8" stroke-width="0.5" />
                   <g class="current-info" transform="translate(62.5,80)">
                     ${this._renderTemperature(this._display_bottom, false, "-5%", "0%", this?._config?.set_current_as_main == true)}
@@ -2619,7 +2629,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
 
     if (isTarget && isMain) {
-      targetPosX = 35;
+      targetPosX = this.effectiveDisableCircle ? 30 : 35;
+      // targetPosX = 35;
       targetPosY = 56;
       targetScale = 0.25;
     }
