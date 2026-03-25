@@ -40,7 +40,8 @@
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
         "use_manual_duration_input": "Allow manual duration input instead of selector",
-        "show_status_text": "Mostra l'estat actual en text"
+        "show_status_text": "Mostra l'estat actual en text",
+        "show_background_gradient_on_active": "Mostra el degradat de fons del control lliscant quan l'entitat està activa"
       }
     }
   },

@@ -40,7 +40,8 @@
         "menu_system": "System menu",
         "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
         "disable_presets": "Disable presets",
-        "show_status_text": "Mostra lo stato attuale come testo"
+        "show_status_text": "Mostra lo stato attuale come testo",
+        "show_background_gradient_on_active": "Mostra il gradiente di sfondo del cursore quando l'entità è attiva"
       }
     }
   },

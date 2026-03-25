@@ -523,6 +523,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           background: none;
       }
 
+      vt-ha-control-circular-slider.with-background-gradient {
+        background: radial-gradient(circle, var(--hvac-mode-color) 0%, transparent 65%);
+        border-radius: 50%;
+        opacity: 0.85;
+      }
+
       vt-ha-outlined-icon-button {
         border: 1px solid var(--secondary-text-color);
         border-radius: 100%;
@@ -1348,7 +1354,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             this.value.high != null &&
             this.stateObj?.state !== UNAVAILABLE) ? html`
               <vt-ha-control-circular-slider
-              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} "
+              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} ${this._config?.show_background_gradient_on_active && this.isDeviceActive ? 'with-background-gradient' : ''}"
                 .inactive=${this._hasWindow}
                 dual
                 .low=${this.value.low}
@@ -1364,7 +1370,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
               >
             ` : html`
               <vt-ha-control-circular-slider
-              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} "
+              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} ${this._config?.show_background_gradient_on_active && this.isDeviceActive ? 'with-background-gradient' : ''}"
                 .inactive=${this._hasWindow}
                 .mode="start"
                 @value-changed=${this._highChanged}

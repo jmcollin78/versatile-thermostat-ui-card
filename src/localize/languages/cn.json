@@ -40,7 +40,8 @@
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
         "use_manual_duration_input": "Allow manual duration input instead of selector",
-        "show_status_text": "以文本形式显示当前状态"
+        "show_status_text": "以文本形式显示当前状态",
+        "show_background_gradient_on_active": "当实体处于活动状态时显示滑块背景渐变"
       }
     }
   },

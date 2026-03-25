@@ -41,7 +41,8 @@
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
         "use_manual_duration_input": "Allow manual duration input instead of selector",
-        "show_status_text": "Показване на статуса като текст"
+        "show_status_text": "Показване на статуса като текст",
+        "show_background_gradient_on_active": "Показване на фоновия градиент на плъзгача, когато обектът е активен"
       }
     }
   },
