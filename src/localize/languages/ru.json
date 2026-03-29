@@ -39,7 +39,8 @@
         "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
-        "use_manual_duration_input": "Allow manual duration input instead of selector"
+        "use_manual_duration_input": "Allow manual duration input instead of selector",
+        "allow_preset_modification": "Разрешить изменение температур пресетов"
       }
     }
   },
@@ -128,7 +129,13 @@
     "cancel_timed_preset": "Cancel timed preset",
     "increase_temp": "Increase temperature",
     "decrease_temp": "Decrease temperature",
-    "not_initialized": "Initialisation error"
+    "not_initialized": "Initialisation error",
+    "preset_mod_title": "Температуры пресетов",
+    "preset_mod_no_entities": "Не найдено объектов температуры пресетов для этого устройства.",
+    "preset_row_heat": "Обогрев",
+    "preset_row_heat_away": "Обогрев (отсутствие)",
+    "preset_row_cool": "Охлаждение",
+    "preset_row_cool_away": "Охлаждение (отсутствие)"
   },
   "theme": "Тема",
   "theme_classic": "Классический",

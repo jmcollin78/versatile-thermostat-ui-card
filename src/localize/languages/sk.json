@@ -40,7 +40,8 @@
         "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
-        "use_manual_duration_input": "Allow manual duration input instead of selector"
+        "use_manual_duration_input": "Allow manual duration input instead of selector",
+        "allow_preset_modification": "Povoliť úpravu teplôt predvolieb"
       }
     }
   },
@@ -129,7 +130,13 @@
     "cancel_timed_preset": "Cancel timed preset",
     "increase_temp": "Increase temperature",
     "decrease_temp": "Decrease temperature",
-    "not_initialized": "Initialisation error"
+    "not_initialized": "Initialisation error",
+    "preset_mod_title": "Teploty predvolieb",
+    "preset_mod_no_entities": "Pre toto zariadenie neboli nájdené žiadne entity teplôt predvolieb.",
+    "preset_row_heat": "Kúrenie",
+    "preset_row_heat_away": "Kúrenie (neprítomnosť)",
+    "preset_row_cool": "Chladenie",
+    "preset_row_cool_away": "Chladenie (neprítomnosť)"
   },
   "theme": "Téma",
   "theme_classic": "Klasický",

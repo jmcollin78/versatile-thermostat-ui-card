@@ -39,7 +39,8 @@
         "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
-        "use_manual_duration_input": "Allow manual duration input instead of selector"
+        "use_manual_duration_input": "Allow manual duration input instead of selector",
+        "allow_preset_modification": "Tillad ændring af forudindstillingstemperaturer"
       }
     }
   },
@@ -128,7 +129,13 @@
     "cancel_timed_preset": "Cancel timed preset",
     "increase_temp": "Increase temperature",
     "decrease_temp": "Decrease temperature",
-    "not_initialized": "Initialisation error"
+    "not_initialized": "Initialisation error",
+    "preset_mod_title": "Forudindstilte temperaturer",
+    "preset_mod_no_entities": "Ingen forudindstillede temperaturenheder fundet for denne enhed.",
+    "preset_row_heat": "Varme",
+    "preset_row_heat_away": "Varme fraværende",
+    "preset_row_cool": "Køling",
+    "preset_row_cool_away": "Køling fraværende"
   },
   "theme": "Tema",
   "theme_classic": "Klassisk",

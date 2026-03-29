@@ -1369,17 +1369,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       .preset-temp-input {
-        width: 34px;
+        width: 40px;
         padding: 2px 1px;
         border: 1px solid var(--divider-color, #ccc);
         border-right: none;
         border-radius: 4px 0 0 4px;
         background: var(--card-background-color, #fff);
         color: var(--primary-text-color);
-        font-size: 11px;
+        font-size: 13px;
         text-align: center;
         -moz-appearance: textfield;
-        height: 26px;
+        height: 40px;
         box-sizing: border-box;
       }
 
@@ -1407,7 +1407,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       .preset-step-btns {
         display: flex;
         flex-direction: column;
-        width: 18px;
+        width: 24px;
         flex-shrink: 0;
       }
 
@@ -1418,7 +1418,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         border-left: none;
         background: var(--secondary-background-color, #f5f5f5);
         color: var(--primary-text-color);
-        font-size: 11px;
+        font-size: 14px;
         font-weight: 700;
         cursor: pointer;
         user-select: none;
@@ -1427,6 +1427,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         display: flex;
         align-items: center;
         justify-content: center;
+        min-height: 19px;
       }
 
       .preset-step-up {
@@ -2033,8 +2034,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
    */
   private _classifyPresetEntity(entityId: string): PresetTempEntityInfo | null {
     const id = entityId.toLowerCase();
-    // Détecter mode cool (présence de _cool_ dans l'id)
-    const isCool = /_cool_/.test(id) || id.endsWith('_cool');
+    // Détecter mode cool :
+    //   - forme classique : _cool_ dans l'id
+    //   - forme AC      : se termine par _ac_temp ou _ac_away_temp
+    const isCool = /_cool_/.test(id) || id.endsWith('_cool')
+                || /_ac_(away_)?temp$/.test(id);
     // Détecter absent/away
     const isAway = id.includes('_away');
     // Détecter le preset

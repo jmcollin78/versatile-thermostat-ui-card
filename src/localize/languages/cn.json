@@ -39,7 +39,8 @@
         "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
-        "use_manual_duration_input": "Allow manual duration input instead of selector"
+        "use_manual_duration_input": "Allow manual duration input instead of selector",
+        "allow_preset_modification": "允许修改预设温度"
       }
     }
   },
@@ -128,7 +129,13 @@
     "cancel_timed_preset": "Cancel timed preset",
     "increase_temp": "Increase temperature",
     "decrease_temp": "Decrease temperature",
-    "not_initialized": "Initialisation error"
+    "not_initialized": "Initialisation error",
+    "preset_mod_title": "预设温度",
+    "preset_mod_no_entities": "未找到该设备的预设温度实体。",
+    "preset_row_heat": "制热",
+    "preset_row_heat_away": "制热（离开）",
+    "preset_row_cool": "制冷",
+    "preset_row_cool_away": "制冷（离开）"
   },
   "theme": "主题",
   "theme_classic": "经典",

@@ -40,7 +40,8 @@
         "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
-        "use_manual_duration_input": "Allow manual duration input instead of selector"
+        "use_manual_duration_input": "Allow manual duration input instead of selector",
+        "allow_preset_modification": "Voreinstellungstemperaturen bearbeitbar machen"
       }
     }
   },
@@ -130,6 +131,12 @@
     "timed_preset_title": "Duration in minutes (0 = permanent)",
     "timed_preset_active": "Timed preset active",
     "cancel_timed_preset": "Cancel timed preset",
-    "not_initialized": "Initialisation error"
+    "not_initialized": "Initialisation error",
+    "preset_mod_title": "Voreinstellungstemperaturen",
+    "preset_mod_no_entities": "Keine Voreinstellungstemperatur-Entitäten für dieses Gerät gefunden.",
+    "preset_row_heat": "Heizen",
+    "preset_row_heat_away": "Heizen (abwesend)",
+    "preset_row_cool": "Kühlen",
+    "preset_row_cool_away": "Kühlen (abwesend)"
   }
 }
