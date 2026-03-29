@@ -141,13 +141,12 @@ export const gunmalmgStyles = css`
 
         /* Gunmalmg theme - minimalist compact list style */
         :host([theme="gunmalmg"]) ha-card {
-          background: #121212;
-          color: #e6e6e6;
+          color: var(--primary-text-color);
           border-radius: 10px;
           padding: 0px 0px;
           box-shadow: none;
         }
-        :host([theme="gunmalmg"]) .name { font-weight: 600; color: #ffffff; font-size: 17px; text-align: left;}
+        :host([theme="gunmalmg"]) .name { font-weight: 600; color: var(--primary-text-color); font-size: 17px; text-align: left;}
         :host([theme="gunmalmg"]) .content { display: flex; position: relative; width: 100%; height: auto; max-width: none; transform: none; left: 0; top: 0; padding: 0; align-items: center; justify-content: center; }
         :host([theme="gunmalmg"]) .current-info, :host([theme="gunmalmg"]) #left-infos, :host([theme="gunmalmg"]) #vt-control-buttons { display: none !important; }
         :host([theme="gunmalmg"]) .disabled-circle-container { height: 84px; background: transparent; }
@@ -180,22 +179,26 @@ export const gunmalmgStyles = css`
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          background: rgba(255,255,255,0.04);
-          color: #e6e6e6;
-          border: 1px solid rgba(255,255,255,0.03);
+          background: var(--secondary-background-color);
+          color: var(--secondary-text-color);
+          border: 1px solid var(--divider-color);
         }
         :host([theme="gunmalmg"]) .preset-label .selected-icon {
           box-shadow: 0 2px 0 rgba(0,0,0,0.3) inset;
         }
 
-        /* Presets base: icon grey, dark grey background */
+        /* Presets base: icon grey, secondary background */
         :host([theme="gunmalmg"]) .preset-label ha-icon-button {
-          background: #2b2b2b; /* dark grey */
-          border: 1px solid rgba(255,255,255,0.03);
+          background: var(--secondary-background-color);
+          border: 1px solid var(--divider-color);
         }
 
         /* Only selected preset icon should be colored */
-        :host([theme="gunmalmg"]) .preset-label ha-icon-button.selected-icon { background: #111111; color: #e6e6e6 !important; transition: background-color 180ms ease, color 180ms ease;}
+        :host([theme="gunmalmg"]) .preset-label ha-icon-button.selected-icon {
+          background: var(--secondary-background-color);
+          color: white !important;
+          transition: background-color 180ms ease, color 180ms ease;
+        }
 
         /* Selected colors mapping */
         :host([theme="gunmalmg"]) .preset-frost ha-icon-button.selected-icon { background: #3a9ff2; } /* blue */
@@ -223,7 +226,7 @@ export const gunmalmgStyles = css`
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          background: rgba(255,255,255,0.02);
+          background: var(--secondary-background-color);
           color: var(--secondary-text-color);
           border: none;
           transition: background-color 220ms ease, color 220ms ease, transform 160ms ease;
@@ -232,22 +235,22 @@ export const gunmalmgStyles = css`
         /* Colored states for hvac mode icon */
         :host([theme="gunmalmg"]) ha-card.heat .hvac-mode-tile ha-icon-button,
         :host([theme="gunmalmg"]) ha-card.heat_cool .hvac-mode-tile ha-icon-button {
-          background: #3e2a00; /* dark orange */
-          color: #fb9600; /* orange icon */
+          background: rgba(251, 150, 0, 0.15);
+          color: #fb9600;
         }
         :host([theme="gunmalmg"]) ha-card.cool .hvac-mode-tile ha-icon-button {
-          background: #003147; /* dark blue */
-          color: #038dfe; /* blue icon */
+          background: rgba(3, 141, 254, 0.15);
+          color: #038dfe;
         }
         :host([theme="gunmalmg"]) ha-card.off .hvac-mode-tile ha-icon-button {
-          background: #2b2b2b; /* dark grey */
-          color: #bdbdbd; /* grey icon */
+          background: var(--secondary-background-color);
+          color: var(--secondary-text-color);
         }
 
         :host([theme="gunmalmg"]) .hvac-action svg {
           width: 20px;
           height: 20px;
-          fill: #ffffff;
+          fill: var(--primary-text-color);
           opacity: 0.95;
         }
 
@@ -263,12 +266,12 @@ export const gunmalmgStyles = css`
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #ffffff; /* icon white */
+          color: #ffffff;
         }
         :host([theme="gunmalmg"]) .hvac-badge.heating { background: #f44336; }
         :host([theme="gunmalmg"]) .hvac-badge.cooling { background: #03A9F4; }
         :host([theme="gunmalmg"]) .hvac-badge.warning { background: #ff9800; }
-        :host([theme="gunmalmg"]) .hvac-badge svg { fill: #ffffff; width: 14px; height: 14px; }
+        :host([theme="gunmalmg"]) .hvac-badge svg { fill: #ffffff; width: 14px; height: 14px; } /* badge always on colored bg */
 
         /* Preset pills tweaks */
         :host([theme="gunmalmg"]) .preset-label {
@@ -353,10 +356,10 @@ export const gunmalmgStyles = css`
           overflow-y: hidden;
           min-width: 0;
           scrollbar-width: thin;
-          scrollbar-color: rgba(255,255,255,0.15) transparent;
+          scrollbar-color: var(--divider-color) transparent;
         }
         :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar { height: 3px; }
-        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar-thumb { background: var(--divider-color); border-radius: 2px; }
         :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar-track { background: transparent; }
 
         /* Fixed actions zone (lock + timed preset) */
@@ -396,8 +399,7 @@ export const gunmalmgStyles = css`
           width: max-content;
         }
 
-        /* Make the more-info icon more visible on dark background */
-        :host([theme="gunmalmg"]) .more-info { color: #e6e6e6; z-index: 6; }
+        :host([theme="gunmalmg"]) .more-info { color: var(--primary-text-color); z-index: 6; }
 
         /* Lock button styles */
         :host([theme="gunmalmg"]) .gunmalmg-lock-btn {
@@ -447,10 +449,10 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) .gunmalmg-timed-input {
           width: 35px;
           height: 25px;
-          border: 1px solid rgba(255,255,255,0.15);
+          border: 1px solid var(--divider-color);
           border-radius: 8px;
-          background: #2b2b2b;
-          color: #e6e6e6;
+          background: var(--secondary-background-color);
+          color: var(--primary-text-color);
           font-size: 12px;
           text-align: center;
           outline: none;
@@ -471,10 +473,10 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) .gunmalmg-timed-select {
           width: 40px;
           height: 30px;
-          border: 1px solid rgba(255,255,255,0.15);
+          border: 1px solid var(--divider-color);
           border-radius: 8px;
-          background: #2b2b2b;
-          color: #e6e6e6;
+          background: var(--secondary-background-color);
+          color: var(--primary-text-color);
           font-size: 10px;
           text-align: center;
           outline: none;
@@ -491,9 +493,9 @@ export const gunmalmgStyles = css`
           border-color: #f9a21f;
           color: #f9a21f;
         }
-        :host([theme="gunmalmg"]) .theme-menu { background: #1b1b1b; color: #e6e6e6; border-color: rgba(255,255,255,0.06); }
-        :host([theme="gunmalmg"]) .theme-menu-item { color: #e6e6e6; }
-        :host([theme="gunmalmg"]) .theme-menu-header { display:flex; align-items:center; justify-content:space-between; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        :host([theme="gunmalmg"]) .theme-menu { background: var(--card-background-color); color: var(--primary-text-color); border-color: var(--divider-color); }
+        :host([theme="gunmalmg"]) .theme-menu-item { color: var(--primary-text-color); }
+        :host([theme="gunmalmg"]) .theme-menu-header { display:flex; align-items:center; justify-content:space-between; padding: 8px 12px; border-bottom: 1px solid var(--divider-color); }
         :host([theme="gunmalmg"]) .theme-menu-title { font-weight:600; cursor:pointer; }
 
         /* Gunmalmg center clickable area */
