@@ -36,10 +36,10 @@
         "section_all_themes": "Dla wszystkich motywów",
         "section_classic_only": "Dla motywu klasycznego, bez koloru i VTherm",
         "menu_system": "Menu systemowe",
-        "lock_relock_delay": "Autoblokada zwłoki (w sek., 0 = wyłączona)",
         "disable_presets": "Wyłącz presety",
         "disable_timed_preset": "Wyłącz czas trwania presetu",
-        "use_manual_duration_input": "Zamiast selektora zezwól na ręczne ustawienie czasu"
+        "use_manual_duration_input": "Zamiast selektora zezwól na ręczne ustawienie czasu",
+        "allow_preset_modification": "Zezwól na modyfikację temperatur ustawień wstępnych"
       }
     }
   },
@@ -133,6 +133,12 @@
     "cancel_timed_preset": "Usuń preset czasowy",
     "increase_temp": "Zwiększ temperaturę",
     "decrease_temp": "Obniż temperaturę",
-    "not_initialized": "Błąd inicjalizacji"
+    "not_initialized": "Błąd inicjalizacji",
+    "preset_mod_title": "Temperatury ustawień wstępnych",
+    "preset_mod_no_entities": "Nie znaleziono jednostek temperatury ustawień wstępnych dla tego urządzenia.",
+    "preset_row_heat": "Ogrzewanie",
+    "preset_row_heat_away": "Ogrzewanie (nieobecność)",
+    "preset_row_cool": "Chłodzenie",
+    "preset_row_cool_away": "Chłodzenie (nieobecność)"
   }
 }

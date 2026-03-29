@@ -37,10 +37,10 @@
         "disable_auto_fan_infos": "Disable auto-fan infos",
         "disable_name": "Disable name",
         "disable_target_icon": "Disable the target icon",
-        "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
-        "use_manual_duration_input": "Allow manual duration input instead of selector"
+        "use_manual_duration_input": "Allow manual duration input instead of selector",
+        "allow_preset_modification": "Позволи промяна на температурите на предварителни настройки"
       }
     }
   },
@@ -129,7 +129,13 @@
     "cancel_timed_preset": "Cancel timed preset",
     "increase_temp": "Increase temperature",
     "decrease_temp": "Decrease temperature",
-    "not_initialized": "Initialisation error"
+    "not_initialized": "Initialisation error",
+    "preset_mod_title": "Температури на предварителни настройки",
+    "preset_mod_no_entities": "Не са намерени обекти за температура на предварителни настройки за това устройство.",
+    "preset_row_heat": "Отопление",
+    "preset_row_heat_away": "Отопление (отсъствие)",
+    "preset_row_cool": "Охлаждане",
+    "preset_row_cool_away": "Охлаждане (отсъствие)"
   },
   "theme": "Тема",
   "theme_classic": "Класически",

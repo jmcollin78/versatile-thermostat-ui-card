@@ -36,10 +36,10 @@
         "disable_name": "Disable name",
         "disable_target_icon": "Disable the target icon",
         "allow_lock_toggle": "Allow lock/unlock from card",
-        "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
-        "use_manual_duration_input": "Allow manual duration input instead of selector"
+        "use_manual_duration_input": "Allow manual duration input instead of selector",
+        "allow_preset_modification": "Allow preset temperature modification"
       }
     }
   },
@@ -128,6 +128,12 @@
     "cooling_failure": "Cooling failure detected",
     "increase_temp": "Increase temperature",
     "decrease_temp": "Decrease temperature",
-    "not_initialized": "Initialisation error"
+    "not_initialized": "Initialisation error",
+    "preset_mod_title": "Preset temperatures",
+    "preset_mod_no_entities": "No preset temperature entities found for this device.",
+    "preset_row_heat": "Heat",
+    "preset_row_heat_away": "Heat away",
+    "preset_row_cool": "Cool",
+    "preset_row_cool_away": "Cool away"
   }
 }

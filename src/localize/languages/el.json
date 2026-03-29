@@ -36,10 +36,10 @@
         "disable_auto_fan_infos": "Disable auto-fan infos",
         "disable_name": "Disable name",
         "disable_target_icon": "Disable the target icon",
-        "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
-        "use_manual_duration_input": "Allow manual duration input instead of selector"
+        "use_manual_duration_input": "Allow manual duration input instead of selector",
+        "allow_preset_modification": "Να επιτρέπεται η τροποποίηση θερμοκρασιών προεπιλογής"
       }
     }
   },
@@ -128,7 +128,13 @@
     "cancel_timed_preset": "Cancel timed preset",
     "increase_temp": "Increase temperature",
     "decrease_temp": "Decrease temperature",
-    "not_initialized": "Initialisation error"
+    "not_initialized": "Initialisation error",
+    "preset_mod_title": "Θερμοκρασίες προεπιλογής",
+    "preset_mod_no_entities": "Δεν βρέθηκαν οντότητες θερμοκρασίας προεπιλογής για αυτή τη συσκευή.",
+    "preset_row_heat": "Θέρμανση",
+    "preset_row_heat_away": "Θέρμανση (απουσία)",
+    "preset_row_cool": "Ψύξη",
+    "preset_row_cool_away": "Ψύξη (απουσία)"
   },
   "theme": "Θέμα",
   "theme_classic": "Κλασικό",

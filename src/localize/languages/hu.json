@@ -37,10 +37,10 @@
         "disable_auto_fan_infos": "Disable auto-fan infos",
         "disable_name": "Disable name",
         "disable_target_icon": "Disable the target icon",
-        "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
-        "use_manual_duration_input": "Allow manual duration input instead of selector"
+        "use_manual_duration_input": "Allow manual duration input instead of selector",
+        "allow_preset_modification": "Előbeállítási hőmérsékletek módosításának engedélyezése"
       }
     }
   },
@@ -129,7 +129,13 @@
     "cancel_timed_preset": "Cancel timed preset",
     "increase_temp": "Increase temperature",
     "decrease_temp": "Decrease temperature",
-    "not_initialized": "Initialisation error"
+    "not_initialized": "Initialisation error",
+    "preset_mod_title": "Előbeállítási hőmérsékletek",
+    "preset_mod_no_entities": "Nem találhatók előbeállítási hőmérséklet entitások ehhez az eszközhöz.",
+    "preset_row_heat": "Fűtés",
+    "preset_row_heat_away": "Fűtés (távol)",
+    "preset_row_cool": "Hűtés",
+    "preset_row_cool_away": "Hűtés (távol)"
   },
   "theme": "Téma",
   "theme_classic": "Klasszikus",

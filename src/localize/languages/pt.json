@@ -37,10 +37,10 @@
         "disable_auto_fan_infos": "Disable auto-fan infos",
         "disable_name": "Disable name",
         "disable_target_icon": "Disable the target icon",
-        "lock_relock_delay": "Auto-relock delay (seconds, 0 = disabled)",
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
-        "use_manual_duration_input": "Allow manual duration input instead of selector"
+        "use_manual_duration_input": "Allow manual duration input instead of selector",
+        "allow_preset_modification": "Permitir modificação das temperaturas de predefinição"
       }
     }
   },
@@ -129,6 +129,12 @@
     "cancel_timed_preset": "Cancel timed preset",
     "increase_temp": "Increase temperature",
     "decrease_temp": "Decrease temperature",
-    "not_initialized": "Initialisation error"
+    "not_initialized": "Initialisation error",
+    "preset_mod_title": "Temperaturas das predefinições",
+    "preset_mod_no_entities": "Nenhuma entidade de temperatura de predefinição encontrada para este dispositivo.",
+    "preset_row_heat": "Aquecimento",
+    "preset_row_heat_away": "Aquecimento (ausente)",
+    "preset_row_cool": "Arrefecimento",
+    "preset_row_cool_away": "Arrefecimento (ausente)"
   }
 }
