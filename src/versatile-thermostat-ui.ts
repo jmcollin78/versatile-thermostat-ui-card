@@ -1276,12 +1276,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         padding: 0 8px;
       }
 
-      /* Dans le popup gunmalmg : dans le flux normal, pleine largeur */
+      /* Dans le popup gunmalmg : positionné en absolu en bas du classic-popup-content (position: relative) */
       .preset-mod-panel.in-popup {
-        width: 100%;
-        margin-top: 8px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--ha-card-background, var(--card-background-color, #fff));
+        border-radius: 0 0 12px 12px;
+        z-index: 4;
         border-top: 1px solid var(--divider-color, #e0e0e0);
-        padding: 0 4px;
+        padding: 0 8px;
       }
 
       .preset-mod-header {

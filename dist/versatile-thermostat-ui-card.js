@@ -405,7 +405,7 @@ const Ys=270;const Xs=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
         }
       `}};function Qs(e){var t,o;return F`
     <ha-card class="gunmalmg-card ${e.hvacMode} ${e._isLocked?"locked":""}">
-      ${e._showClassicPopup?function(e){var t;return F`
+      ${e._showClassicPopup?function(e){var t,o;return F`
     <div class="classic-popup-backdrop" @click=${()=>e._closeClassicPopup()}></div>
     <div class="classic-popup-container">
       <ha-icon-button
@@ -423,7 +423,7 @@ const Ys=270;const Xs=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
           tabindex="0"
         ></ha-icon-button>
       `}
-      <div class="classic-popup-content">
+      <div class="classic-popup-content ${(null===(o=e._config)||void 0===o?void 0:o.allow_preset_modification)?"has-preset-mod":""}">
         ${e._renderClassicContent(!0)}
       </div>
     </div>
@@ -950,6 +950,10 @@ const Ys=270;const Xs=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
           flex-direction: column;
           align-items: center;
           justify-content: center;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content.has-preset-mod {
+          padding-bottom: calc(1em + 38px);
         }
 
         /* Name */
@@ -2436,12 +2440,17 @@ const Ys=270;const Xs=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
         padding: 0 8px;
       }
 
-      /* Dans le popup gunmalmg : dans le flux normal, pleine largeur */
+      /* Dans le popup gunmalmg : positionné en absolu en bas du classic-popup-content (position: relative) */
       .preset-mod-panel.in-popup {
-        width: 100%;
-        margin-top: 8px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--ha-card-background, var(--card-background-color, #fff));
+        border-radius: 0 0 12px 12px;
+        z-index: 4;
         border-top: 1px solid var(--divider-color, #e0e0e0);
-        padding: 0 4px;
+        padding: 0 8px;
       }
 
       .preset-mod-header {

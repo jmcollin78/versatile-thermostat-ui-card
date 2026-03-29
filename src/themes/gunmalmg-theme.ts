@@ -24,7 +24,7 @@ export function renderClassicPopup(ctx: any): TemplateResult {
           tabindex="0"
         ></ha-icon-button>
       ` : ''}
-      <div class="classic-popup-content">
+      <div class="classic-popup-content ${ctx._config?.allow_preset_modification ? 'has-preset-mod' : ''}">
         ${ctx._renderClassicContent(true)}
       </div>
     </div>
@@ -578,6 +578,10 @@ export const gunmalmgStyles = css`
           flex-direction: column;
           align-items: center;
           justify-content: center;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content.has-preset-mod {
+          padding-bottom: calc(1em + 38px);
         }
 
         /* Name */
