@@ -39,6 +39,7 @@
         "disable_presets": "Désactiver les presets",
         "disable_timed_preset": "Désactiver le champ de durée du preset temporisé",
         "use_manual_duration_input": "Permettre la saisie manuelle de la durée",
+        "allow_preset_modification": "Permettre la modification des températures de preset",
         "disable_menu": "Disable menu"
       }
     }
@@ -129,6 +130,12 @@
     "night_mode": "Mode nuit",
     "undefined": "Aucun",
     "auto_fan_boost": "Boost",
-    "not_initialized": "Erreur d'initialisation"
+    "not_initialized": "Erreur d'initialisation",
+    "preset_mod_title": "Températures des presets",
+    "preset_mod_no_entities": "Aucune entité de température de preset trouvée pour cet appareil.",
+    "preset_row_heat": "Chauffe",
+    "preset_row_heat_away": "Chauffe absent",
+    "preset_row_cool": "Clim.",
+    "preset_row_cool_away": "Clim. absent"
   }
 }

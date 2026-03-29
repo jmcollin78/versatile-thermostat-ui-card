@@ -59,7 +59,9 @@ import {
   mdiUpdate,
   mdiLock,
   mdiLockOpen,
-  mdiBackspaceOutline
+  mdiBackspaceOutline,
+  mdiChevronDown,
+  mdiChevronUp
 } from "@mdi/js";
 
 import {
@@ -151,6 +153,14 @@ const hvacOffReasonAutoStartStop="hvac_off_auto_start_stop";
 const autoStartStopLevels=["auto_start_stop_slow", "auto_start_stop_medium", "auto_start_stop_fast"];
 
 const minPowerWatt=7;
+
+/** Describes a number entity that controls a preset temperature */
+interface PresetTempEntityInfo {
+  entityId: string;
+  preset: 'frost' | 'eco' | 'comfort' | 'boost';
+  mode: 'heat' | 'cool';
+  away: boolean;
+}
 
 const THEMES = {
   CLASSIC: 'classic',
@@ -417,6 +427,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @state() private timedPresetActive: boolean = false;
   @state() private timedPresetRemainingTime: number | null = null;
   @state() private timedPresetPreset: string | null = null;
+  @state() private _presetsPanelOpen: boolean = false;
+  @state() private _presetTempEntities: PresetTempEntityInfo[] = [];
 
   setConfig(config: ClimateCardConfig): void {
     this._config = {
@@ -1241,6 +1253,116 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
         40%, 60% { transform: translate3d(4px, 0, 0); }
       }
+
+      /* ── Preset modification collapsible panel ── */
+      .preset-mod-panel {
+        width: 100%;
+        margin-top: 8px;
+        border-top: 1px solid var(--divider-color, #e0e0e0);
+      }
+
+      .preset-mod-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        padding: 6px 4px;
+        user-select: none;
+        color: var(--secondary-text-color);
+      }
+
+      .preset-mod-header:hover {
+        color: var(--primary-text-color);
+      }
+
+      .preset-mod-title {
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .preset-mod-chevron {
+        --mdc-icon-size: 18px;
+        transition: transform 0.2s ease;
+      }
+
+      .preset-mod-chevron.open {
+        transform: rotate(180deg);
+      }
+
+      .preset-mod-body {
+        padding: 4px 0 8px 0;
+        animation: fadeIn 0.15s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-4px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .preset-mod-empty {
+        font-size: 12px;
+        color: var(--secondary-text-color);
+        text-align: center;
+        padding: 8px;
+      }
+
+      .preset-temp-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+
+      .preset-temp-table th,
+      .preset-temp-table td {
+        padding: 3px 4px;
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      .preset-temp-col-label {
+        font-weight: 600;
+        color: var(--secondary-text-color);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .preset-temp-row-label {
+        text-align: left !important;
+        color: var(--secondary-text-color);
+        font-size: 11px;
+        white-space: nowrap;
+        padding-right: 6px;
+      }
+
+      .preset-temp-cell.empty {
+        color: var(--disabled-text-color, #bbb);
+      }
+
+      .preset-temp-input {
+        width: 52px;
+        padding: 3px 4px;
+        border: 1px solid var(--divider-color, #ccc);
+        border-radius: 4px;
+        background: var(--card-background-color, #fff);
+        color: var(--primary-text-color);
+        font-size: 12px;
+        text-align: center;
+        -moz-appearance: textfield;
+      }
+
+      .preset-temp-input::-webkit-outer-spin-button,
+      .preset-temp-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      .preset-temp-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+      }
       }
 
       @keyframes shake {
@@ -1278,6 +1400,115 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _closeClassicPopup() {
     this._showClassicPopup = false;
     this.displayMessages = false;
+  }
+
+  /**
+   * Renders the collapsible preset temperature modification panel.
+   * Shows a table with 4 columns (Frost, Eco, Comfort, Boost) and rows
+   * for heat/cool × present/away combinations, based on discovered entities.
+   */
+  private _renderPresetModificationPanel(): TemplateResult {
+    if (!this._config?.allow_preset_modification) return html``;
+
+    const presetCols: PresetTempEntityInfo['preset'][] = ['frost', 'eco', 'comfort', 'boost'];
+    const presetLabels: Record<PresetTempEntityInfo['preset'], string> = {
+      frost: localize({ hass: this.hass, string: 'extra_states.frost' }),
+      eco: localize({ hass: this.hass, string: 'extra_states.eco' }),
+      comfort: localize({ hass: this.hass, string: 'extra_states.comfort' }),
+      boost: localize({ hass: this.hass, string: 'extra_states.boost' }),
+    };
+
+    // Build lookup map: "mode_away_preset" -> entityId
+    const lookup = new Map<string, string>();
+    for (const info of this._presetTempEntities) {
+      const key = `${info.mode}_${info.away ? 'away' : 'present'}_${info.preset}`;
+      lookup.set(key, info.entityId);
+    }
+
+    // Determine which rows have at least one entity
+    const rows: Array<{ mode: 'heat' | 'cool', away: boolean, labelKey: string }> = [
+      { mode: 'heat' as const, away: false, labelKey: 'extra_states.preset_row_heat' },
+      { mode: 'heat' as const, away: true,  labelKey: 'extra_states.preset_row_heat_away' },
+      { mode: 'cool' as const, away: false, labelKey: 'extra_states.preset_row_cool' },
+      { mode: 'cool' as const, away: true,  labelKey: 'extra_states.preset_row_cool_away' },
+    ].filter(row =>
+      presetCols.some(p => lookup.has(`${row.mode}_${row.away ? 'away' : 'present'}_${p}`))
+    );
+
+    const hasAnyEntity = this._presetTempEntities.length > 0;
+
+    const renderCell = (mode: 'heat' | 'cool', away: boolean, preset: PresetTempEntityInfo['preset']) => {
+      const key = `${mode}_${away ? 'away' : 'present'}_${preset}`;
+      const entityId = lookup.get(key);
+      if (!entityId) return html`<td class="preset-temp-cell empty">–</td>`;
+      const state = this.hass?.states[entityId];
+      const val = state ? parseFloat(state.state) : null;
+      const stepAttr = state?.attributes?.step ?? 0.5;
+      const minAttr = state?.attributes?.min ?? 7;
+      const maxAttr = state?.attributes?.max ?? 35;
+      return html`
+        <td class="preset-temp-cell">
+          <input
+            type="number"
+            class="preset-temp-input"
+            .value=${val !== null && !isNaN(val) ? String(val) : ''}
+            step=${stepAttr}
+            min=${minAttr}
+            max=${maxAttr}
+            @change=${(ev: Event) => {
+              const newVal = parseFloat((ev.target as HTMLInputElement).value);
+              if (!isNaN(newVal)) {
+                this.hass.callService('number', 'set_value', { entity_id: entityId, value: newVal });
+              }
+            }}
+          />
+        </td>
+      `;
+    };
+
+    return html`
+      <div class="preset-mod-panel">
+        <div
+          class="preset-mod-header"
+          @click=${() => { this._presetsPanelOpen = !this._presetsPanelOpen; }}
+          title=${localize({ hass: this.hass, string: 'extra_states.preset_mod_title' })}
+        >
+          <span class="preset-mod-title">${localize({ hass: this.hass, string: 'extra_states.preset_mod_title' })}</span>
+          <ha-svg-icon
+            class="preset-mod-chevron ${this._presetsPanelOpen ? 'open' : ''}"
+            .path=${this._presetsPanelOpen ? mdiChevronUp : mdiChevronDown}
+          ></ha-svg-icon>
+        </div>
+        ${this._presetsPanelOpen ? html`
+          <div class="preset-mod-body">
+            ${!hasAnyEntity ? html`
+              <div class="preset-mod-empty">
+                ${localize({ hass: this.hass, string: 'extra_states.preset_mod_no_entities' })}
+              </div>
+            ` : html`
+              <table class="preset-temp-table">
+                <thead>
+                  <tr>
+                    <th class="preset-temp-row-label"></th>
+                    ${presetCols.map(p => html`<th class="preset-temp-col-label">${presetLabels[p]}</th>`)}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rows.map(row => html`
+                    <tr>
+                      <td class="preset-temp-row-label">
+                        ${localize({ hass: this.hass, string: row.labelKey })}
+                      </td>
+                      ${presetCols.map(p => renderCell(row.mode, row.away, p))}
+                    </tr>
+                  `)}
+                </tbody>
+              </table>
+            `}
+          </div>
+        ` : ''}
+      </div>
+    `;
   }
 
   /**
@@ -1528,6 +1759,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             `
         : ''}
     </div>
+    ${this._renderPresetModificationPanel()}
     `;
     this._renderingAsClassic = false;
     return result;
@@ -1672,6 +1904,67 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
   }
 
+  /**
+   * Classifie un entity_id en PresetTempEntityInfo en analysant son nom.
+   * Retourne null si l'entité ne correspond pas à un preset de température.
+   */
+  private _classifyPresetEntity(entityId: string): PresetTempEntityInfo | null {
+    const id = entityId.toLowerCase();
+    // Détecter mode cool (présence de _cool_ dans l'id)
+    const isCool = /_cool_/.test(id) || id.endsWith('_cool');
+    // Détecter absent/away
+    const isAway = id.includes('_away');
+    // Détecter le preset
+    let preset: PresetTempEntityInfo['preset'] | null = null;
+    if (id.includes('frost') || id.includes('hors_gel')) preset = 'frost';
+    else if (id.includes('eco')) preset = 'eco';
+    else if (id.includes('comfort')) preset = 'comfort';
+    else if (id.includes('boost')) preset = 'boost';
+    if (!preset) return null;
+    return { entityId, preset, mode: isCool ? 'cool' : 'heat', away: isAway };
+  }
+
+  /**
+   * Découvre automatiquement les entités de type number + device_class temperature
+   * liées au même appareil que l'entité vtherm configurée.
+   */
+  private _discoverPresetTempEntities(): void {
+    if (!this.hass || !this._config?.entity) return;
+    const hassAny = this.hass as any;
+    const entityRegistry: Record<string, any> | undefined = hassAny.entities;
+    if (!entityRegistry) {
+      if (DEBUG) console.log(`[PresetMod] hass.entities not available`);
+      return;
+    }
+    // Trouver le device_id de l'entité climate
+    const climateEntry = entityRegistry[this._config.entity];
+    if (!climateEntry?.device_id) {
+      if (DEBUG) console.log(`[PresetMod] No device_id for entity ${this._config.entity}`);
+      return;
+    }
+    const deviceId = climateEntry.device_id;
+    if (DEBUG) console.log(`[PresetMod] device_id=${deviceId}`);
+    const found: PresetTempEntityInfo[] = [];
+    for (const [entityId, entry] of Object.entries(entityRegistry)) {
+      if (entry.device_id !== deviceId) continue;
+      if (!entityId.startsWith('number.')) continue;
+      const state = this.hass.states[entityId];
+      if (!state) continue;
+      if (state.attributes?.device_class !== 'temperature') continue;
+      const info = this._classifyPresetEntity(entityId);
+      if (info) {
+        if (DEBUG) console.log(`[PresetMod] found entity: ${entityId} preset=${info.preset} mode=${info.mode} away=${info.away}`);
+        found.push(info);
+      }
+    }
+    // Mettre à jour seulement si le contenu a changé (pour éviter re-renders inutiles)
+    const oldIds = this._presetTempEntities.map(e => e.entityId).join(',');
+    const newIds = found.map(e => e.entityId).join(',');
+    if (oldIds !== newIds) {
+      this._presetTempEntities = found;
+    }
+  }
+
   public willUpdate(changedProps: PropertyValues) {
       if (!this.hass || !this._config || (!changedProps.has("hass") && !changedProps.has("_config"))) {
           return;
@@ -1681,6 +1974,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
       this._willUpdatePower();
       
+      if (this._config?.allow_preset_modification) {
+        this._discoverPresetTempEntities();
+      }
+
       const stateObj = this.hass.states[entity_id] as ClimateEntity;
       if (!stateObj) {
           if (DEBUG) console.log(`No state`);

@@ -58,6 +58,7 @@ export type ClimateCardConfig = LovelaceCardConfig &
         disable_presets?: boolean;
         disable_timed_preset?: boolean;
         use_manual_duration_input?: boolean;
+        allow_preset_modification?: boolean;
     };
 
 export const climateCardConfigStruct = assign(
@@ -89,6 +90,7 @@ export const climateCardConfigStruct = assign(
         disable_presets: optional(boolean()),
         theme: optional(union([literal('classic'), literal('vtherm'), literal('uncolored'), literal('gunmalmg')])),
         disable_timed_preset: optional(boolean()),
-        use_manual_duration_input: optional(boolean())
+        use_manual_duration_input: optional(boolean()),
+        allow_preset_modification: optional(boolean())
     })
 );
