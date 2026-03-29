@@ -1254,11 +1254,34 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         40%, 60% { transform: translate3d(4px, 0, 0); }
       }
 
+      ha-card.has-preset-mod {
+        padding-bottom: 38px;
+      }
+
       /* ── Preset modification collapsible panel ── */
       .preset-mod-panel {
+        box-sizing: border-box;
+      }
+
+      /* Dans la carte principale : positionné en absolu en bas, hors du flux flex */
+      .preset-mod-panel.in-card {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--ha-card-background, var(--card-background-color, #fff));
+        border-radius: 0 0 var(--ha-card-border-radius, 12px) var(--ha-card-border-radius, 12px);
+        z-index: 4;
+        border-top: 1px solid var(--divider-color, #e0e0e0);
+        padding: 0 8px;
+      }
+
+      /* Dans le popup gunmalmg : dans le flux normal, pleine largeur */
+      .preset-mod-panel.in-popup {
         width: 100%;
         margin-top: 8px;
         border-top: 1px solid var(--divider-color, #e0e0e0);
+        padding: 0 4px;
       }
 
       .preset-mod-header {
@@ -1467,7 +1490,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     };
 
     return html`
-      <div class="preset-mod-panel">
+      <div class="preset-mod-panel ${this._renderingAsClassic ? 'in-popup' : 'in-card'}">
         <div
           class="preset-mod-header"
           @click=${() => { this._presetsPanelOpen = !this._presetsPanelOpen; }}
@@ -2903,6 +2926,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
    <ha-card class=${classMap({
      [this.hvacMode]: true,
      locked: this.isUserLocked,
+     'has-preset-mod': !!this._config?.allow_preset_modification,
    })}
    >
     ${this._config?.disable_menu ? `` : html`
