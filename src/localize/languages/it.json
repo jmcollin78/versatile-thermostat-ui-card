@@ -35,7 +35,6 @@
         "disable_name": "Disabilita nome",
         "disable_target_icon": "Disabilita  icona obbiettivo",
         "allow_lock_toggle": "Consenti blocco/sblocco dalla card",
-        "lock_relock_delay": "Ritardo del blocco automatico (in secondi, 0 = disattivato)",
         "disable_sleep": "Disabilita modo riposo",
         "disable_timed_preset": "Disattiva immissione durata preimpostata",
         "use_manual_duration_input": "Consenti l'inserimento manuale della durata invece della selezione",

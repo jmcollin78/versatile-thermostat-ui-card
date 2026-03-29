@@ -54,7 +54,6 @@ export type ClimateCardConfig = LovelaceCardConfig &
         eco_temperature?: number;
         disable_buttons?: boolean;
         allow_lock_toggle?: boolean;
-        lock_relock_delay?: number;
         disable_presets?: boolean;
         disable_timed_preset?: boolean;
         use_manual_duration_input?: boolean;
@@ -86,7 +85,6 @@ export const climateCardConfigStruct = assign(
         disable_menu: optional(boolean()),
         disable_buttons: optional(boolean()),
         allow_lock_toggle: optional(boolean()),
-        lock_relock_delay: optional(number()),
         disable_presets: optional(boolean()),
         theme: optional(union([literal('classic'), literal('vtherm'), literal('uncolored'), literal('gunmalmg')])),
         disable_timed_preset: optional(boolean()),

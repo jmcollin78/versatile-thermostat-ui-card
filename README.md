@@ -27,11 +27,15 @@
   - [Disable the auto-fan mode](#disable-the-auto-fan-mode)
   - [By-pass the window detection](#by-pass-the-window-detection)
   - [Lock/Unlock the thermostat](#lockunlock-the-thermostat)
-    - [Auto-relock feature](#auto-relock-feature)
   - [Timed preset](#timed-preset)
     - [How to use](#how-to-use)
     - [When a timed preset is active](#when-a-timed-preset-is-active)
     - [Configuration options](#configuration-options)
+  - [Modify preset temperatures](#modify-preset-temperatures)
+    - [How it works](#how-it-works)
+    - [The temperature table](#the-temperature-table)
+    - [The stepper input](#the-stepper-input)
+    - [Entity discovery](#entity-discovery)
 - [Informations on current state](#informations-on-current-state)
   - [Display some messages](#display-some-messages)
   - [Update of underlying scheduled](#update-of-underlying-scheduled)
@@ -198,6 +202,7 @@ Then you can add the new card into your dashboard.
 | lock_relock_delay         | number  | **Optional** | Delay in seconds after which the card will automatically re-lock after being unlocked. Set to 0 or omit to disable auto-relock. |
 | disable_timed_preset      | boolean | **Optional** | true to hide the timed preset duration selector next to preset icons. |
 | use_manual_duration_input | boolean | **Optional** | true to use a manual input field instead of the preset duration selector (15min, 30min, 1h, 4h, 8h, 24h). |
+| allow_preset_modification | boolean | **Optional** | true to show a collapsible panel at the bottom of the card allowing direct editing of preset temperatures (Frost, Eco, Comfort, Boost) for each HVAC mode and away/present combination. |
 
 ### Classical, VTherm and Uncolored themes only
 
@@ -259,18 +264,6 @@ This requires the `allow_lock_toggle` option to be set to `true` in the card con
 
 The lock should be configured in the _VTherm_ integration in order to have a full feature. See [here](https://github.com/jmcollin78/versatile_thermostat/blob/main/documentation/en/feature-lock.md).
 
-### Auto-relock feature
-
-You can configure an auto-relock delay using the `lock_relock_delay` option. When set, the card will automatically re-lock itself after the specified number of seconds following an unlock action.
-
-Example with auto-relock after 60 seconds:
-```yaml
-type: custom:versatile-thermostat-ui-card
-entity: climate.living_room
-allow_lock_toggle: true
-lock_relock_delay: 60
-```
-
 ## Timed preset
 
 The timed preset feature allows you to temporarily switch to a preset for a specific duration. After the duration expires, the thermostat will automatically return to its previous preset.
@@ -330,6 +323,78 @@ type: custom:versatile-thermostat-ui-card
 entity: climate.living_room
 disable_timed_preset: true
 ```
+
+## Modify preset temperatures
+
+The **preset temperature modification** panel lets you edit the target temperatures of each preset directly from the card, without opening Home Assistant's entity settings.
+
+To enable it, add `allow_preset_modification: true` to your card configuration:
+
+```yaml
+type: custom:versatile-thermostat-ui-card
+entity: climate.living_room
+allow_preset_modification: true
+```
+
+When the option is enabled, a collapsible panel appears at the bottom of the card, allowing you to view and edit the preset temperatures for each HVAC mode and presence combination (heat, heat away, cool, cool away).
+
+![preset temperature modification](assets/update-preset-temperature1.png)
+
+click to expand the panel:
+
+![preset temperature modification expanded](assets/update-preset-temperature2.png)
+
+### How it works
+
+A collapsible bar is permanently attached to the bottom of the card (or the popup for the Gunmalmg theme). A header row shows the title and a **chevron** indicator:
+- **▲** (chevron up) — panel is **closed**
+- **▼** (chevron down) — panel is **open**
+
+Click the header to toggle the panel open or closed.
+
+### The temperature table
+
+When open, the panel shows a table with up to **4 rows** and **4 columns**:
+
+**Columns** — one per preset, color-coded for quick identification:
+| Column | Color |
+|--------|-------|
+| Frost  | 🔵 Blue |
+| Eco    | 🟢 Green |
+| Comfort | 🟠 Orange |
+| Boost  | 🔴 Red |
+
+**Rows** — one per HVAC mode × presence combination (only rows that have at least one matching entity are displayed):
+| Row | Description |
+|-----|-------------|
+| Heat | Target temperature when heating and occupant is present |
+| Heat away | Target temperature when heating and occupant is absent |
+| Cool | Target temperature when cooling and occupant is present |
+| Cool away | Target temperature when cooling and occupant is absent |
+
+> The Cool and Cool away rows are shown only if the thermostat supports cooling mode (entities named `*_ac_temp` or `*_ac_away_temp` are detected automatically).
+
+### The stepper input
+
+Each cell contains a compact **stepper** widget:
+
+```
+┌───────┬──┐
+│ 19.5  │+ │
+│       ├──┤
+│       │− │
+└───────┴──┘
+```
+
+- The **input field** shows the current temperature and can be edited directly.
+- The **+** button (top) increments the value by one `step` (as defined by the entity).
+- The **−** button (bottom) decrements the value by one `step`.
+- Values are automatically clamped to the entity's `min` / `max` bounds.
+- The buttons are tinted with the column's color for easy identification.
+
+### Entity discovery
+
+The panel automatically discovers all `number` entities with `device_class: temperature` that belong to the same device as the configured climate entity. No manual configuration is needed.
 
 # Informations on current state
 

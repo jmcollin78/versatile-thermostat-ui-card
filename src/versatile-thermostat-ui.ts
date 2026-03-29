@@ -392,7 +392,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _isLockConfigured: boolean = false;
   private _isLocked: boolean = false;
   private _hasLockCode: boolean = false;
-  private _relockTimeout: ReturnType<typeof setTimeout> | null = null;
   private _timeout: any;
   private _oldValueMin: number = 0;
   private _oldValueMax: number = 0;
@@ -1914,11 +1913,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       if (this._isLocked) {
         if (this._isLockConfigured) {
           await this.hass.callService("versatile_thermostat", "unlock", { entity_id: this._config!.entity });
-          this._startRelockTimeout();
         } else {
           this._isLocked = this.isUserLocked = false;
           this.requestUpdate();
-          this._startRelockTimeout();
         }
       } else {
         if (this._isLockConfigured) {
@@ -2831,9 +2828,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       return;
     }
 
-    // Annuler tout timer de reverrouillage existant
-    this._clearRelockTimeout();
-
     if (this._isLocked) {
       if (this._hasLockCode) {
         this.isLocking = false;
@@ -2845,14 +2839,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.hass.callService("versatile_thermostat", "unlock", {
           entity_id: this._config.entity,
         });
-        // Démarrer le timer de reverrouillage si configuré
-        this._startRelockTimeout();
       }
       else {
         this._isLocked = this.isUserLocked = false;
         this.requestUpdate();
-        // Démarrer le timer de reverrouillage si configuré
-        this._startRelockTimeout();
       }
     } else {
       if (this._hasLockCode) {
@@ -2871,37 +2861,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.requestUpdate();
         // this._updateDisplay();
       }
-    }
-  }
-
-  private _startRelockTimeout(): void {
-    const delay = this._config?.lock_relock_delay;
-    if (delay && delay > 0) {
-      this._relockTimeout = setTimeout(() => {
-        this._relockCard();
-      }, delay * 1000);
-    }
-  }
-
-  private _clearRelockTimeout(): void {
-    if (this._relockTimeout) {
-      clearTimeout(this._relockTimeout);
-      this._relockTimeout = null;
-    }
-  }
-
-  private _relockCard(): void {
-    if (!this._config?.entity || !this.hass) {
-      return;
-    }
-    
-    if (this._isLockConfigured) {
-      this.hass.callService("versatile_thermostat", "lock", {
-        entity_id: this._config.entity,
-      });
-    } else {
-      this._isLocked = this.isUserLocked = true;
-      this.requestUpdate();
     }
   }
 
@@ -2944,10 +2903,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         });
         // If successful, close the modal
         this._handleModalClose();
-        // Si c'était un déverrouillage, démarrer le timer de reverrouillage
-        if (!this.isLocking) {
-          this._startRelockTimeout();
-        }
       } catch (e) {
         // If error (wrong code), set error state and vibrate
         this.codeError = true;
@@ -3134,7 +3089,6 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener("keydown", this._handleKeyDown);
-    this._clearRelockTimeout();
   }
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     await import("./versatile-thermostat-ui-card-editor");

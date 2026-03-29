@@ -58,7 +58,6 @@ const CLIMATE_LABELS = [
     "disable_auto_fan_infos",
     "disable_target_icon",
     "allow_lock_toggle",
-    "lock_relock_delay",
     "disable_presets",
     "disable_timed_preset",
     "use_manual_duration_input",
@@ -88,7 +87,6 @@ const computeSchema = memoizeOne(
                 { name: "disable_safety_warning", selector: { boolean: {} } },
                 { name: "set_current_as_main", selector: { boolean: {} } },
                 { name: "allow_lock_toggle", selector: { boolean: {} } },
-                { name: "lock_relock_delay", selector: { number: { min: 0, max: 3600, unit_of_measurement: "s", mode: "box" } } },
                 { name: "disable_timed_preset", selector: { boolean: {} } },
                 { name: "use_manual_duration_input", selector: { boolean: {} } },
                 { name: "allow_preset_modification", selector: { boolean: {} } },
@@ -130,7 +128,7 @@ export class ClimateCardEditor extends LitElement implements LovelaceCardEditor 
     // Keys that belong to the "all themes" expandable section
     private static readonly ALL_THEMES_KEYS = [
         'disable_name', 'disable_safety_warning', 'set_current_as_main',
-        'allow_lock_toggle', 'lock_relock_delay', 'disable_timed_preset',
+        'allow_lock_toggle', 'disable_timed_preset',
         'use_manual_duration_input', 'allow_preset_modification',
     ];
 
