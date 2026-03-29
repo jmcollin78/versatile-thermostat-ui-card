@@ -1312,11 +1312,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
       .preset-mod-chevron {
         --mdc-icon-size: 18px;
-        transition: transform 0.2s ease;
       }
 
       .preset-mod-chevron.open {
-        transform: rotate(180deg);
+        /* no rotation - icon is swapped directly */
       }
 
       .preset-mod-body {
@@ -1370,15 +1369,18 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       .preset-temp-input {
-        width: 52px;
-        padding: 3px 4px;
+        width: 34px;
+        padding: 2px 1px;
         border: 1px solid var(--divider-color, #ccc);
-        border-radius: 4px;
+        border-right: none;
+        border-radius: 4px 0 0 4px;
         background: var(--card-background-color, #fff);
         color: var(--primary-text-color);
-        font-size: 12px;
+        font-size: 11px;
         text-align: center;
         -moz-appearance: textfield;
+        height: 26px;
+        box-sizing: border-box;
       }
 
       .preset-temp-input::-webkit-outer-spin-button,
@@ -1391,6 +1393,86 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         outline: none;
         border-color: var(--primary-color);
       }
+
+      /* Stepper: input + vertical ± buttons */
+      .preset-temp-stepper {
+        display: inline-flex;
+        flex-direction: row;
+        align-items: stretch;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      /* Vertical stack for + and − */
+      .preset-step-btns {
+        display: flex;
+        flex-direction: column;
+        width: 18px;
+        flex-shrink: 0;
+      }
+
+      .preset-step-btn {
+        flex: 1;
+        padding: 0;
+        border: 1px solid var(--divider-color, #ccc);
+        border-left: none;
+        background: var(--secondary-background-color, #f5f5f5);
+        color: var(--primary-text-color);
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        user-select: none;
+        line-height: 1;
+        transition: background-color 150ms ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .preset-step-up {
+        border-bottom: 1px solid var(--divider-color, #ccc);
+        border-radius: 0 4px 0 0;
+      }
+
+      .preset-step-down {
+        border-top: none;
+        border-radius: 0 0 4px 0;
+      }
+
+      .preset-step-btn:hover {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      .preset-step-btn:active {
+        opacity: 0.75;
+      }
+
+      /* Column colors */
+      .preset-temp-col-label.col-frost { color: #3a9ff2; }
+      .preset-temp-col-label.col-eco   { color: #5dd461; }
+      .preset-temp-col-label.col-comfort { color: #f9a21f; }
+      .preset-temp-col-label.col-boost  { color: #f75252; }
+
+      .preset-col-frost .preset-step-btn       { background: rgba(58,159,242,0.15); color: #3a9ff2; border-color: rgba(58,159,242,0.4); }
+      .preset-col-frost .preset-step-btn:hover  { background: #3a9ff2; color: white; }
+      .preset-col-frost .preset-step-up         { border-bottom-color: rgba(58,159,242,0.4); }
+      .preset-col-frost .preset-temp-input      { border-color: rgba(58,159,242,0.4); }
+
+      .preset-col-eco .preset-step-btn       { background: rgba(93,212,97,0.15); color: #5dd461; border-color: rgba(93,212,97,0.4); }
+      .preset-col-eco .preset-step-btn:hover  { background: #5dd461; color: white; }
+      .preset-col-eco .preset-step-up         { border-bottom-color: rgba(93,212,97,0.4); }
+      .preset-col-eco .preset-temp-input      { border-color: rgba(93,212,97,0.4); }
+
+      .preset-col-comfort .preset-step-btn       { background: rgba(249,162,31,0.15); color: #f9a21f; border-color: rgba(249,162,31,0.4); }
+      .preset-col-comfort .preset-step-btn:hover  { background: #f9a21f; color: white; }
+      .preset-col-comfort .preset-step-up         { border-bottom-color: rgba(249,162,31,0.4); }
+      .preset-col-comfort .preset-temp-input      { border-color: rgba(249,162,31,0.4); }
+
+      .preset-col-boost .preset-step-btn       { background: rgba(247,82,82,0.15); color: #f75252; border-color: rgba(247,82,82,0.4); }
+      .preset-col-boost .preset-step-btn:hover  { background: #f75252; color: white; }
+      .preset-col-boost .preset-step-up         { border-bottom-color: rgba(247,82,82,0.4); }
+      .preset-col-boost .preset-temp-input      { border-color: rgba(247,82,82,0.4); }
       }
 
       @keyframes shake {
@@ -1474,22 +1556,35 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       const stepAttr = state?.attributes?.step ?? 0.5;
       const minAttr = state?.attributes?.min ?? 7;
       const maxAttr = state?.attributes?.max ?? 35;
+      const applyValue = (newVal: number) => {
+        const clamped = Math.round(Math.min(maxAttr, Math.max(minAttr, newVal)) / stepAttr) * stepAttr;
+        const rounded = Math.round(clamped * 100) / 100;
+        this.hass.callService('number', 'set_value', { entity_id: entityId, value: rounded });
+      };
       return html`
-        <td class="preset-temp-cell">
-          <input
-            type="number"
-            class="preset-temp-input"
-            .value=${val !== null && !isNaN(val) ? String(val) : ''}
-            step=${stepAttr}
-            min=${minAttr}
-            max=${maxAttr}
-            @change=${(ev: Event) => {
-              const newVal = parseFloat((ev.target as HTMLInputElement).value);
-              if (!isNaN(newVal)) {
-                this.hass.callService('number', 'set_value', { entity_id: entityId, value: newVal });
-              }
-            }}
-          />
+        <td class="preset-temp-cell preset-col-${preset}">
+          <div class="preset-temp-stepper">
+            <input
+              type="number"
+              class="preset-temp-input"
+              .value=${val !== null && !isNaN(val) ? String(val) : ''}
+              step=${stepAttr}
+              min=${minAttr}
+              max=${maxAttr}
+              @change=${(ev: Event) => {
+                const newVal = parseFloat((ev.target as HTMLInputElement).value);
+                if (!isNaN(newVal)) applyValue(newVal);
+              }}
+            />
+            <div class="preset-step-btns">
+              <button class="preset-step-btn preset-step-up" @click=${() => {
+                if (val !== null && !isNaN(val)) applyValue(val + stepAttr);
+              }}>+</button>
+              <button class="preset-step-btn preset-step-down" @click=${() => {
+                if (val !== null && !isNaN(val)) applyValue(val - stepAttr);
+              }}>−</button>
+            </div>
+          </div>
         </td>
       `;
     };
@@ -1504,7 +1599,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           <span class="preset-mod-title">${localize({ hass: this.hass, string: 'extra_states.preset_mod_title' })}</span>
           <ha-svg-icon
             class="preset-mod-chevron ${this._presetsPanelOpen ? 'open' : ''}"
-            .path=${this._presetsPanelOpen ? mdiChevronUp : mdiChevronDown}
+            .path=${this._presetsPanelOpen ? mdiChevronDown : mdiChevronUp}
           ></ha-svg-icon>
         </div>
         ${this._presetsPanelOpen ? html`
@@ -1518,7 +1613,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
                 <thead>
                   <tr>
                     <th class="preset-temp-row-label"></th>
-                    ${presetCols.map(p => html`<th class="preset-temp-col-label">${presetLabels[p]}</th>`)}
+                    ${presetCols.map(p => html`<th class="preset-temp-col-label col-${p}">${presetLabels[p]}</th>`)}
                   </tr>
                 </thead>
                 <tbody>
