@@ -40,7 +40,8 @@
         "use_manual_duration_input": "Permettre la saisie manuelle de la durée",
         "allow_preset_modification": "Permettre la modification des températures de preset",
         "disable_menu": "Désactiver le menu",
-        "show_status_text": "Afficher l'état du HVAC en texte"
+        "show_status_text": "Afficher l'état du HVAC en texte",
+        "show_background_gradient_on_active": "Afficher le dégradé de fond du slider lorsque l'entité est active"
       }
     }
   },

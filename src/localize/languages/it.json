@@ -40,7 +40,8 @@
         "use_manual_duration_input": "Consenti l'inserimento manuale della durata invece della selezione",
         "disable_presets": "Disabilita preimpostazioni",
         "allow_preset_modification": "Consenti la modifica delle temperature dei preset",
-        "show_status_text": "Mostra lo stato attuale come testo"
+        "show_status_text": "Mostra lo stato attuale come testo",
+        "show_background_gradient_on_active": "Mostra il gradiente di sfondo del cursore quando l'entità è attiva"
       }
     }
   },

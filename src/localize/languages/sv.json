@@ -138,7 +138,8 @@
         "disable_timed_preset": "Disable timed preset duration input",
         "use_manual_duration_input": "Allow manual duration input instead of selector",
         "allow_preset_modification": "Tillåt ändring av förinställningstemperaturer",
-        "show_status_text": "Visa aktuell status som text"
+        "show_status_text": "Visa aktuell status som text",
+        "show_background_gradient_on_active": "Visa reglagets bakgrundsgradient när entiteten är aktiv"
       }
     }
   }
