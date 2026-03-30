@@ -13,7 +13,8 @@ const entitySharedConfigStruct = object({
     name: optional(string()),
     icon: optional(string()),
     autoStartStopEnableEntity: optional(string()),
-    powerEntity: optional(string())
+    powerEntity: optional(string()),
+    visibility: optional(any()),
 });
 type EntitySharedConfig = Infer<typeof entitySharedConfigStruct>;
 
