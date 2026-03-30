@@ -39,7 +39,8 @@
         "disable_timed_preset": "Désactiver le champ de durée du preset temporisé",
         "use_manual_duration_input": "Permettre la saisie manuelle de la durée",
         "allow_preset_modification": "Permettre la modification des températures de preset",
-        "disable_menu": "Disable menu"
+        "disable_menu": "Désactiver le menu",
+        "show_status_text": "Afficher l'état du HVAC en texte"
       }
     }
   },

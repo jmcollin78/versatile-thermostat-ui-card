@@ -1481,6 +1481,25 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
         40%, 60% { transform: translate3d(4px, 0, 0); }
       }
+      
+      .hvac-action-text-svg {
+        text-anchor: middle;
+        font-weight: var(--ha-font-weight-light);
+        font-size: 6px;
+        text-align: center;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: var(--ha-line-height-normal);
+        min-height: 1.5em;
+        white-space: nowrap;
+        filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.8));
+      }
+      .hvac-action-text-svg.heating {
+        fill: var(--hvac-mode-color, #f44336);
+      }
+      
   `, gunmalmgStyles, vthermStyles];
   // Additional theme styles
   static additionalThemeStyles = [vthermStyles];
@@ -1737,13 +1756,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
               ${
                 disableCircle ? svg`
-                  ${this._renderTemperature(this._display_top, true, "55", "60%", ! this?._config?.set_current_as_main)}
-                  ${this._renderTemperature(this._display_bottom, false, "90", "60%", this?._config?.set_current_as_main == true)}
+                  ${this._renderStatusText("62.5", "50")} 
+                  ${this._renderTemperature(this._display_top, true, "55", "62%", ! this?._config?.set_current_as_main)}
+                  ${this._renderTemperature(this._display_bottom, false, "90", "62%", this?._config?.set_current_as_main == true)}
                   <g class="current-info" transform="translate(100,65)">
                     ${this._renderHVACAction()}
                   </g>
                 `: svg`
-                  ${this._renderTemperature(this._display_top, true, "50%", "60%", ! this?._config?.set_current_as_main)}
+                  ${this._renderStatusText("62.5", "50")} 
+                  ${this._renderTemperature(this._display_top, true, "50%", "62%", ! this?._config?.set_current_as_main)}
                   <line x1="35" y1="72" x2="90" y2="72" stroke="#e7e7e8" stroke-width="0.5" />
                   <g class="current-info" transform="translate(62.5,80)">
                     ${this._renderTemperature(this._display_bottom, false, "-5%", "0%", this?._config?.set_current_as_main == true)}
@@ -2601,6 +2622,23 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       else return this?.value?.low || 0;
     }
     return this?.value?.value || 0;
+  }
+
+  private _renderStatusText(x: string, y: string): TemplateResult {
+    if (!this._config?.show_status_text || !this.hvacAction) {
+      return svg``;
+    }
+
+    const localizedState =
+      this.hass!.localize(
+        `component.climate.entity_component._.state_attributes.hvac_action.state.${this.hvacAction}`,
+      ) || this.hvacAction;
+
+    return svg`
+      <text class="hvac-action-text-svg ${this.hvacAction}" x="${x}" y="${y}" dominant-baseline="middle" text-anchor="middle">
+        ${localizedState}
+      </text>
+    `;
   }
 
   private _renderHVACAction(): TemplateResult {
