@@ -40,7 +40,9 @@
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
         "use_manual_duration_input": "Allow manual duration input instead of selector",
-        "allow_preset_modification": "Előbeállítási hőmérsékletek módosításának engedélyezése"
+        "allow_preset_modification": "Előbeállítási hőmérsékletek módosításának engedélyezése",
+        "show_status_text": "Aktuális állapot megjelenítése szövegként",
+        "show_background_gradient_on_active": "A csúszka háttérszínátmenetének megjelenítése, ha az entitás aktív"
       }
     }
   },

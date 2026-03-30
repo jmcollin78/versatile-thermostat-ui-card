@@ -62,6 +62,8 @@ const CLIMATE_LABELS = [
     "disable_timed_preset",
     "use_manual_duration_input",
     "allow_preset_modification",
+    "show_status_text",
+    "show_background_gradient_on_active",
 ] as string[];
 
 const computeSchema = memoizeOne(
@@ -115,6 +117,8 @@ const computeSchema = memoizeOne(
                 { name: "disable_auto_fan_infos", selector: { boolean: {} } },
                 { name: "disable_target_icon", selector: { boolean: {} } },
                 { name: "disable_presets", selector: { boolean: {} } },
+                { name: "show_status_text", selector: { boolean: {} } },
+                { name: "show_background_gradient_on_active", selector: { boolean: {} } },
             ],
         }] : []),
     ]
@@ -139,6 +143,7 @@ export class ClimateCardEditor extends LitElement implements LovelaceCardEditor 
         'disable_dry', 'disable_fan_only', 'disable_off', 'disable_sleep',
         'disable_menu', 'disable_buttons', 'disable_power_infos',
         'disable_auto_fan_infos', 'disable_target_icon', 'disable_presets',
+        'show_status_text', 'show_background_gradient_on_active'
     ];
 
     connectedCallback() {

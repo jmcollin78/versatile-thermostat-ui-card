@@ -39,7 +39,9 @@
         "disable_presets": "Disable presets",
         "disable_timed_preset": "Disable timed preset duration input",
         "use_manual_duration_input": "Allow manual duration input instead of selector",
-        "allow_preset_modification": "Να επιτρέπεται η τροποποίηση θερμοκρασιών προεπιλογής"
+        "allow_preset_modification": "Να επιτρέπεται η τροποποίηση θερμοκρασιών προεπιλογής",
+        "show_status_text": "Εμφάνιση τρέχουσας κατάστασης σε κείμενο",
+        "show_background_gradient_on_active": "Εμφάνιση της διαβάθμισης φόντου του ρυθμιστικού όταν η οντότητα είναι ενεργή"
       }
     }
   },

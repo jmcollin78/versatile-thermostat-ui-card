@@ -13,7 +13,8 @@ const entitySharedConfigStruct = object({
     name: optional(string()),
     icon: optional(string()),
     autoStartStopEnableEntity: optional(string()),
-    powerEntity: optional(string())
+    powerEntity: optional(string()),
+    visibility: optional(any()),
 });
 type EntitySharedConfig = Infer<typeof entitySharedConfigStruct>;
 
@@ -58,6 +59,8 @@ export type ClimateCardConfig = LovelaceCardConfig &
         disable_timed_preset?: boolean;
         use_manual_duration_input?: boolean;
         allow_preset_modification?: boolean;
+        show_status_text?: boolean;
+        show_background_gradient_on_active?: boolean;
     };
 
 export const climateCardConfigStruct = assign(
@@ -89,6 +92,8 @@ export const climateCardConfigStruct = assign(
         theme: optional(union([literal('classic'), literal('vtherm'), literal('uncolored'), literal('gunmalmg')])),
         disable_timed_preset: optional(boolean()),
         use_manual_duration_input: optional(boolean()),
-        allow_preset_modification: optional(boolean())
+        allow_preset_modification: optional(boolean()),
+        show_status_text: optional(boolean()),
+        show_background_gradient_on_active: optional(boolean())
     })
 );

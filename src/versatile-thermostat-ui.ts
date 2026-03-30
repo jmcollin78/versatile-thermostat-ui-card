@@ -607,6 +607,23 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       vt-ha-control-circular-slider {
         --primary-color: var(--hvac-mode-color);
       }
+      vt-ha-control-circular-slider.with-background-gradient {
+        z-index: 0;
+        position: relative;
+      }
+      vt-ha-control-circular-slider.with-background-gradient::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, var(--hvac-mode-color) 0%, transparent 65%);
+        border-radius: 50%;
+        opacity: 0.45;
+        z-index: -1;
+        pointer-events: none;
+      }
 
       .content {
         position: absolute;
@@ -1481,6 +1498,25 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
         40%, 60% { transform: translate3d(4px, 0, 0); }
       }
+      
+      .hvac-action-text-svg {
+        text-anchor: middle;
+        font-weight: var(--ha-font-weight-light);
+        font-size: 6px;
+        text-align: center;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: var(--ha-line-height-normal);
+        min-height: 1.5em;
+        white-space: nowrap;
+        filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.8));
+      }
+      .hvac-action-text-svg.heating {
+        fill: var(--hvac-mode-color, #f44336);
+      }
+      
   `, gunmalmgStyles, vthermStyles];
   // Additional theme styles
   static additionalThemeStyles = [vthermStyles];
@@ -1677,7 +1713,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             this.value.high != null &&
             this.stateObj?.state !== UNAVAILABLE) ? html`
             <vt-ha-control-circular-slider
-              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} "
+              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} ${this._config?.show_background_gradient_on_active && this.isDeviceActive ? 'with-background-gradient' : ''}"
               .inactive=${this._hasWindow}
               dual
               .low=${this.value.low}
@@ -1693,7 +1729,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             >
             ` : html`
             <vt-ha-control-circular-slider
-              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} "
+              class="${this.safety_state !== null || this.displayMessages ? 'security_msg': ''} ${this._hasWindow ? 'window_open': ''}  ${this.overpowering ? 'overpowering': ''} ${this.presence ? 'presence': ''} ${this.motion ? 'motion': ''}  ${this._hasWindowByPass ? 'windowByPass': ''} ${this._config?.show_background_gradient_on_active && this.isDeviceActive ? 'with-background-gradient' : ''}"
               .inactive=${this._hasWindow}
               .mode="start"
               @value-changed=${this._highChanged}
@@ -1737,13 +1773,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
               ${
                 disableCircle ? svg`
-                  ${this._renderTemperature(this._display_top, true, "55", "60%", ! this?._config?.set_current_as_main)}
-                  ${this._renderTemperature(this._display_bottom, false, "90", "60%", this?._config?.set_current_as_main == true)}
+                  ${this._renderStatusText("62.5", "50")} 
+                  ${this._renderTemperature(this._display_top, true, "55", "62%", ! this?._config?.set_current_as_main)}
+                  ${this._renderTemperature(this._display_bottom, false, "90", "62%", this?._config?.set_current_as_main == true)}
                   <g class="current-info" transform="translate(100,65)">
                     ${this._renderHVACAction()}
                   </g>
                 `: svg`
-                  ${this._renderTemperature(this._display_top, true, "50%", "60%", ! this?._config?.set_current_as_main)}
+                  ${this._renderStatusText("62.5", "50")} 
+                  ${this._renderTemperature(this._display_top, true, "50%", "62%", ! this?._config?.set_current_as_main)}
                   <line x1="35" y1="72" x2="90" y2="72" stroke="#e7e7e8" stroke-width="0.5" />
                   <g class="current-info" transform="translate(62.5,80)">
                     ${this._renderTemperature(this._display_bottom, false, "-5%", "0%", this?._config?.set_current_as_main == true)}
@@ -2603,6 +2641,23 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     return this?.value?.value || 0;
   }
 
+  private _renderStatusText(x: string, y: string): TemplateResult {
+    if (!this._config?.show_status_text || !this.hvacAction) {
+      return svg``;
+    }
+
+    const localizedState =
+      this.hass!.localize(
+        `component.climate.entity_component._.state_attributes.hvac_action.state.${this.hvacAction}`,
+      ) || this.hvacAction;
+
+    return svg`
+      <text class="hvac-action-text-svg ${this.hvacAction}" x="${x}" y="${y}" dominant-baseline="middle" text-anchor="middle">
+        ${localizedState}
+      </text>
+    `;
+  }
+
   private _renderHVACAction(): TemplateResult {
     // return empty when off
     if (!this.hvacAction || this.hvacAction === 'off' || this.hvacAction === 'idle') {
@@ -2948,7 +3003,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
 
     if (isTarget && isMain) {
-      targetPosX = 35;
+      targetPosX = this.effectiveDisableCircle ? 30 : 35;
       targetPosY = 56;
       targetScale = 0.25;
     }
