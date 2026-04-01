@@ -356,11 +356,11 @@ export const gunmalmgStyles = css`
           overflow-y: hidden;
           min-width: 0;
           scrollbar-width: thin;
-          scrollbar-color: var(--divider-color) transparent;
+          scrollbar-color: var(--secondary-text-color, #888) rgba(128,128,128,0.15);
         }
-        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar { height: 3px; }
-        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar-thumb { background: var(--divider-color); border-radius: 2px; }
-        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar-track { background: transparent; }
+        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar { height: 5px; }
+        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar-thumb { background: var(--secondary-text-color, #888); border-radius: 3px; }
+        :host([theme="gunmalmg"]) .gunmalmg-presets-scroll::-webkit-scrollbar-track { background: rgba(128,128,128,0.15); border-radius: 3px; }
 
         /* Fixed actions zone (lock + timed preset) */
         :host([theme="gunmalmg"]) .gunmalmg-actions {
