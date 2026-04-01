@@ -882,6 +882,13 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         background: rgba(var(--rgb-primary-color, 33, 150, 243), 0.12);
       }
 
+      /* Timed preset container locked state */
+      .timed-preset-container.locked {
+        opacity: 0.45;
+        pointer-events: none;
+        user-select: none;
+      }
+
       .preset-label {
         cursor: pointer;
         user-select: none;
@@ -1490,6 +1497,13 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       .preset-col-boost .preset-step-btn:hover  { background: #f75252; color: white; }
       .preset-col-boost .preset-step-up         { border-bottom-color: rgba(247,82,82,0.4); }
       .preset-col-boost .preset-temp-input      { border-color: rgba(247,82,82,0.4); }
+
+      /* Preset modification panel locked state */
+      .preset-mod-panel.locked {
+        opacity: 0.45;
+        pointer-events: none;
+        user-select: none;
+      }
       }
 
       @keyframes shake {
@@ -1626,10 +1640,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     };
 
     return html`
-      <div class="preset-mod-panel ${this._renderingAsClassic ? 'in-popup' : 'in-card'}">
+      <div class="preset-mod-panel ${this._renderingAsClassic ? 'in-popup' : 'in-card'} ${this._isLocked ? 'locked' : ''}">
         <div
           class="preset-mod-header"
-          @click=${() => { this._presetsPanelOpen = !this._presetsPanelOpen; }}
+          @click=${() => { if (!this._isLocked) this._presetsPanelOpen = !this._presetsPanelOpen; }}
           title=${localize({ hass: this.hass, string: 'extra_states.preset_mod_title' })}
         >
           <span class="preset-mod-title">${localize({ hass: this.hass, string: 'extra_states.preset_mod_title' })}</span>
@@ -1839,7 +1853,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           })}
         `}
         ${!this._config?.disable_timed_preset ? html`
-          <div class="timed-preset-container">
+          <div class="timed-preset-container ${this._isLocked ? 'locked' : ''}">
             ${this.timedPresetActive ? html`
               <span class="timed-preset-remaining" 
                 title="${localize({ hass: this.hass, string: 'extra_states.cancel_timed_preset' })}"

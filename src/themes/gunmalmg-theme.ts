@@ -383,6 +383,7 @@ export const gunmalmgStyles = css`
         :host([theme="gunmalmg"]) ha-card.locked #presets ha-icon-button,
         :host([theme="gunmalmg"]) ha-card.locked #presets .preset-label,
         :host([theme="gunmalmg"]) ha-card.locked .gunmalmg-timed-preset {
+          opacity: 0.45;
           color: var(--disabled-text-color);
           pointer-events: none;
         }
