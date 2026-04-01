@@ -64,6 +64,7 @@ const CLIMATE_LABELS = [
     "allow_preset_modification",
     "show_status_text",
     "show_background_gradient_on_active",
+    "show_regulation_chart",
 ] as string[];
 
 const computeSchema = memoizeOne(
@@ -92,6 +93,7 @@ const computeSchema = memoizeOne(
                 { name: "disable_timed_preset", selector: { boolean: {} } },
                 { name: "use_manual_duration_input", selector: { boolean: {} } },
                 { name: "allow_preset_modification", selector: { boolean: {} } },
+                { name: "show_regulation_chart", selector: { boolean: {} } },
             ],
         },
         // --- Section: For Classic, VTherm and Uncolored themes only ---
@@ -133,7 +135,7 @@ export class ClimateCardEditor extends LitElement implements LovelaceCardEditor 
     private static readonly ALL_THEMES_KEYS = [
         'disable_name', 'disable_safety_warning', 'set_current_as_main',
         'allow_lock_toggle', 'disable_timed_preset',
-        'use_manual_duration_input', 'allow_preset_modification',
+        'use_manual_duration_input', 'allow_preset_modification', 'show_regulation_chart',
     ];
 
     // Keys that belong to the "classic only" expandable section
