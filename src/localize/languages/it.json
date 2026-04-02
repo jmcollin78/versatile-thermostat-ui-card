@@ -41,7 +41,8 @@
         "disable_presets": "Disabilita preimpostazioni",
         "allow_preset_modification": "Consenti la modifica delle temperature dei preset",
         "show_status_text": "Mostra lo stato attuale come testo",
-        "show_background_gradient_on_active": "Mostra il gradiente di sfondo del cursore quando l'entità è attiva"
+        "show_background_gradient_on_active": "Mostra il gradiente di sfondo del cursore quando l'entità è attiva",
+        "show_regulation_chart": "Show regulation chart"
       }
     }
   },
@@ -136,6 +137,7 @@
     "preset_row_heat": "Riscaldamento",
     "preset_row_heat_away": "Riscaldamento (assente)",
     "preset_row_cool": "Raffreddamento",
-    "preset_row_cool_away": "Raffreddamento (assente)"
+    "preset_row_cool_away": "Raffreddamento (assente)",
+    "regulation_chart_title": "Regulation chart"
   }
 }

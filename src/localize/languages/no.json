@@ -41,7 +41,8 @@
         "use_manual_duration_input": "Allow manual duration input instead of selector",
         "allow_preset_modification": "Tillat endring av forhåndsinnstillingstemperaturer",
         "show_status_text": "Vis gjeldende status som tekst",
-        "show_background_gradient_on_active": "Vis glidebryterens bakgrunnsgradient når enheten er aktiv"
+        "show_background_gradient_on_active": "Vis glidebryterens bakgrunnsgradient når enheten er aktiv",
+        "show_regulation_chart": "Show regulation chart"
       }
     }
   },
@@ -136,7 +137,8 @@
     "preset_row_heat": "Varme",
     "preset_row_heat_away": "Varme (fraværende)",
     "preset_row_cool": "Kjøling",
-    "preset_row_cool_away": "Kjøling (fraværende)"
+    "preset_row_cool_away": "Kjøling (fraværende)",
+    "regulation_chart_title": "Regulation chart"
   },
   "theme": "Tema",
   "theme_classic": "Klassisk",

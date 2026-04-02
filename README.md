@@ -36,6 +36,10 @@
     - [The temperature table](#the-temperature-table)
     - [The stepper input](#the-stepper-input)
     - [Entity discovery](#entity-discovery)
+  - [Regulation chart](#regulation-chart)
+    - [Displayed curves](#displayed-curves)
+    - [Navigation](#navigation)
+    - [Configuration](#configuration)
 - [Informations on current state](#informations-on-current-state)
   - [Display some messages](#display-some-messages)
   - [Update of underlying scheduled](#update-of-underlying-scheduled)
@@ -203,6 +207,7 @@ Then you can add the new card into your dashboard.
 | disable_timed_preset      | boolean | **Optional** | true to hide the timed preset duration selector next to preset icons. |
 | use_manual_duration_input | boolean | **Optional** | true to use a manual input field instead of the preset duration selector (15min, 30min, 1h, 4h, 8h, 24h). |
 | allow_preset_modification | boolean | **Optional** | true to show a collapsible panel at the bottom of the card allowing direct editing of preset temperatures (Frost, Eco, Comfort, Boost) for each HVAC mode and away/present combination. |
+| show_regulation_chart | boolean | **Optional** | true to show a collapsible regulation chart panel at the bottom of the card. See [Regulation chart](#regulation-chart) for details. |
 
 ### Classical, VTherm and Uncolored themes only
 
@@ -395,6 +400,60 @@ Each cell contains a compact **stepper** widget:
 ### Entity discovery
 
 The panel automatically discovers all `number` entities with `device_class: temperature` that belong to the same device as the configured climate entity. No manual configuration is needed.
+
+## Regulation chart
+
+The **regulation chart** displays the historical regulation data of your thermostat on a dual-axis time chart. It helps you understand how the thermostat is regulating the temperature over time.
+
+To enable it, add `show_regulation_chart: true` to your card configuration:
+
+```yaml
+type: custom:versatile-thermostat-ui-card
+entity: climate.living_room
+show_regulation_chart: true
+```
+
+A collapsible panel labelled **"Graphique de régulation"** appears at the bottom of the card (or the popup for the Gunmalmg theme). Click the header to open or close it.
+
+![regulation chart](assets/regulation-chart.png)
+
+### Displayed curves
+
+The chart shows up to 5 curves over the last 24 hours. Curves are automatically hidden if their data is not available for the entity:
+
+| Curve | Colour | Y axis | Description |
+|-------|--------|--------|-------------|
+| Consigne | 🟠 Orange | Left (°) | Target temperature (`temperature`) |
+| Pièce | 🔵 Blue | Left (°) | Room temperature (`current_temperature`) |
+| Régulée | 🟢 Green dashed | Left (°) | Regulated target temperature (over-climate TPI only) |
+| Ext. | 🟣 Purple dashed | Left (°) | Outdoor temperature (`specific_states.ext_current_temperature`) |
+| Puissance % | 🔴 Red filled | Right (%) | Heating power percentage (`power_percent`) |
+
+The chart loads the full **24 hours** of history from the Home Assistant history API on first open. Live data points are then appended automatically as the thermostat state changes.
+
+### Navigation
+
+The chart opens by default zoomed on the **last 2 hours**. Two buttons are available at the top-right of the chart:
+
+| Button | Action |
+|--------|--------|
+| **2h** | Zoom back to the last 2 hours (default view) |
+| **1d** | Show the full 24-hour history |
+
+You can also:
+- **Scroll** the mouse wheel to zoom in/out on the time axis
+- **Drag** left or right to pan through time
+- Use a **pinch gesture** on touch screens to zoom
+
+### Configuration
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| show_regulation_chart | boolean | **Optional** | `true` to enable the regulation chart panel |
+
+> **Note:** The regulation chart is available in all themes. For the Gunmalmg theme, it appears inside the popup.
+
+---
 
 # Informations on current state
 

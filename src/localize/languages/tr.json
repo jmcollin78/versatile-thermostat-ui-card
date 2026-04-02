@@ -41,7 +41,8 @@
         "use_manual_duration_input": "Allow manual duration input instead of selector",
         "allow_preset_modification": "Ön ayar sıcaklıklarının değiştirilmesine izin ver",
         "show_status_text": "Mevcut durumu metin olarak göster",
-        "show_background_gradient_on_active": "Varlık etkinken kaydırıcı arka plan gradyanını göster"
+        "show_background_gradient_on_active": "Varlık etkinken kaydırıcı arka plan gradyanını göster",
+        "show_regulation_chart": "Show regulation chart"
       }
     }
   },
@@ -136,7 +137,8 @@
     "preset_row_heat": "Isıtma",
     "preset_row_heat_away": "Isıtma (uzakta)",
     "preset_row_cool": "Soğutma",
-    "preset_row_cool_away": "Soğutma (uzakta)"
+    "preset_row_cool_away": "Soğutma (uzakta)",
+    "regulation_chart_title": "Regulation chart"
   },
   "theme": "Tema",
   "theme_classic": "Klasik",

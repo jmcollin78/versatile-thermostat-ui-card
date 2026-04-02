@@ -41,7 +41,8 @@
         "use_manual_duration_input": "Allow manual duration input instead of selector",
         "allow_preset_modification": "Dovoli spremembo temperatur prednastavitev",
         "show_status_text": "Prikaži trenutno stanje kot besedilo",
-        "show_background_gradient_on_active": "Prikaži preliv ozadja drsnika, ko je entiteta aktivna"
+        "show_background_gradient_on_active": "Prikaži preliv ozadja drsnika, ko je entiteta aktivna",
+        "show_regulation_chart": "Show regulation chart"
       }
     }
   },
@@ -136,7 +137,8 @@
     "preset_row_heat": "Ogrevanje",
     "preset_row_heat_away": "Ogrevanje (odsotnost)",
     "preset_row_cool": "Hlajenje",
-    "preset_row_cool_away": "Hlajenje (odsotnost)"
+    "preset_row_cool_away": "Hlajenje (odsotnost)",
+    "regulation_chart_title": "Regulation chart"
   },
   "theme": "Tema",
   "theme_classic": "Klasična",

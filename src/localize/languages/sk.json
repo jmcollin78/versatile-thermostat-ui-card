@@ -42,7 +42,8 @@
         "use_manual_duration_input": "Allow manual duration input instead of selector",
         "allow_preset_modification": "Povoliť úpravu teplôt predvolieb",
         "show_status_text": "Zobraziť aktuálny stav textom",
-        "show_background_gradient_on_active": "Zobraziť prechod pozadia posúvača, keď je entita aktívna"
+        "show_background_gradient_on_active": "Zobraziť prechod pozadia posúvača, keď je entita aktívna",
+        "show_regulation_chart": "Show regulation chart"
       }
     }
   },
@@ -137,7 +138,8 @@
     "preset_row_heat": "Kúrenie",
     "preset_row_heat_away": "Kúrenie (neprítomnosť)",
     "preset_row_cool": "Chladenie",
-    "preset_row_cool_away": "Chladenie (neprítomnosť)"
+    "preset_row_cool_away": "Chladenie (neprítomnosť)",
+    "regulation_chart_title": "Regulation chart"
   },
   "theme": "Téma",
   "theme_classic": "Klasický",
