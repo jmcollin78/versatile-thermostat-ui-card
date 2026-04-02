@@ -41,7 +41,8 @@
         "use_manual_duration_input": "Allow manual duration input instead of selector",
         "allow_preset_modification": "Разрешить изменение температур пресетов",
         "show_status_text": "Показывать текущий статус в виде текста",
-        "show_background_gradient_on_active": "Показывать фоновый градиент ползунка, когда сущность активна"
+        "show_background_gradient_on_active": "Показывать фоновый градиент ползунка, когда сущность активна",
+        "show_regulation_chart": "Show regulation chart"
       }
     }
   },
@@ -136,7 +137,8 @@
     "preset_row_heat": "Обогрев",
     "preset_row_heat_away": "Обогрев (отсутствие)",
     "preset_row_cool": "Охлаждение",
-    "preset_row_cool_away": "Охлаждение (отсутствие)"
+    "preset_row_cool_away": "Охлаждение (отсутствие)",
+    "regulation_chart_title": "Regulation chart"
   },
   "theme": "Тема",
   "theme_classic": "Классический",

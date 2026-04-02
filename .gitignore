@@ -1,2 +1,3 @@
 node_modules
 .hass_dev
+src/localize/languages/*.bak

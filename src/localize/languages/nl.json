@@ -41,7 +41,8 @@
         "use_manual_duration_input": "Allow manual duration input instead of selector",
         "allow_preset_modification": "Voorkeursinstellingstemperaturen aanpassen toestaan",
         "show_status_text": "Toon huidige status als tekst",
-        "show_background_gradient_on_active": "Toon achtergrondgradiënt van de schuifregelaar wanneer de entiteit actief is"
+        "show_background_gradient_on_active": "Toon achtergrondgradiënt van de schuifregelaar wanneer de entiteit actief is",
+        "show_regulation_chart": "Show regulation chart"
       }
     }
   },
@@ -136,7 +137,8 @@
     "preset_row_heat": "Verwarming",
     "preset_row_heat_away": "Verwarming (afwezig)",
     "preset_row_cool": "Koeling",
-    "preset_row_cool_away": "Koeling (afwezig)"
+    "preset_row_cool_away": "Koeling (afwezig)",
+    "regulation_chart_title": "Regulation chart"
   },
   "theme": "Thema",
   "theme_classic": "Classic",

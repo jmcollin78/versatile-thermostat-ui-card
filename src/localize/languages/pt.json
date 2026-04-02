@@ -42,7 +42,8 @@
         "use_manual_duration_input": "Allow manual duration input instead of selector",
         "allow_preset_modification": "Permitir modificação das temperaturas de predefinição",
         "show_status_text": "Mostrar o estado atual em texto",
-        "show_background_gradient_on_active": "Mostrar o gradiente de fundo do controle deslizante quando a entidade está ativa"
+        "show_background_gradient_on_active": "Mostrar o gradiente de fundo do controle deslizante quando a entidade está ativa",
+        "show_regulation_chart": "Show regulation chart"
       }
     }
   },
@@ -137,6 +138,7 @@
     "preset_row_heat": "Aquecimento",
     "preset_row_heat_away": "Aquecimento (ausente)",
     "preset_row_cool": "Arrefecimento",
-    "preset_row_cool_away": "Arrefecimento (ausente)"
+    "preset_row_cool_away": "Arrefecimento (ausente)",
+    "regulation_chart_title": "Regulation chart"
   }
 }

@@ -41,7 +41,8 @@
         "use_manual_duration_input": "Allow manual duration input instead of selector",
         "allow_preset_modification": "Permet la modificació de les temperatures de preset",
         "show_status_text": "Mostra l'estat actual en text",
-        "show_background_gradient_on_active": "Mostra el degradat de fons del control lliscant quan l'entitat està activa"
+        "show_background_gradient_on_active": "Mostra el degradat de fons del control lliscant quan l'entitat està activa",
+        "show_regulation_chart": "Show regulation chart"
       }
     }
   },
@@ -136,7 +137,8 @@
     "preset_row_heat": "Calefacció",
     "preset_row_heat_away": "Calefacció absent",
     "preset_row_cool": "Refrigeració",
-    "preset_row_cool_away": "Refrigeració absent"
+    "preset_row_cool_away": "Refrigeració absent",
+    "regulation_chart_title": "Regulation chart"
   },
   "theme": "Tema",
   "theme_classic": "Clàssic",

@@ -87,6 +87,7 @@ import { SensorEntity } from './ha/data/sensor';
 import { map } from 'superstruct';
 import { gunmalmgStyles, renderGunmalmg } from './themes/gunmalmg-theme';
 import { vthermStyles, renderVtherm } from './themes/vtherm-theme';
+import './regulation-chart';
 
 const UNAVAILABLE = "unavailable";
 const DEBUG=true;
@@ -427,6 +428,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @state() private timedPresetRemainingTime: number | null = null;
   @state() private timedPresetPreset: string | null = null;
   @state() private _presetsPanelOpen: boolean = false;
+  @state() private _regulationChartOpen: boolean = false;
   @state() private _presetTempEntities: PresetTempEntityInfo[] = [];
 
   setConfig(config: ClimateCardConfig): void {
@@ -1281,13 +1283,36 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         padding-bottom: 38px;
       }
 
-      /* ── Preset modification collapsible panel ── */
-      .preset-mod-panel {
-        box-sizing: border-box;
+      ha-card.has-regulation-chart {
+        padding-bottom: 38px;
       }
 
-      /* Dans la carte principale : positionné en absolu en bas, hors du flux flex */
-      .preset-mod-panel.in-card {
+      ha-card.has-preset-mod.has-regulation-chart {
+        padding-bottom: 76px;
+      }
+
+      /* When bottom panels are active the card grows (auto-height/masonry layout).
+         top: 50% on .content shifts down by half the extra padding — compensate here. */
+      ha-card.has-preset-mod .content,
+      ha-card.has-regulation-chart .content {
+        top: calc(50% - 40px - 19px);
+      }
+
+      ha-card.has-preset-mod.has-regulation-chart .content {
+        top: calc(50% - 40px - 38px);
+      }
+
+      ha-card.has-preset-mod .content.no-presets,
+      ha-card.has-regulation-chart .content.no-presets {
+        top: calc(60% - 30px - 19px);
+      }
+
+      ha-card.has-preset-mod.has-regulation-chart .content.no-presets {
+        top: calc(60% - 30px - 38px);
+      }
+
+      /* ── Container commun pour les panneaux du bas ── */
+      .bottom-panels.in-card {
         position: absolute;
         bottom: 0;
         left: 0;
@@ -1295,12 +1320,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         background: var(--ha-card-background, var(--card-background-color, #fff));
         border-radius: 0 0 var(--ha-card-border-radius, 12px) var(--ha-card-border-radius, 12px);
         z-index: 4;
-        border-top: 1px solid var(--divider-color, #e0e0e0);
-        padding: 0 8px;
+        overflow: hidden;
       }
 
-      /* Dans le popup gunmalmg : positionné en absolu en bas du classic-popup-content (position: relative) */
-      .preset-mod-panel.in-popup {
+      .bottom-panels.in-popup {
         position: absolute;
         bottom: 0;
         left: 0;
@@ -1308,6 +1331,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         background: var(--ha-card-background, var(--card-background-color, #fff));
         border-radius: 0 0 12px 12px;
         z-index: 4;
+        overflow: hidden;
+      }
+
+      /* ── Preset modification collapsible panel ── */
+      .preset-mod-panel {
+        box-sizing: border-box;
         border-top: 1px solid var(--divider-color, #e0e0e0);
         padding: 0 8px;
       }
@@ -1504,6 +1533,44 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         pointer-events: none;
         user-select: none;
       }
+
+      /* ── Regulation chart collapsible panel ── */
+      .regulation-chart-panel {
+        box-sizing: border-box;
+        border-top: 1px solid var(--divider-color, #e0e0e0);
+        padding: 0 8px;
+      }
+
+      .regulation-chart-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        padding: 6px 4px;
+        user-select: none;
+        color: var(--secondary-text-color);
+      }
+
+      .regulation-chart-header:hover {
+        color: var(--primary-text-color);
+      }
+
+      .regulation-chart-title {
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .regulation-chart-chevron {
+        --mdc-icon-size: 18px;
+      }
+
+      .regulation-chart-body {
+        padding: 4px 0 8px 0;
+        min-height: 60px;
+        animation: fadeIn 0.15s ease;
+      }
       }
 
       @keyframes shake {
@@ -1560,6 +1627,42 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _closeClassicPopup() {
     this._showClassicPopup = false;
     this.displayMessages = false;
+  }
+
+  /**
+   * Renders the collapsible regulation chart panel.
+   * Only shown when show_regulation_chart is enabled.
+   * For the Gunmalmg theme, this panel only appears in the popup.
+   */
+  private _renderRegulationChartPanel(): TemplateResult {
+    if (!this._config?.show_regulation_chart) return html``;
+
+    return html`
+      <div class="regulation-chart-panel">
+        <div
+          class="regulation-chart-header"
+          @click=${() => { this._regulationChartOpen = !this._regulationChartOpen; }}
+        >
+          <span class="regulation-chart-title">${localize({ hass: this.hass, string: 'extra_states.regulation_chart_title' })}</span>
+          <ha-svg-icon
+            class="regulation-chart-chevron"
+            .path=${this._regulationChartOpen ? mdiChevronDown : mdiChevronUp}
+          ></ha-svg-icon>
+        </div>
+        <div class="regulation-chart-body" style=${this._regulationChartOpen ? '' : 'display:none'}>
+          <vt-regulation-chart
+            .hass=${this.hass}
+            .entityId=${this._config?.entity ?? ''}
+            .visible=${this._regulationChartOpen}
+            .targetTemp=${this.temperature ?? null}
+            .roomTemp=${this.current ?? null}
+            .regulatedTemp=${this.regulatedTargetTemperature}
+            .extTemp=${this.hass?.states?.[this._config?.entity ?? '']?.attributes?.specific_states?.ext_current_temperature ?? null}
+            .powerPercent=${this.powerPercent ?? null}
+          ></vt-regulation-chart>
+        </div>
+      </div>
+    `;
   }
 
   /**
@@ -1640,7 +1743,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     };
 
     return html`
-      <div class="preset-mod-panel ${this._renderingAsClassic ? 'in-popup' : 'in-card'} ${this._isLocked ? 'locked' : ''}">
+      <div class="preset-mod-panel ${this._isLocked ? 'locked' : ''}">
         <div
           class="preset-mod-header"
           @click=${() => { if (!this._isLocked) this._presetsPanelOpen = !this._presetsPanelOpen; }}
@@ -1934,7 +2037,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             `
         : ''}
     </div>
-    ${this._renderPresetModificationPanel()}
+    <div class="bottom-panels ${this._renderingAsClassic ? 'in-popup' : 'in-card'}">
+      ${this._renderPresetModificationPanel()}
+      ${this._renderRegulationChartPanel()}
+    </div>
     `;
     this._renderingAsClassic = false;
     return result;
@@ -3055,6 +3161,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
      [this.hvacMode]: true,
      locked: this.isUserLocked,
      'has-preset-mod': !!this._config?.allow_preset_modification,
+     'has-regulation-chart': !!this._config?.show_regulation_chart,
    })}
    >
     ${this._config?.disable_menu ? `` : html`

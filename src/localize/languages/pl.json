@@ -41,7 +41,8 @@
         "use_manual_duration_input": "Zamiast selektora zezwól na ręczne ustawienie czasu",
         "allow_preset_modification": "Zezwól na modyfikację temperatur ustawień wstępnych",
         "show_status_text": "Pokaż aktualny status jako tekst",
-        "show_background_gradient_on_active": "Pokaż gradient tła suwaka, gdy encja jest aktywna"
+        "show_background_gradient_on_active": "Pokaż gradient tła suwaka, gdy encja jest aktywna",
+        "show_regulation_chart": "Show regulation chart"
       }
     }
   },
@@ -141,6 +142,7 @@
     "preset_row_heat": "Ogrzewanie",
     "preset_row_heat_away": "Ogrzewanie (nieobecność)",
     "preset_row_cool": "Chłodzenie",
-    "preset_row_cool_away": "Chłodzenie (nieobecność)"
+    "preset_row_cool_away": "Chłodzenie (nieobecność)",
+    "regulation_chart_title": "Regulation chart"
   }
 }

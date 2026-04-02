@@ -24,7 +24,7 @@ export function renderClassicPopup(ctx: any): TemplateResult {
           tabindex="0"
         ></ha-icon-button>
       ` : ''}
-      <div class="classic-popup-content ${ctx._config?.allow_preset_modification ? 'has-preset-mod' : ''}">
+      <div class="classic-popup-content ${ctx._config?.allow_preset_modification ? 'has-preset-mod' : ''} ${ctx._config?.show_regulation_chart ? 'has-regulation-chart' : ''}">
         ${ctx._renderClassicContent(true)}
       </div>
     </div>
@@ -585,6 +585,34 @@ export const gunmalmgStyles = css`
 
         :host([theme="gunmalmg"]) .classic-popup-content.has-preset-mod {
           padding-bottom: calc(1em + 38px);
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content.has-regulation-chart {
+          padding-bottom: calc(1em + 38px);
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content.has-preset-mod.has-regulation-chart {
+          padding-bottom: calc(1em + 76px);
+        }
+
+        /* Same correction as in the main card: compensate for the 50% shift
+           caused by the popup content growing when panels are active. */
+        :host([theme="gunmalmg"]) .classic-popup-content.has-preset-mod .content,
+        :host([theme="gunmalmg"]) .classic-popup-content.has-regulation-chart .content {
+          top: calc(50% - 40px - 19px) !important;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content.has-preset-mod.has-regulation-chart .content {
+          top: calc(50% - 40px - 38px) !important;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content.has-preset-mod .content.no-presets,
+        :host([theme="gunmalmg"]) .classic-popup-content.has-regulation-chart .content.no-presets {
+          top: calc(60% - 30px - 19px) !important;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content.has-preset-mod.has-regulation-chart .content.no-presets {
+          top: calc(60% - 30px - 38px) !important;
         }
 
         /* Name */

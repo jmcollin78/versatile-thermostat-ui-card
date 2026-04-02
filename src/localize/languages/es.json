@@ -40,7 +40,9 @@
         "disable_timed_preset": "Disable timed preset duration input",
         "use_manual_duration_input": "Allow manual duration input instead of selector",
         "show_status_text": "Mostrar el estado actual en texto",
-        "show_background_gradient_on_active": "Mostrar el degradado de fondo del control deslizante cuando la entidad está activa"
+        "show_background_gradient_on_active": "Mostrar el degradado de fondo del control deslizante cuando la entidad está activa",
+        "allow_preset_modification": "Allow preset temperature modification",
+        "show_regulation_chart": "Show regulation chart"
       }
     }
   },
@@ -135,7 +137,8 @@
     "preset_row_heat": "Calefacción",
     "preset_row_heat_away": "Calefacción ausente",
     "preset_row_cool": "Refrigeración",
-    "preset_row_cool_away": "Refrigeración ausente"
+    "preset_row_cool_away": "Refrigeración ausente",
+    "regulation_chart_title": "Regulation chart"
   },
   "theme": "Tema",
   "theme_classic": "Clásico",

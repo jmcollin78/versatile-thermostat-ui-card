@@ -41,7 +41,8 @@
         "use_manual_duration_input": "Allow manual duration input instead of selector",
         "allow_preset_modification": "允许修改预设温度",
         "show_status_text": "以文本形式显示当前状态",
-        "show_background_gradient_on_active": "当实体处于活动状态时显示滑块背景渐变"
+        "show_background_gradient_on_active": "当实体处于活动状态时显示滑块背景渐变",
+        "show_regulation_chart": "Show regulation chart"
       }
     }
   },
@@ -136,7 +137,8 @@
     "preset_row_heat": "制热",
     "preset_row_heat_away": "制热（离开）",
     "preset_row_cool": "制冷",
-    "preset_row_cool_away": "制冷（离开）"
+    "preset_row_cool_away": "制冷（离开）",
+    "regulation_chart_title": "Regulation chart"
   },
   "theme": "主题",
   "theme_classic": "经典",
