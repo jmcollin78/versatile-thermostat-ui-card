@@ -595,6 +595,26 @@ export const gunmalmgStyles = css`
           padding-bottom: calc(1em + 76px);
         }
 
+        /* Same correction as in the main card: compensate for the 50% shift
+           caused by the popup content growing when panels are active. */
+        :host([theme="gunmalmg"]) .classic-popup-content.has-preset-mod .content,
+        :host([theme="gunmalmg"]) .classic-popup-content.has-regulation-chart .content {
+          top: calc(50% - 40px - 19px) !important;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content.has-preset-mod.has-regulation-chart .content {
+          top: calc(50% - 40px - 38px) !important;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content.has-preset-mod .content.no-presets,
+        :host([theme="gunmalmg"]) .classic-popup-content.has-regulation-chart .content.no-presets {
+          top: calc(60% - 30px - 19px) !important;
+        }
+
+        :host([theme="gunmalmg"]) .classic-popup-content.has-preset-mod.has-regulation-chart .content.no-presets {
+          top: calc(60% - 30px - 38px) !important;
+        }
+
         /* Name */
         :host([theme="gunmalmg"]) .classic-popup-content .name {
           display: block;

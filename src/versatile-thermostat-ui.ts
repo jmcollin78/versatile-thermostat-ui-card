@@ -1291,6 +1291,26 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         padding-bottom: 76px;
       }
 
+      /* When bottom panels are active the card grows (auto-height/masonry layout).
+         top: 50% on .content shifts down by half the extra padding — compensate here. */
+      ha-card.has-preset-mod .content,
+      ha-card.has-regulation-chart .content {
+        top: calc(50% - 40px - 19px);
+      }
+
+      ha-card.has-preset-mod.has-regulation-chart .content {
+        top: calc(50% - 40px - 38px);
+      }
+
+      ha-card.has-preset-mod .content.no-presets,
+      ha-card.has-regulation-chart .content.no-presets {
+        top: calc(60% - 30px - 19px);
+      }
+
+      ha-card.has-preset-mod.has-regulation-chart .content.no-presets {
+        top: calc(60% - 30px - 38px);
+      }
+
       /* ── Container commun pour les panneaux du bas ── */
       .bottom-panels.in-card {
         position: absolute;
@@ -1637,6 +1657,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             .targetTemp=${this.temperature ?? null}
             .roomTemp=${this.current ?? null}
             .regulatedTemp=${this.regulatedTargetTemperature}
+            .extTemp=${this.hass?.states?.[this._config?.entity ?? '']?.attributes?.specific_states?.ext_current_temperature ?? null}
             .powerPercent=${this.powerPercent ?? null}
           ></vt-regulation-chart>
         </div>

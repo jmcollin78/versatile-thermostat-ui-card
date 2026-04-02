@@ -17,6 +17,7 @@ export interface RegulationDataPoint {
   targetTemp: number | null;
   roomTemp: number | null;
   regulatedTemp: number | null;
+  extTemp: number | null;
   powerPercent: number | null;
 }
 
@@ -35,6 +36,7 @@ export class VtRegulationChart extends LitElement {
   @property({ type: Number }) public targetTemp: number | null = null;
   @property({ type: Number }) public roomTemp: number | null = null;
   @property({ type: Number }) public regulatedTemp: number | null = null;
+  @property({ type: Number }) public extTemp: number | null = null;
   @property({ type: Number }) public powerPercent: number | null = null;
 
   @state() private _history: RegulationDataPoint[] = [];
@@ -45,6 +47,7 @@ export class VtRegulationChart extends LitElement {
   private _chartReady = false;
   private _destroyed = false;
   private _lastEntityId = '';
+  private _initialViewSet = false;
 
   // ─── Lifecycle ────────────────────────────────────────────────────────────
 
@@ -60,8 +63,6 @@ export class VtRegulationChart extends LitElement {
   }
 
   protected async firstUpdated() {
-    console.log('[VtRegulationChart] firstUpdated — entityId:', this.entityId, 'hasHass:', !!this.hass,
-      'visible:', this.visible, 'targetTemp:', this.targetTemp, 'roomTemp:', this.roomTemp, 'powerPercent:', this.powerPercent);
     await this._initChart();
     // Inject current values immediately
     this._addLiveDataPoint();
@@ -74,17 +75,18 @@ export class VtRegulationChart extends LitElement {
     if (this.visible && this._chartReady) {
       this._chart?.resize();
       this._updateChart();
+      this._applyInitialView();
     }
   }
 
   protected updated(changedProps: PropertyValues) {
     // When panel becomes visible: resize the canvas (was 0×0 while hidden) then repaint
     if (changedProps.has('visible') && this.visible && this._chartReady) {
-      console.log('[VtRegulationChart] became visible — resizing chart, history size:', this._history.length);
       // Use rAF to ensure the DOM has been reflowed before measuring canvas size
       requestAnimationFrame(() => {
         this._chart?.resize();
         this._updateChart();
+        this._applyInitialView();
       });
       return;
     }
@@ -97,13 +99,15 @@ export class VtRegulationChart extends LitElement {
         if (this._chartReady && this.visible) {
           this._chart?.resize();
           this._updateChart();
+          this._initialViewSet = false;   // reset so new entity gets 2h view
+          this._applyInitialView();
         }
       });
       return;
     }
 
     // Add live data when values change
-    const dataKeys = ['targetTemp', 'roomTemp', 'regulatedTemp', 'powerPercent'];
+    const dataKeys = ['targetTemp', 'roomTemp', 'regulatedTemp', 'extTemp', 'powerPercent'];
     const hasDataChange = dataKeys.some(k => changedProps.has(k));
     if (hasDataChange && (this.targetTemp !== null || this.roomTemp !== null || this.powerPercent !== null)) {
       this._addLiveDataPoint();
@@ -119,28 +123,15 @@ export class VtRegulationChart extends LitElement {
    * from the climate entity's attribute history.
    */
   private async _fetchHistory() {
-    if (!this.hass || !this.entityId) {
-      console.warn('[VtRegulationChart] Cannot fetch history: hass or entityId missing', { entityId: this.entityId, hasHass: !!this.hass });
-      return;
-    }
+    if (!this.hass || !this.entityId) return;
     this._loading = true;
     const end = new Date();
     const start = new Date(end.getTime() - 24 * 60 * 60 * 1000);
-    // significant_changes_only=false → get ALL changes, not just hvac_mode changes
     const path = `history/period/${start.toISOString()}?filter_entity_id=${this.entityId}&end_time=${end.toISOString()}&significant_changes_only=false&minimal_response=false`;
     try {
-      console.log('[VtRegulationChart] Fetching history:', path);
       const result: any[][] = await this.hass.callApi('GET', path);
-      if (!Array.isArray(result) || result.length === 0) {
-        console.warn('[VtRegulationChart] Empty history result', result);
-        return;
-      }
+      if (!Array.isArray(result) || result.length === 0) return;
       const entityHistory: any[] = result[0];
-      console.log(`[VtRegulationChart] Got ${entityHistory.length} history entries`);
-      // Log first entry attributes to check attribute paths
-      if (entityHistory.length > 0) {
-        console.log('[VtRegulationChart] First state sample:', JSON.stringify(entityHistory[0].attributes));
-      }
       const mapped: RegulationDataPoint[] = entityHistory
         .filter(s => s.attributes && s.last_updated)
         .map(s => ({
@@ -151,6 +142,9 @@ export class VtRegulationChart extends LitElement {
             s.attributes?.vtherm_over_climate?.regulation?.regulated_target_temperature ??
             s.attributes?.regulated_target_temperature ??
             null,
+          extTemp:
+            s.attributes?.specific_states?.ext_current_temperature ??
+            null,
           powerPercent:
             s.attributes?.power_percent ??
             s.attributes?.specific_states?.power_percent ??
@@ -159,7 +153,6 @@ export class VtRegulationChart extends LitElement {
             null,
         }))
         .filter(p => p.targetTemp !== null || p.roomTemp !== null);
-      console.log(`[VtRegulationChart] Mapped ${mapped.length} valid points (targetTemp/roomTemp non-null)`);
       // Merge history with any already-accumulated live points (keep live points at the end)
       const lastHistoryTs = mapped.length > 0 ? mapped[mapped.length - 1].timestamp : 0;
       const futurePoints = this._history.filter(p => p.timestamp > lastHistoryTs);
@@ -180,6 +173,7 @@ export class VtRegulationChart extends LitElement {
       targetTemp: this.targetTemp,
       roomTemp: this.roomTemp,
       regulatedTemp: this.regulatedTemp ?? null,
+      extTemp: this.extTemp ?? null,
       powerPercent: this.powerPercent,
     };
     if (last && (now - last.timestamp) < 30_000) {
@@ -235,8 +229,8 @@ export class VtRegulationChart extends LitElement {
               borderColor: '#f9a21f',
               backgroundColor: 'rgba(249,162,31,0.08)',
               borderWidth: 2,
-              pointRadius: 2,
-              pointHoverRadius: 5,
+              pointRadius: 0,
+              pointHoverRadius: 4,
               tension: 0.3,
               yAxisID: 'yTemp',
             },
@@ -246,8 +240,8 @@ export class VtRegulationChart extends LitElement {
               borderColor: '#3a9ff2',
               backgroundColor: 'rgba(58,159,242,0.08)',
               borderWidth: 2,
-              pointRadius: 2,
-              pointHoverRadius: 5,
+              pointRadius: 0,
+              pointHoverRadius: 4,
               tension: 0.3,
               yAxisID: 'yTemp',
             },
@@ -258,8 +252,21 @@ export class VtRegulationChart extends LitElement {
               backgroundColor: 'rgba(93,212,97,0.08)',
               borderWidth: 2,
               borderDash: [5, 4],
-              pointRadius: 2,
-              pointHoverRadius: 5,
+              pointRadius: 0,
+              pointHoverRadius: 4,
+              tension: 0.3,
+              yAxisID: 'yTemp',
+              hidden: true,   // shown only when data exists
+            },
+            {
+              label: 'Ext.',
+              data: [],
+              borderColor: '#a78bfa',
+              backgroundColor: 'rgba(167,139,250,0.08)',
+              borderWidth: 1.5,
+              borderDash: [3, 3],
+              pointRadius: 1,
+              pointHoverRadius: 4,
               tension: 0.3,
               yAxisID: 'yTemp',
               hidden: true,   // shown only when data exists
@@ -275,6 +282,7 @@ export class VtRegulationChart extends LitElement {
               tension: 0.3,
               fill: true,
               yAxisID: 'yPercent',
+              hidden: true,   // shown only when data exists
             },
           ],
         },
@@ -306,7 +314,11 @@ export class VtRegulationChart extends LitElement {
             },
             zoom: {
               pan:  { enabled: true, mode: 'x' },
-              zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' },
+              zoom: {
+                wheel: { enabled: true, speed: 0.015 },
+                pinch: { enabled: true },
+                mode: 'x',
+              },
               limits: { x: { minRange: 60_000 } },
             },
           },
@@ -366,15 +378,36 @@ export class VtRegulationChart extends LitElement {
     ds[0].data = toXY(this._history, 'targetTemp');
     ds[1].data = toXY(this._history, 'roomTemp');
     ds[2].data = toXY(this._history, 'regulatedTemp');
-    ds[3].data = toXY(this._history, 'powerPercent');
+    ds[3].data = toXY(this._history, 'extTemp');
+    ds[4].data = toXY(this._history, 'powerPercent');
 
-    // Hide regulated temp dataset when there is no data at all
+    // Hide optional datasets when there is no data
     ds[2].hidden = ds[2].data.length === 0;
+    ds[3].hidden = ds[3].data.length === 0;
+    ds[4].hidden = ds[4].data.length === 0;
 
     this._chart.update('none');
   }
 
-  /** Reset zoom to show all data */
+  /**
+   * Zooms the initial view to the last 2 hours.
+   * Called once after the chart becomes visible for the first time.
+   * The full 24h of history remains available by panning left.
+   */
+  private _applyInitialView() {
+    if (this._initialViewSet || !this._chart) return;
+    this._initialViewSet = true;
+    this._zoomTo2h();
+  }
+
+  /** Zoom to the last 2 hours */
+  private _zoomTo2h() {
+    if (!this._chart) return;
+    const now = Date.now();
+    this._chart.zoomScale('x', { min: now - 2 * 60 * 60 * 1000, max: now }, 'none');
+  }
+
+  /** Reset zoom to show all 24h data */
   public resetZoom() {
     this._chart?.resetZoom?.();
   }
@@ -400,7 +433,10 @@ export class VtRegulationChart extends LitElement {
       <div class="chart-wrapper">
         ${this._loading ? html`<div class="chart-loading"></div>` : ''}
         <canvas></canvas>
-        <button class="reset-zoom-btn" @click=${() => this.resetZoom()} title="Réinitialiser le zoom">⌂</button>
+        <div class="zoom-btns">
+          <button class="reset-zoom-btn" @click=${() => this._zoomTo2h()} title="Vue 2 heures">2h</button>
+          <button class="reset-zoom-btn" @click=${() => this.resetZoom()} title="Vue 24 heures">1d</button>
+        </div>
       </div>
     `;
   }
@@ -425,10 +461,17 @@ export class VtRegulationChart extends LitElement {
         height: 100% !important;
       }
 
-      .reset-zoom-btn {
+      .zoom-btns {
         position: absolute;
-        top: 4px;
+        top: -4px;
         right: 4px;
+        display: flex;
+        gap: 4px;
+        z-index: 10;
+      }
+
+      .reset-zoom-btn {
+        position: static;
         background: var(--secondary-background-color, rgba(0,0,0,0.08));
         border: 1px solid var(--divider-color, #ccc);
         border-radius: 4px;
