@@ -87,6 +87,7 @@ import { SensorEntity } from './ha/data/sensor';
 import { map } from 'superstruct';
 import { gunmalmgStyles, renderGunmalmg } from './themes/gunmalmg-theme';
 import { vthermStyles, renderVtherm } from './themes/vtherm-theme';
+import './regulation-chart';
 
 const UNAVAILABLE = "unavailable";
 const DEBUG=true;
@@ -1628,11 +1629,17 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             .path=${this._regulationChartOpen ? mdiChevronDown : mdiChevronUp}
           ></ha-svg-icon>
         </div>
-        ${this._regulationChartOpen ? html`
-          <div class="regulation-chart-body">
-            <!-- Graphique de régulation à venir -->
-          </div>
-        ` : ''}
+        <div class="regulation-chart-body" style=${this._regulationChartOpen ? '' : 'display:none'}>
+          <vt-regulation-chart
+            .hass=${this.hass}
+            .entityId=${this._config?.entity ?? ''}
+            .visible=${this._regulationChartOpen}
+            .targetTemp=${this.temperature ?? null}
+            .roomTemp=${this.current ?? null}
+            .regulatedTemp=${this.regulatedTargetTemperature}
+            .powerPercent=${this.powerPercent ?? null}
+          ></vt-regulation-chart>
+        </div>
       </div>
     `;
   }
