@@ -1384,6 +1384,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         color: var(--disabled-text-color, #bbb);
       }
 
+      .preset-temp-readonly {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
       .preset-temp-input {
         width: 40px;
         padding: 2px 1px;
@@ -1466,10 +1472,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       /* Column colors */
-      .preset-temp-col-label.col-frost { color: #3a9ff2; }
-      .preset-temp-col-label.col-eco   { color: #5dd461; }
-      .preset-temp-col-label.col-comfort { color: #f9a21f; }
-      .preset-temp-col-label.col-boost  { color: #f75252; }
+      .preset-temp-col-label.col-frost, .preset-temp-cell.preset-col-frost  { color: #3a9ff2; }
+      .preset-temp-col-label.col-eco, .preset-temp-cell.preset-col-eco   { color: #5dd461; }
+      .preset-temp-col-label.col-comfort, .preset-temp-cell.preset-col-comfort { color: #f9a21f; }
+      .preset-temp-col-label.col-boost, .preset-temp-cell.preset-col-boost  { color: #f75252; }
 
       .preset-col-frost .preset-step-btn       { background: rgba(58,159,242,0.15); color: #3a9ff2; border-color: rgba(58,159,242,0.4); }
       .preset-col-frost .preset-step-btn:hover  { background: #3a9ff2; color: white; }
@@ -1549,10 +1555,124 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   /**
-   * Renders the collapsible preset temperature modification panel.
-   * Shows a table with 4 columns (Frost, Eco, Comfort, Boost) and rows
-   * for heat/cool × present/away combinations, based on discovered entities.
+   * Gets preset temperature from entities or central config.
+   * @param preset preset name (frost, eco, comfort, boost)
+   * @param mode optional hvac mode (heat/cool), auto-detected if not provided
+   * @param away optional away state, auto-detected if not provided
+   * @param includeEntities if true, tries number entities first; if false, only reads central config
+   * @returns temperature value or null if not found/zero
    */
+  private _getPresetTemperature(
+    preset: string,
+    mode?: 'heat' | 'cool',
+    away?: boolean,
+    includeEntities: boolean = true
+  ): number | null {
+    if (!this.hass) {
+      return null;
+    }
+
+    // Auto-detect mode/away if not provided
+    const resolvedMode = mode ?? (this.hvacMode === hvac_mode_COOL ? 'cool' : 'heat');
+    const resolvedAway = away ?? (this._hasPresence ? !this.presence : false);
+
+    // Try entity-based temperature if enabled
+    if (includeEntities && this._presetTempEntities && this._presetTempEntities.length > 0) {
+      const candidates = this._presetTempEntities.filter((e) => e.preset === preset);
+      if (candidates.length > 0) {
+        // Prioritize: exact match (mode+away) > mode match > any mode
+        const orderedCandidates = [
+          ...candidates.filter((e) => e.mode === resolvedMode && e.away === resolvedAway),
+          ...candidates.filter((e) => e.mode === resolvedMode && e.away !== resolvedAway),
+          ...candidates.filter((e) => e.mode !== resolvedMode)
+        ];
+
+        for (const candidate of orderedCandidates) {
+          const state = this.hass.states[candidate.entityId];
+          if (state && state.state !== UNAVAILABLE) {
+            const value = Number.parseFloat(state.state);
+            if (Number.isFinite(value) && value !== 0) {
+              if (DEBUG) console.log(`[PresetTemp] Found temperature ${value} for preset ${preset} from entity ${candidate.entityId}`);
+              return value;
+            }
+          }
+        }
+      }
+    }
+
+    // Fallback: central preset_temperatures attribute
+    if (!this.stateObj?.attributes?.preset_temperatures) {
+      return null;
+    }
+    const presetTemps = this.stateObj.attributes.preset_temperatures;
+    if (typeof presetTemps !== 'object' || presetTemps === null) {
+      return null;
+    }
+
+    // Build key lookup with priority
+    const keysToTry: string[] = [];
+    const presetTyped = preset as PresetTempEntityInfo['preset'];
+
+    // Specific mode+away keys first
+    const modeKey = `${preset}_${resolvedMode}_temp`;
+    const modeAwayKey = `${preset}_${resolvedMode}_away_temp`;
+    if (resolvedAway) {
+      keysToTry.push(modeAwayKey);
+    }
+    keysToTry.push(modeKey);
+
+    // Generic present/away and fallback keys
+    if (resolvedAway) {
+      keysToTry.push(`${preset}_away_temp`);
+    }
+    keysToTry.push(`${preset}_temp`, preset);
+
+    for (const key of keysToTry) {
+      if (key in presetTemps && presetTemps[key] !== undefined) {
+        const value = Number.parseFloat(String((presetTemps as any)[key]));
+        if (Number.isFinite(value) && value !== 0) {
+          if (DEBUG) console.log(`[PresetTemp] Found central value for ${preset} using key ${key}: ${value}`);
+          return value;
+        }
+      }
+    }
+
+    // Optional nested structure in mode object (heat/cool)
+    if (presetTemps[resolvedMode] && typeof presetTemps[resolvedMode] === 'object') {
+      const modeTemps = presetTemps[resolvedMode] as Record<string, any>;
+      if (modeTemps[preset] !== undefined) {
+        const value = Number.parseFloat(String(modeTemps[preset]));
+        if (Number.isFinite(value) && value !== 0) {
+          if (DEBUG) console.log(`[PresetTemp] Found central nested value for ${preset} in ${resolvedMode}: ${value}`);
+          return value;
+        }
+      }
+    }
+
+    if (DEBUG) console.log(`[PresetTemp] No temperature found for preset ${preset}`);
+    return null;
+  }
+
+  /**
+   * Checks if preset_temperatures attribute contains at least one valid temperature > 0
+   */
+  private _hasValidCentralPresetTemperatures(): boolean {
+    if (!this.stateObj?.attributes?.preset_temperatures) {
+      return false;
+    }
+    const presetTemps = this.stateObj.attributes.preset_temperatures;
+
+    const hasValidValue = (val: any): boolean => {
+      if (typeof val === 'number' && Number.isFinite(val) && val !== 0) return true;
+      if (typeof val === 'object' && val !== null) {
+        return Object.values(val).some(hasValidValue);
+      }
+      return false;
+    };
+
+    return hasValidValue(presetTemps);
+  }
+
   private _renderPresetModificationPanel(): TemplateResult {
     if (!this._config?.allow_preset_modification) return html``;
 
@@ -1571,58 +1691,98 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       lookup.set(key, info.entityId);
     }
 
-    // Determine which rows have at least one entity
-    const rows: Array<{ mode: 'heat' | 'cool', away: boolean, labelKey: string }> = [
+    const hasCentralPresetAttributes = this._hasValidCentralPresetTemperatures();
+    const hasPresetTempEntities = this._presetTempEntities.length > 0;
+    const hasAvailablePresetTempEntities = this._presetTempEntities.some(info => {
+      const state = this.hass?.states[info.entityId];
+      return !!state && state.state !== UNAVAILABLE;
+    });
+
+    // Determine which rows to display
+    let rows: Array<{ mode: 'heat' | 'cool', away: boolean, labelKey: string }> = [
       { mode: 'heat' as const, away: false, labelKey: 'extra_states.preset_row_heat' },
       { mode: 'heat' as const, away: true,  labelKey: 'extra_states.preset_row_heat_away' },
       { mode: 'cool' as const, away: false, labelKey: 'extra_states.preset_row_cool' },
       { mode: 'cool' as const, away: true,  labelKey: 'extra_states.preset_row_cool_away' },
-    ].filter(row =>
-      presetCols.some(p => lookup.has(`${row.mode}_${row.away ? 'away' : 'present'}_${p}`))
-    );
+    ];
 
-    const hasAnyEntity = this._presetTempEntities.length > 0;
+    // Always filter rows by current hvac_mode (heat or cool)
+    const currentMode = this.hvacMode === hvac_mode_COOL ? 'cool' : 'heat';
+    rows = rows.filter(row => row.mode === currentMode);
+
+    // If preset-temp entities are available, show rows with matching entities.
+    // Fallback to central attributes only when no entity is available.
+    if (hasAvailablePresetTempEntities) {
+      rows = rows.filter(row =>
+        presetCols.some(p => lookup.has(`${row.mode}_${row.away ? 'away' : 'present'}_${p}`))
+      );
+    } else if (!hasCentralPresetAttributes) {
+      rows = [];
+    }
+
+    const hasAnyEntity = hasAvailablePresetTempEntities || hasCentralPresetAttributes;
 
     const renderCell = (mode: 'heat' | 'cool', away: boolean, preset: PresetTempEntityInfo['preset']) => {
       const key = `${mode}_${away ? 'away' : 'present'}_${preset}`;
       const entityId = lookup.get(key);
-      if (!entityId) return html`<td class="preset-temp-cell empty">–</td>`;
-      const state = this.hass?.states[entityId];
-      const val = state ? parseFloat(state.state) : null;
-      const stepAttr = state?.attributes?.step ?? 0.5;
-      const minAttr = state?.attributes?.min ?? 7;
-      const maxAttr = state?.attributes?.max ?? 35;
-      const applyValue = (newVal: number) => {
-        const clamped = Math.round(Math.min(maxAttr, Math.max(minAttr, newVal)) / stepAttr) * stepAttr;
-        const rounded = Math.round(clamped * 100) / 100;
-        this.hass.callService('number', 'set_value', { entity_id: entityId, value: rounded });
-      };
-      return html`
-        <td class="preset-temp-cell preset-col-${preset}">
-          <div class="preset-temp-stepper">
-            <input
-              type="number"
-              class="preset-temp-input"
-              .value=${val !== null && !isNaN(val) ? String(val) : ''}
-              step=${stepAttr}
-              min=${minAttr}
-              max=${maxAttr}
-              @change=${(ev: Event) => {
-                const newVal = parseFloat((ev.target as HTMLInputElement).value);
-                if (!isNaN(newVal)) applyValue(newVal);
-              }}
-            />
-            <div class="preset-step-btns">
-              <button class="preset-step-btn preset-step-up" @click=${() => {
-                if (val !== null && !isNaN(val)) applyValue(val + stepAttr);
-              }}>+</button>
-              <button class="preset-step-btn preset-step-down" @click=${() => {
-                if (val !== null && !isNaN(val)) applyValue(val - stepAttr);
-              }}>−</button>
+      const entityState = entityId ? this.hass.states[entityId] : undefined;
+      const entityAvailable = !!entityState && entityState.state !== UNAVAILABLE;
+
+      if (entityId && entityAvailable) {
+        const val = parseFloat(entityState!.state);
+        const stepAttr = entityState?.attributes?.step ?? 0.5;
+        const minAttr = entityState?.attributes?.min ?? 7;
+        const maxAttr = entityState?.attributes?.max ?? 35;
+        const applyValue = (newVal: number) => {
+          const clamped = Math.round(Math.min(maxAttr, Math.max(minAttr, newVal)) / stepAttr) * stepAttr;
+          const rounded = Math.round(clamped * 100) / 100;
+          this.hass.callService('number', 'set_value', { entity_id: entityId, value: rounded });
+        };
+
+        return html`
+          <td class="preset-temp-cell preset-col-${preset}">
+            <div class="preset-temp-stepper">
+              <input
+                type="number"
+                class="preset-temp-input"
+                .value=${val !== null && !isNaN(val) ? String(val) : ''}
+                step=${stepAttr}
+                min=${minAttr}
+                max=${maxAttr}
+                @change=${(ev: Event) => {
+                  const newVal = parseFloat((ev.target as HTMLInputElement).value);
+                  if (!isNaN(newVal)) applyValue(newVal);
+                }}
+              />
+              <div class="preset-step-btns">
+                <button class="preset-step-btn preset-step-up" @click=${() => {
+                  if (val !== null && !isNaN(val)) applyValue(val + stepAttr);
+                }}>+</button>
+                <button class="preset-step-btn preset-step-down" @click=${() => {
+                  if (val !== null && !isNaN(val)) applyValue(val - stepAttr);
+                }}>−</button>
+              </div>
             </div>
-          </div>
-        </td>
-      `;
+          </td>
+        `;
+      }
+
+      if (!hasAvailablePresetTempEntities && hasCentralPresetAttributes) {
+        const fallbackValue = this._getPresetTemperature(preset, mode, away, false);
+        if (fallbackValue !== null) {
+          return html`
+            <td class="preset-temp-cell preset-col-${preset}">
+              <div class="preset-temp-stepper">
+                <div class="preset-temp-readonly">
+                  ${formatNumber(fallbackValue, this.hass.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} ${this.hass.config.unit_system.temperature}
+                </div>
+              </div>
+            </td>
+          `;
+        }
+      }
+
+      return html`<td class="preset-temp-cell empty">–</td>`;
     };
 
     return html`
@@ -2094,32 +2254,46 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     if (!this.hass || !this._config?.entity) return;
     const hassAny = this.hass as any;
     const entityRegistry: Record<string, any> | undefined = hassAny.entities;
-    if (!entityRegistry) {
-      if (DEBUG) console.log(`[PresetMod] hass.entities not available`);
-      return;
-    }
-    // Trouver le device_id de l'entité climate
-    const climateEntry = entityRegistry[this._config.entity];
-    if (!climateEntry?.device_id) {
-      if (DEBUG) console.log(`[PresetMod] No device_id for entity ${this._config.entity}`);
-      return;
-    }
-    const deviceId = climateEntry.device_id;
-    if (DEBUG) console.log(`[PresetMod] device_id=${deviceId}`);
     const found: PresetTempEntityInfo[] = [];
-    for (const [entityId, entry] of Object.entries(entityRegistry)) {
-      if (entry.device_id !== deviceId) continue;
-      if (!entityId.startsWith('number.')) continue;
-      const state = this.hass.states[entityId];
-      if (!state) continue;
-      if (state.attributes?.device_class !== 'temperature') continue;
-      const info = this._classifyPresetEntity(entityId);
-      if (info) {
-        if (DEBUG) console.log(`[PresetMod] found entity: ${entityId} preset=${info.preset} mode=${info.mode} away=${info.away}`);
-        found.push(info);
+
+    if (entityRegistry) {
+      // Trouver le device_id de l'entité climate
+      const climateEntry = entityRegistry[this._config.entity];
+      if (climateEntry?.device_id) {
+        const deviceId = climateEntry.device_id;
+        if (DEBUG) console.log(`[PresetMod] device_id=${deviceId}`);
+        for (const [entityId, entry] of Object.entries(entityRegistry)) {
+          if (entry.device_id !== deviceId) continue;
+          if (!entityId.startsWith('number.')) continue;
+          const state = this.hass.states[entityId];
+          if (!state) continue;
+          if (state.attributes?.device_class !== 'temperature') continue;
+          const info = this._classifyPresetEntity(entityId);
+          if (info) {
+            if (DEBUG) console.log(`[PresetMod] found entity: ${entityId} preset=${info.preset} mode=${info.mode} away=${info.away}`);
+            found.push(info);
+          }
+        }
+      } else {
+        if (DEBUG) console.log(`[PresetMod] No device_id for entity ${this._config.entity}, fallback to state scan`);
+      }
+    } else {
+      if (DEBUG) console.log(`[PresetMod] hass.entities not available, fallback to state scan`);
+    }
+
+    // Fallback si pas de device_id ou hass.entities manquant : scan de hass.states
+    if (found.length === 0) {
+      for (const [entityId, state] of Object.entries(this.hass.states)) {
+        if (!entityId.startsWith('number.')) continue;
+        if (state.attributes?.device_class !== 'temperature' && state.attributes?.unit_of_measurement !== this.hass.config.unit_system.temperature) continue;
+        const info = this._classifyPresetEntity(entityId);
+        if (info) {
+          if (DEBUG) console.log(`[PresetMod] fallback found entity: ${entityId} preset=${info.preset} mode=${info.mode} away=${info.away}`);
+          found.push(info);
+        }
       }
     }
-    // Mettre à jour seulement si le contenu a changé (pour éviter re-renders inutiles)
+
     const oldIds = this._presetTempEntities.map(e => e.entityId).join(',');
     const newIds = found.map(e => e.entityId).join(',');
     if (oldIds !== newIds) {
@@ -2137,7 +2311,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       this._willUpdatePower();
       
       if (this._config?.allow_preset_modification) {
-        this._discoverPresetTempEntities();
+      this._discoverPresetTempEntities();
       }
 
       const stateObj = this.hass.states[entity_id] as ClimateEntity;
@@ -2249,7 +2423,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           if (DEBUG) console.log(`After hvac_action patch ${this.hvacAction}`);
         }
 
-
+        // Always discover preset temperature entities for tooltip, even when modification panel is disabled
+        this._discoverPresetTempEntities();
         // Sort modes to have "off" at the end
         if (DEBUG) console.log(`Modes are ${this.modes}`);
         if (this.modes.length > 1 && this.modes.includes(hvac_mode_OFF)) {
@@ -2781,17 +2956,27 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   }
 
   private _renderPreset(preset: string, currentPreset: string): TemplateResult {
-    const localizePreset =
-      ( this.hass!.localize(`component.climate.state._.${preset}`) ||
-        localize({ hass: this.hass, string: `extra_states.${preset}` }))
-      + "\n" + localize({ hass: this.hass, string: `extra_states.change_message` });
+    const localizePresetLabel =
+      this.hass!.localize(`component.climate.state._.${preset}`) ||
+      localize({ hass: this.hass, string: `extra_states.${preset}` });
 
-    // title="${currentPreset === preset ? preset : ''}"
+    const presetTemp = this._getPresetTemperature(preset);
+    const presetTempText = presetTemp !== null
+      ? `${formatNumber(presetTemp, this.hass.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} ${this.hass.config.unit_system.temperature}`
+      : null;
+
+    if (DEBUG) console.log(`[RenderPreset] Rendering preset ${preset}: temp=${presetTemp}, tempText=${presetTempText}`);
+
+    const tooltip = presetTempText
+      ? `${localizePresetLabel} - ${presetTempText}`
+      : localizePresetLabel;
+
+    const localizePreset = `${tooltip}\n${localize({ hass: this.hass, string: `extra_states.change_message` })}`;
 
     return html `
       <div class="preset-label preset-${preset}">
           <ha-icon-button
-            title="${currentPreset === preset ? preset : ''}"
+            title="${tooltip}"
             class=${classMap({ "selected-icon": currentPreset === preset })}
             .preset=${preset}
             @click=${this._handlePreset}
