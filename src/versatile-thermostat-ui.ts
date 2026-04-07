@@ -1502,10 +1502,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       }
 
       /* Column colors */
-      .preset-temp-col-label.col-frost { color: #3a9ff2; }
-      .preset-temp-col-label.col-eco   { color: #5dd461; }
-      .preset-temp-col-label.col-comfort { color: #f9a21f; }
-      .preset-temp-col-label.col-boost  { color: #f75252; }
+      .preset-temp-col-label.col-frost, .preset-temp-cell.preset-col-frost  { color: #3a9ff2; }
+      .preset-temp-col-label.col-eco, .preset-temp-cell.preset-col-eco   { color: #5dd461; }
+      .preset-temp-col-label.col-comfort, .preset-temp-cell.preset-col-comfort { color: #f9a21f; }
+      .preset-temp-col-label.col-boost, .preset-temp-cell.preset-col-boost  { color: #f75252; }
 
       .preset-col-frost .preset-step-btn       { background: rgba(58,159,242,0.15); color: #3a9ff2; border-color: rgba(58,159,242,0.4); }
       .preset-col-frost .preset-step-btn:hover  { background: #3a9ff2; color: white; }
@@ -1688,58 +1688,94 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       lookup.set(key, info.entityId);
     }
 
-    // Determine which rows have at least one entity
-    const rows: Array<{ mode: 'heat' | 'cool', away: boolean, labelKey: string }> = [
+    const hasCentralPresetAttributes = this._hasValidCentralPresetTemperatures();
+    const hasAvailablePresetTempEntities = this._presetTempEntities.some(info => {
+      const state = this.hass?.states[info.entityId];
+      return !!state && state.state !== UNAVAILABLE;
+    });
+
+    const currentMode = this.hvacMode === hvac_mode_COOL ? 'cool' : 'heat';
+
+    let rows: Array<{ mode: 'heat' | 'cool', away: boolean, labelKey: string }> = [
       { mode: 'heat' as const, away: false, labelKey: 'extra_states.preset_row_heat' },
       { mode: 'heat' as const, away: true,  labelKey: 'extra_states.preset_row_heat_away' },
       { mode: 'cool' as const, away: false, labelKey: 'extra_states.preset_row_cool' },
       { mode: 'cool' as const, away: true,  labelKey: 'extra_states.preset_row_cool_away' },
-    ].filter(row =>
-      presetCols.some(p => lookup.has(`${row.mode}_${row.away ? 'away' : 'present'}_${p}`))
-    );
+    ];
 
-    const hasAnyEntity = this._presetTempEntities.length > 0;
+    rows = rows.filter(row => row.mode === currentMode);
+
+    if (hasAvailablePresetTempEntities) {
+      rows = rows.filter(row =>
+        presetCols.some(p => lookup.has(`${row.mode}_${row.away ? 'away' : 'present'}_${p}`))
+      );
+    } else if (!hasCentralPresetAttributes) {
+      rows = [];
+    }
+
+    const hasAnyEntity = hasAvailablePresetTempEntities || hasCentralPresetAttributes;
 
     const renderCell = (mode: 'heat' | 'cool', away: boolean, preset: PresetTempEntityInfo['preset']) => {
       const key = `${mode}_${away ? 'away' : 'present'}_${preset}`;
       const entityId = lookup.get(key);
-      if (!entityId) return html`<td class="preset-temp-cell empty">–</td>`;
-      const state = this.hass?.states[entityId];
-      const val = state ? parseFloat(state.state) : null;
-      const stepAttr = state?.attributes?.step ?? 0.5;
-      const minAttr = state?.attributes?.min ?? 7;
-      const maxAttr = state?.attributes?.max ?? 35;
-      const applyValue = (newVal: number) => {
-        const clamped = Math.round(Math.min(maxAttr, Math.max(minAttr, newVal)) / stepAttr) * stepAttr;
-        const rounded = Math.round(clamped * 100) / 100;
-        this.hass.callService('number', 'set_value', { entity_id: entityId, value: rounded });
-      };
-      return html`
-        <td class="preset-temp-cell preset-col-${preset}">
-          <div class="preset-temp-stepper">
-            <input
-              type="number"
-              class="preset-temp-input"
-              .value=${val !== null && !isNaN(val) ? String(val) : ''}
-              step=${stepAttr}
-              min=${minAttr}
-              max=${maxAttr}
-              @change=${(ev: Event) => {
-                const newVal = parseFloat((ev.target as HTMLInputElement).value);
-                if (!isNaN(newVal)) applyValue(newVal);
-              }}
-            />
-            <div class="preset-step-btns">
-              <button class="preset-step-btn preset-step-up" @click=${() => {
-                if (val !== null && !isNaN(val)) applyValue(val + stepAttr);
-              }}>+</button>
-              <button class="preset-step-btn preset-step-down" @click=${() => {
-                if (val !== null && !isNaN(val)) applyValue(val - stepAttr);
-              }}>−</button>
+      const entityState = entityId ? this.hass.states[entityId] : undefined;
+      const entityAvailable = !!entityState && entityState.state !== UNAVAILABLE;
+
+      if (entityId && entityAvailable) {
+        const val = parseFloat(entityState!.state);
+        const stepAttr = entityState?.attributes?.step ?? 0.5;
+        const minAttr = entityState?.attributes?.min ?? 7;
+        const maxAttr = entityState?.attributes?.max ?? 35;
+        const applyValue = (newVal: number) => {
+          const clamped = Math.round(Math.min(maxAttr, Math.max(minAttr, newVal)) / stepAttr) * stepAttr;
+          const rounded = Math.round(clamped * 100) / 100;
+          this.hass.callService('number', 'set_value', { entity_id: entityId, value: rounded });
+        };
+
+        return html`
+          <td class="preset-temp-cell preset-col-${preset}">
+            <div class="preset-temp-stepper">
+              <input
+                type="number"
+                class="preset-temp-input"
+                .value=${val !== null && !isNaN(val) ? String(val) : ''}
+                step=${stepAttr}
+                min=${minAttr}
+                max=${maxAttr}
+                @change=${(ev: Event) => {
+                  const newVal = parseFloat((ev.target as HTMLInputElement).value);
+                  if (!isNaN(newVal)) applyValue(newVal);
+                }}
+              />
+              <div class="preset-step-btns">
+                <button class="preset-step-btn preset-step-up" @click=${() => {
+                  if (val !== null && !isNaN(val)) applyValue(val + stepAttr);
+                }}>+</button>
+                <button class="preset-step-btn preset-step-down" @click=${() => {
+                  if (val !== null && !isNaN(val)) applyValue(val - stepAttr);
+                }}>−</button>
+              </div>
             </div>
-          </div>
-        </td>
-      `;
+          </td>
+        `;
+      }
+
+      if (!hasAvailablePresetTempEntities && hasCentralPresetAttributes) {
+        const fallbackValue = this._getPresetTemperature(preset, mode, away, false);
+        if (fallbackValue !== null) {
+          return html`
+            <td class="preset-temp-cell preset-col-${preset}">
+              <div class="preset-temp-stepper">
+                <div class="preset-temp-readonly">
+                  ${formatNumber(fallbackValue, this.hass.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} ${this.hass.config.unit_system.temperature}
+                </div>
+              </div>
+            </td>
+          `;
+        }
+      }
+
+      return html`<td class="preset-temp-cell empty">–</td>`;
     };
 
     return html`
@@ -2900,18 +2936,124 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     `;
   }
 
-  private _renderPreset(preset: string, currentPreset: string): TemplateResult {
-    const localizePreset =
-      ( this.hass!.localize(`component.climate.state._.${preset}`) ||
-        localize({ hass: this.hass, string: `extra_states.${preset}` }))
-      + "\n" + localize({ hass: this.hass, string: `extra_states.change_message` });
+  /**
+   * Returns preset temperature by priority:
+   * - number entity temperature when includeEntities=true
+   * - central preset_temperatures fallback (smart key patterns)
+   * rejects 0 values.
+   */
+  private _getPresetTemperature(
+    preset: string,
+    mode?: 'heat' | 'cool',
+    away?: boolean,
+    includeEntities: boolean = true
+  ): number | null {
+    if (!this.hass) {
+      return null;
+    }
 
-    // title="${currentPreset === preset ? preset : ''}"
+    const resolvedMode = mode ?? (this.hvacMode === hvac_mode_COOL ? 'cool' : 'heat');
+    const resolvedAway = away ?? (this._hasPresence ? !this.presence : false);
+
+    if (includeEntities && this._presetTempEntities?.length) {
+      const candidates = this._presetTempEntities.filter((e) => e.preset === preset);
+      if (candidates.length > 0) {
+        const orderedCandidates = [
+          ...candidates.filter((e) => e.mode === resolvedMode && e.away === resolvedAway),
+          ...candidates.filter((e) => e.mode === resolvedMode && e.away !== resolvedAway),
+          ...candidates.filter((e) => e.mode !== resolvedMode),
+        ];
+
+        for (const candidate of orderedCandidates) {
+          const state = this.hass.states[candidate.entityId];
+          if (state && state.state !== UNAVAILABLE) {
+            const value = Number.parseFloat(state.state);
+            if (Number.isFinite(value) && value !== 0) {
+              if (DEBUG) console.log(`[PresetTemp] entity value for ${preset} from ${candidate.entityId}: ${value}`);
+              return value;
+            }
+          }
+        }
+      }
+    }
+
+    const presetTemps = this.stateObj?.attributes?.preset_temperatures;
+    if (!presetTemps || typeof presetTemps !== 'object') {
+      return null;
+    }
+
+    const keysToTry: string[] = [];
+    const modeKey = `${preset}_${resolvedMode}_temp`;
+    const modeAwayKey = `${preset}_${resolvedMode}_away_temp`;
+
+    if (resolvedAway) {
+      keysToTry.push(modeAwayKey);
+    }
+    keysToTry.push(modeKey, `${preset}_away_temp`, `${preset}_temp`, preset);
+
+    for (const key of keysToTry) {
+      if (key in presetTemps && presetTemps[key] !== undefined) {
+        const value = Number.parseFloat(String((presetTemps as any)[key]));
+        if (Number.isFinite(value) && value !== 0) {
+          if (DEBUG) console.log(`[PresetTemp] central value for ${preset} using key ${key}: ${value}`);
+          return value;
+        }
+      }
+    }
+
+    if (presetTemps[resolvedMode] && typeof presetTemps[resolvedMode] === 'object') {
+      const modeTemps = presetTemps[resolvedMode] as Record<string, any>;
+      if (modeTemps[preset] !== undefined) {
+        const value = Number.parseFloat(String(modeTemps[preset]));
+        if (Number.isFinite(value) && value !== 0) {
+          if (DEBUG) console.log(`[PresetTemp] central nested value for ${preset} in ${resolvedMode}: ${value}`);
+          return value;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private _hasValidCentralPresetTemperatures(): boolean {
+    if (!this.stateObj?.attributes?.preset_temperatures) {
+      return false;
+    }
+    const presetTemps = this.stateObj.attributes.preset_temperatures;
+
+    const hasValid = (obj: any): boolean => {
+      if (typeof obj === 'number') {
+        return Number.isFinite(obj) && obj !== 0;
+      }
+      if (obj && typeof obj === 'object') {
+        return Object.values(obj).some(hasValid);
+      }
+      return false;
+    };
+
+    return hasValid(presetTemps);
+  }
+
+  private _renderPreset(preset: string, currentPreset: string): TemplateResult {
+    const localizePresetLabel =
+      this.hass!.localize(`component.climate.state._.${preset}`) ||
+      localize({ hass: this.hass, string: `extra_states.${preset}` });
+
+    const presetTemp = this._getPresetTemperature(preset);
+    const presetTempText = presetTemp !== null
+      ? `${formatNumber(presetTemp, this.hass.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} ${this.hass.config.unit_system.temperature}`
+      : null;
+
+    const tooltip = presetTempText
+      ? `${localizePresetLabel} - ${presetTempText}`
+      : localizePresetLabel;
+
+    const localizePreset = `${tooltip}\n${localize({ hass: this.hass, string: `extra_states.change_message` })}`;
 
     return html `
       <div class="preset-label preset-${preset}">
           <ha-icon-button
-            title="${currentPreset === preset ? preset : ''}"
+            title="${tooltip}"
             class=${classMap({ "selected-icon": currentPreset === preset })}
             .preset=${preset}
             @click=${this._handlePreset}
