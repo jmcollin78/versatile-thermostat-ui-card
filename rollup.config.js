@@ -3,7 +3,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import babel from "@rollup/plugin-babel";
 import json from "@rollup/plugin-json";
-import { terser } from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 import serve from "rollup-plugin-serve";
 import ignore from "./rollup-ignore-plugin.js";
 import cssImports from "rollup-plugin-import-css";
