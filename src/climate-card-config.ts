@@ -13,6 +13,7 @@ const entitySharedConfigStruct = object({
     name: optional(string()),
     icon: optional(string()),
     autoStartStopEnableEntity: optional(string()),
+    autoStartStopStopModeEntity: optional(string()),
     powerEntity: optional(string()),
     visibility: optional(any()),
 });

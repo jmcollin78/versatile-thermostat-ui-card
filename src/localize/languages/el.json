@@ -42,7 +42,8 @@
         "allow_preset_modification": "Να επιτρέπεται η τροποποίηση θερμοκρασιών προεπιλογής",
         "show_status_text": "Εμφάνιση τρέχουσας κατάστασης σε κείμενο",
         "show_background_gradient_on_active": "Εμφάνιση της διαβάθμισης φόντου του ρυθμιστικού όταν η οντότητα είναι ενεργή",
-        "show_regulation_chart": "Show regulation chart"
+        "show_regulation_chart": "Show regulation chart",
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
       }
     }
   },
@@ -138,7 +139,11 @@
     "preset_row_heat_away": "Θέρμανση (απουσία)",
     "preset_row_cool": "Ψύξη",
     "preset_row_cool_away": "Ψύξη (απουσία)",
-    "regulation_chart_title": "Regulation chart"
+    "regulation_chart_title": "Regulation chart",
+    "auto_start_stop_mode_disabled": "Disabled",
+    "auto_start_stop_mode_off": "Turn off",
+    "auto_start_stop_mode_fan_only": "Fan only",
+    "auto_start_stop_mode_dry": "Dry"
   },
   "theme": "Θέμα",
   "theme_classic": "Κλασικό",

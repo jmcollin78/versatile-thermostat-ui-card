@@ -35,6 +35,7 @@ const loadHaComponents = (version: string) => {
 const CLIMATE_LABELS = [
     "theme",
     "autoStartStopEnableEntity",
+    "autoStartStopStopModeEntity",
     "powerEntity",
     "section_all_themes",
     "section_classic_only",
@@ -77,6 +78,7 @@ const computeSchema = memoizeOne(
             name: "",
             schema: [
                 { name: "autoStartStopEnableEntity", selector: { entity: { domain: ["switch"] } } },
+                { name: "autoStartStopStopModeEntity", selector: { entity: { domain: ["select"] } } },
                 { name: "powerEntity", selector: { entity: { domain: ["sensor", "input_number"] } } },
             ]
         },

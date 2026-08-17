@@ -43,7 +43,8 @@
         "allow_preset_modification": "Позволи промяна на температурите на предварителни настройки",
         "show_status_text": "Показване на статуса като текст",
         "show_background_gradient_on_active": "Показване на фоновия градиент на плъзгача, когато обектът е активен",
-        "show_regulation_chart": "Show regulation chart"
+        "show_regulation_chart": "Show regulation chart",
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
       }
     }
   },
@@ -139,7 +140,11 @@
     "preset_row_heat_away": "Отопление (отсъствие)",
     "preset_row_cool": "Охлаждане",
     "preset_row_cool_away": "Охлаждане (отсъствие)",
-    "regulation_chart_title": "Regulation chart"
+    "regulation_chart_title": "Regulation chart",
+    "auto_start_stop_mode_disabled": "Disabled",
+    "auto_start_stop_mode_off": "Turn off",
+    "auto_start_stop_mode_fan_only": "Fan only",
+    "auto_start_stop_mode_dry": "Dry"
   },
   "theme": "Тема",
   "theme_classic": "Класически",

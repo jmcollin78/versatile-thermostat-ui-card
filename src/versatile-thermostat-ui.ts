@@ -52,6 +52,7 @@ import {
   mdiFanAuto,
   mdiFanOff,
   mdiPowerSleep,
+  mdiPowerCycle,
   mdiBullseyeArrow,
   mdiSleep,
   mdiInformationBoxOutline,
@@ -126,6 +127,7 @@ const modeIcons: {
   auto_fan_mode_off: mdiFanOff,
   fan_mode: mdiFan,
   power_sleep: mdiPowerSleep,
+  auto_start_stop: mdiPowerCycle,
   sleep: mdiSleep
 };
 type Target = "value" | "low" | "high";
@@ -152,6 +154,11 @@ const autoFanModeMapping={
 
 const hvacOffReasonAutoStartStop="hvac_off_auto_start_stop";
 const autoStartStopLevels=["auto_start_stop_slow", "auto_start_stop_medium", "auto_start_stop_fast"];
+
+// Value used in the unified auto-start/stop selector to disable the feature (turn off the enable switch).
+const autoStartStopDisabledValue="disabled";
+// Backend stop modes (hvac_mode applied when a stop is detected). "off" is always available.
+const autoStartStopStopModeOff="off";
 
 const minPowerWatt=7;
 
@@ -390,6 +397,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _hasAutoStartStop: boolean = false;
   private _isAutoStartStopEnabled: boolean = false;
   private _isAutoStartStopConfigured: boolean = false;
+  private _autoStartStopStopMode: string = autoStartStopStopModeOff;
+  private _autoStartStopStopModeOptions: string[] = [];
   private _isLockConfigured: boolean = false;
   private _isLocked: boolean = false;
   private _hasLockCode: boolean = false;
@@ -865,6 +874,28 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         border-color: var(--primary-color);
         background: var(--primary-color);
         color: var(--text-primary-color, #fff);
+      }
+
+      .auto-start-stop-select {
+        height: 28px;
+        max-width: 120px;
+        border: 1px solid var(--divider-color, #e0e0e0);
+        border-radius: 4px;
+        padding: 0 4px;
+        font-size: 13px;
+        background: var(--card-background-color, #fff);
+        color: var(--primary-text-color);
+        outline: none;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+      }
+
+      .auto-start-stop-select:focus {
+        border-color: var(--primary-color);
+      }
+
+      .auto-start-stop-select.active {
+        border-color: var(--primary-color);
       }
 
       .timed-preset-remaining {
@@ -2042,7 +2073,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       ${ this.messages.length > 0 ? svg`
         ${this._renderMessagesButton()}
         `:''}
-      ${ this._config!.autoStartStopEnableEntity && this._isAutoStartStopConfigured ? svg`
+      ${ (this._config!.autoStartStopEnableEntity || this._config!.autoStartStopStopModeEntity) && this._isAutoStartStopConfigured ? svg`
         ${ this._renderAutoStartStopEnable()}
         `:'' }
       ${svg`
@@ -2144,6 +2175,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this._hasPresence = false;
         this._hasAutoStartStop = false;
         this._isAutoStartStopEnabled = false;
+        this._autoStartStopStopMode = autoStartStopStopModeOff;
+        this._autoStartStopStopModeOptions = [];
         this.humidity = 0;
       }
     }
@@ -2627,6 +2660,13 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         // this._hasAutoStartStopEnable = autoStartStopLevels.includes(attributes?.auto_start_stop_level);
         this._isAutoStartStopConfigured = (attributes?.is_auto_start_stop_configured === true);
         this._isAutoStartStopEnabled = (attributes?.auto_start_stop_manager?.auto_start_stop_enable === true);
+        this._autoStartStopStopMode = attributes?.auto_start_stop_manager?.auto_start_stop_stop_mode || autoStartStopStopModeOff;
+
+        // Read the available stop modes from the configured select entity (options are dynamic:
+        // "off" is always present, "fan_only"/"dry" only if the underlying device supports them).
+        const stopModeEntityId = this._config?.autoStartStopStopModeEntity;
+        const stopModeState = stopModeEntityId ? this.hass?.states[stopModeEntityId] : undefined;
+        this._autoStartStopStopModeOptions = stopModeState?.attributes?.options || [autoStartStopStopModeOff];
         if (DEBUG) console.log(`_isAutoStartStopConfigured=${this._isAutoStartStopConfigured} _isAutoStartStopEnabled=${this._isAutoStartStopEnabled} hvac_off_reason=${this.hvacOffReason}`);
 
         this._updateDisplay();
@@ -2755,19 +2795,39 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     });
   }
 
-  private _handleClickAutoStartStopEnable(/*e: MouseEvent*/): void {
+  private _handleChangeAutoStartStop(e: Event): void {
     if (this.isUserLocked) {
       return;
     }
-    // Activate or deactivate the auto-start-stop enable
-    let newMode = !this._isAutoStartStopEnabled;
+    const value = (e.target as HTMLSelectElement).value;
+    const enableEntity = this._config!.autoStartStopEnableEntity;
+    const stopModeEntity = this._config!.autoStartStopStopModeEntity;
     console.info(
-      `VersatileThermostatUI-CARD changing auto_start_stop_enable to ${newMode}`
+      `VersatileThermostatUI-CARD changing auto_start_stop selector to ${value}`
     );
-    
-    this.hass!.callService("switch", "toggle", {
-      entity_id: this._config!.autoStartStopEnableEntity,
-    });
+
+    if (value === autoStartStopDisabledValue) {
+      // Disable the whole feature by turning off the enable switch.
+      if (enableEntity) {
+        this.hass!.callService("switch", "turn_off", {
+          entity_id: enableEntity,
+        });
+      }
+      return;
+    }
+
+    // A stop mode was selected: make sure the feature is enabled, then apply the stop mode.
+    if (enableEntity && !this._isAutoStartStopEnabled) {
+      this.hass!.callService("switch", "turn_on", {
+        entity_id: enableEntity,
+      });
+    }
+    if (stopModeEntity) {
+      this.hass!.callService("select", "select_option", {
+        entity_id: stopModeEntity,
+        option: value,
+      });
+    }
   }
 
   private _handleToggleWindowByPass(/*e: MouseEvent*/): void {
@@ -3116,19 +3176,48 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       localize({ hass: this.hass, string: `extra_states.auto_start_stop_enable` }),
       localizeLabel = localize({ hass: this.hass, string: `extra_states.auto_start_stop_label` });
 
-    const checked=this._isAutoStartStopEnabled ? "checked":"";
+    // Unified selector value: "disabled" when the feature is off, otherwise the current stop mode.
+    const currentValue = this._isAutoStartStopEnabled
+      ? this._autoStartStopStopMode
+      : autoStartStopDisabledValue;
 
-    if (DEBUG) console.log(`checked=${checked}`);
+    // Build the option list: always "disabled" first, then the stop modes exposed by the select
+    // entity ("off" always present; "fan_only"/"dry" only when the device supports them).
+    const stopModeOptions = this._autoStartStopStopModeOptions.length
+      ? this._autoStartStopStopModeOptions
+      : [autoStartStopStopModeOff];
+    const options = [autoStartStopDisabledValue, ...stopModeOptions];
 
     return html`
-      <div class="left-info-label" title="${localizeInfo}">
+      <div class="left-info-label" title="${localizeLabel}">
         <span>
-          <input type="checkbox" .checked=${this._isAutoStartStopEnabled} class="auto-start-stop-enable" @click=${this._handleClickAutoStartStopEnable} .label="${localizeInfo}" name="auto-start-stop-enable">
+          <ha-icon-button
+            title="${localizeLabel}"
+            class="auto-start-stop"
+            .name=${"auto_start_stop"}
+            tabindex="0"
+            .path=${modeIcons["auto_start_stop"]}
+            .label=${localizeLabel}
+          >
+          </ha-icon-button>
         </span>
-        <span>${localizeLabel}</span>
+        <span>
+          <select
+            class="auto-start-stop-select ${this._isAutoStartStopEnabled ? 'active' : ''}"
+            @change=${this._handleChangeAutoStartStop}
+            .disabled=${this.isUserLocked}
+            title="${localizeInfo}"
+            name="auto-start-stop-select"
+          >
+            ${options.map((option) => html`
+              <option value="${option}" ?selected=${currentValue === option}>
+                ${localize({ hass: this.hass, string: `extra_states.auto_start_stop_mode_${option}` })}
+              </option>
+            `)}
+          </select>
+        </span>
       </div>
     `;
-
   }
 
   private _handleMoreInfo() {

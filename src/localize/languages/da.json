@@ -42,7 +42,8 @@
         "allow_preset_modification": "Tillad ændring af forudindstillingstemperaturer",
         "show_status_text": "Vis aktuel status som tekst",
         "show_background_gradient_on_active": "Vis skyderens baggrundsgradient, når enheden er aktiv",
-        "show_regulation_chart": "Show regulation chart"
+        "show_regulation_chart": "Show regulation chart",
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
       }
     }
   },
@@ -138,7 +139,11 @@
     "preset_row_heat_away": "Varme fraværende",
     "preset_row_cool": "Køling",
     "preset_row_cool_away": "Køling fraværende",
-    "regulation_chart_title": "Regulation chart"
+    "regulation_chart_title": "Regulation chart",
+    "auto_start_stop_mode_disabled": "Disabled",
+    "auto_start_stop_mode_off": "Turn off",
+    "auto_start_stop_mode_fan_only": "Fan only",
+    "auto_start_stop_mode_dry": "Dry"
   },
   "theme": "Tema",
   "theme_classic": "Klassisk",

@@ -43,7 +43,8 @@
         "allow_preset_modification": "Permitir modificação das temperaturas de predefinição",
         "show_status_text": "Mostrar o estado atual em texto",
         "show_background_gradient_on_active": "Mostrar o gradiente de fundo do controle deslizante quando a entidade está ativa",
-        "show_regulation_chart": "Show regulation chart"
+        "show_regulation_chart": "Show regulation chart",
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
       }
     }
   },
@@ -139,6 +140,10 @@
     "preset_row_heat_away": "Aquecimento (ausente)",
     "preset_row_cool": "Arrefecimento",
     "preset_row_cool_away": "Arrefecimento (ausente)",
-    "regulation_chart_title": "Regulation chart"
+    "regulation_chart_title": "Regulation chart",
+    "auto_start_stop_mode_disabled": "Disabled",
+    "auto_start_stop_mode_off": "Turn off",
+    "auto_start_stop_mode_fan_only": "Fan only",
+    "auto_start_stop_mode_dry": "Dry"
   }
 }
