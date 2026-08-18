@@ -7,6 +7,7 @@
     "card": {
       "climate": {
         "autoStartStopEnableEntity": "Entité - auto-start/stop",
+        "autoStartStopStopModeEntity": "Entité - mode d'arrêt auto-start/stop",
         "powerEntity": "Entité - puissance consommée",
         "theme": "Thème",
         "theme_classic": "Classique",
@@ -90,6 +91,10 @@
     "auto_start_stop": "Stoppé par auto-start/stop",
     "auto_start_stop_enable": "Active/désactive l'auto-start/stop",
     "auto_start_stop_label": "Auto-start/stop",
+    "auto_start_stop_mode_disabled": "Désactivé",
+    "auto_start_stop_mode_off": "Extinction",
+    "auto_start_stop_mode_fan_only": "Ventilation seule",
+    "auto_start_stop_mode_dry": "Déshumidification",
     "temp_unavailable": "-",
     "sleep": "Endormi",
     "New strings for recent edits. Please translate": "-------------------------------------",

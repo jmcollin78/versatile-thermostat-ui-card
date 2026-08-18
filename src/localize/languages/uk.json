@@ -42,7 +42,8 @@
         "allow_preset_modification": "Дозволити зміну температур попередніх налаштувань",
         "show_status_text": "Показувати поточний статус у вигляді тексту",
         "show_background_gradient_on_active": "Показувати фоновий градієнт повзунка, коли сутність активна",
-        "show_regulation_chart": "Show regulation chart"
+        "show_regulation_chart": "Show regulation chart",
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
       }
     }
   },
@@ -138,7 +139,11 @@
     "preset_row_heat_away": "Опалення (відсутність)",
     "preset_row_cool": "Охолодження",
     "preset_row_cool_away": "Охолодження (відсутність)",
-    "regulation_chart_title": "Regulation chart"
+    "regulation_chart_title": "Regulation chart",
+    "auto_start_stop_mode_disabled": "Disabled",
+    "auto_start_stop_mode_off": "Turn off",
+    "auto_start_stop_mode_fan_only": "Fan only",
+    "auto_start_stop_mode_dry": "Dry"
   },
   "theme": "Тема",
   "theme_classic": "Класичний",

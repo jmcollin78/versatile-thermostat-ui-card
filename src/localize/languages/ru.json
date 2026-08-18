@@ -42,7 +42,8 @@
         "allow_preset_modification": "Разрешить изменение температур пресетов",
         "show_status_text": "Показывать текущий статус в виде текста",
         "show_background_gradient_on_active": "Показывать фоновый градиент ползунка, когда сущность активна",
-        "show_regulation_chart": "Show regulation chart"
+        "show_regulation_chart": "Show regulation chart",
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
       }
     }
   },
@@ -138,7 +139,11 @@
     "preset_row_heat_away": "Обогрев (отсутствие)",
     "preset_row_cool": "Охлаждение",
     "preset_row_cool_away": "Охлаждение (отсутствие)",
-    "regulation_chart_title": "Regulation chart"
+    "regulation_chart_title": "Regulation chart",
+    "auto_start_stop_mode_disabled": "Disabled",
+    "auto_start_stop_mode_off": "Turn off",
+    "auto_start_stop_mode_fan_only": "Fan only",
+    "auto_start_stop_mode_dry": "Dry"
   },
   "theme": "Тема",
   "theme_classic": "Классический",

@@ -42,7 +42,8 @@
         "allow_preset_modification": "Dovoli spremembo temperatur prednastavitev",
         "show_status_text": "Prikaži trenutno stanje kot besedilo",
         "show_background_gradient_on_active": "Prikaži preliv ozadja drsnika, ko je entiteta aktivna",
-        "show_regulation_chart": "Show regulation chart"
+        "show_regulation_chart": "Show regulation chart",
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
       }
     }
   },
@@ -138,7 +139,11 @@
     "preset_row_heat_away": "Ogrevanje (odsotnost)",
     "preset_row_cool": "Hlajenje",
     "preset_row_cool_away": "Hlajenje (odsotnost)",
-    "regulation_chart_title": "Regulation chart"
+    "regulation_chart_title": "Regulation chart",
+    "auto_start_stop_mode_disabled": "Disabled",
+    "auto_start_stop_mode_off": "Turn off",
+    "auto_start_stop_mode_fan_only": "Fan only",
+    "auto_start_stop_mode_dry": "Dry"
   },
   "theme": "Tema",
   "theme_classic": "Klasična",

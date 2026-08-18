@@ -42,7 +42,8 @@
         "allow_preset_modification": "Permet la modificació de les temperatures de preset",
         "show_status_text": "Mostra l'estat actual en text",
         "show_background_gradient_on_active": "Mostra el degradat de fons del control lliscant quan l'entitat està activa",
-        "show_regulation_chart": "Show regulation chart"
+        "show_regulation_chart": "Show regulation chart",
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
       }
     }
   },
@@ -138,7 +139,11 @@
     "preset_row_heat_away": "Calefacció absent",
     "preset_row_cool": "Refrigeració",
     "preset_row_cool_away": "Refrigeració absent",
-    "regulation_chart_title": "Regulation chart"
+    "regulation_chart_title": "Regulation chart",
+    "auto_start_stop_mode_disabled": "Disabled",
+    "auto_start_stop_mode_off": "Turn off",
+    "auto_start_stop_mode_fan_only": "Fan only",
+    "auto_start_stop_mode_dry": "Dry"
   },
   "theme": "Tema",
   "theme_classic": "Clàssic",

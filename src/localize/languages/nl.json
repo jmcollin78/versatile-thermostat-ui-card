@@ -42,7 +42,8 @@
         "allow_preset_modification": "Voorkeursinstellingstemperaturen aanpassen toestaan",
         "show_status_text": "Toon huidige status als tekst",
         "show_background_gradient_on_active": "Toon achtergrondgradiënt van de schuifregelaar wanneer de entiteit actief is",
-        "show_regulation_chart": "Show regulation chart"
+        "show_regulation_chart": "Show regulation chart",
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
       }
     }
   },
@@ -138,7 +139,11 @@
     "preset_row_heat_away": "Verwarming (afwezig)",
     "preset_row_cool": "Koeling",
     "preset_row_cool_away": "Koeling (afwezig)",
-    "regulation_chart_title": "Regulation chart"
+    "regulation_chart_title": "Regulation chart",
+    "auto_start_stop_mode_disabled": "Disabled",
+    "auto_start_stop_mode_off": "Turn off",
+    "auto_start_stop_mode_fan_only": "Fan only",
+    "auto_start_stop_mode_dry": "Dry"
   },
   "theme": "Thema",
   "theme_classic": "Classic",
