@@ -439,6 +439,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @state() private _presetsPanelOpen: boolean = false;
   @state() private _regulationChartOpen: boolean = false;
   @state() private _presetTempEntities: PresetTempEntityInfo[] = [];
+  @state() private _autoStartStopEditMode: boolean = false;
 
   setConfig(config: ClimateCardConfig): void {
     this._config = {
@@ -2799,6 +2800,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     if (this.isUserLocked) {
       return;
     }
+    // Leave edit mode once a value has been selected.
+    this._autoStartStopEditMode = false;
     const value = (e.target as HTMLSelectElement).value;
     const enableEntity = this._config!.autoStartStopEnableEntity;
     const stopModeEntity = this._config!.autoStartStopStopModeEntity;
@@ -3188,6 +3191,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       : [autoStartStopStopModeOff];
     const options = [autoStartStopDisabledValue, ...stopModeOptions];
 
+    const currentLabel = localize({ hass: this.hass, string: `extra_states.auto_start_stop_mode_${currentValue}` });
+
     return html`
       <div class="left-info-label" title="${localizeLabel}">
         <span>
@@ -3195,17 +3200,19 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             title="${localizeLabel}"
             class="auto-start-stop"
             .name=${"auto_start_stop"}
+            @click=${this._handleClickAutoStartStopIcon}
             tabindex="0"
             .path=${modeIcons["auto_start_stop"]}
             .label=${localizeLabel}
           >
           </ha-icon-button>
         </span>
+        ${this._autoStartStopEditMode && !this.isUserLocked ? html`
         <span>
           <select
             class="auto-start-stop-select ${this._isAutoStartStopEnabled ? 'active' : ''}"
             @change=${this._handleChangeAutoStartStop}
-            .disabled=${this.isUserLocked}
+            @blur=${this._handleBlurAutoStartStop}
             title="${localizeInfo}"
             name="auto-start-stop-select"
           >
@@ -3216,8 +3223,22 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
             `)}
           </select>
         </span>
+        ` : html`
+        <span>${currentLabel}</span>
+        `}
       </div>
     `;
+  }
+
+  private _handleClickAutoStartStopIcon(): void {
+    if (this.isUserLocked) {
+      return;
+    }
+    this._autoStartStopEditMode = !this._autoStartStopEditMode;
+  }
+
+  private _handleBlurAutoStartStop(): void {
+    this._autoStartStopEditMode = false;
   }
 
   private _handleMoreInfo() {
