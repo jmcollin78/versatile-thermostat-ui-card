@@ -1683,7 +1683,7 @@ const er=270;const ir=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
           >
         </ha-icon-button>
         </span>
-        <span>${t.value} ${t.unit}</span>
+        <span class="clickable-info-label" @click=${this._handleClickAutoFanInfo}>${t.value} ${t.unit}</span>
       </div>
     `}_renderAutoStartStopEnable(){const t=_n({hass:this.hass,string:"extra_states.auto_start_stop_enable"}),e=_n({hass:this.hass,string:"extra_states.auto_start_stop_label"}),i=this._isAutoStartStopEnabled?this._autoStartStopStopMode:vr,o=this._autoStartStopStopModeOptions.length?this._autoStartStopStopModeOptions:[yr],n=[vr,...o],a=_n({hass:this.hass,string:`extra_states.auto_start_stop_mode_${i}`});return W`
       <div class="left-info-label" title="${e}">
@@ -1716,7 +1716,7 @@ const er=270;const ir=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
           </select>
         </span>
         `:W`
-        <span>${a}</span>
+        <span class="clickable-info-label" @click=${this._handleClickAutoStartStopIcon}>${a}</span>
         `}
       </div>
     `}_handleClickAutoStartStopIcon(){this.isUserLocked||(this._autoStartStopEditMode=!this._autoStartStopEditMode)}_handleBlurAutoStartStop(){this._autoStartStopEditMode=!1}_handleMoreInfo(){Sn(this,"hass-more-info",{entityId:this._config.entity})}_handleLockToggle(){var t,e;if((null===(t=this._config)||void 0===t?void 0:t.allow_lock_toggle)&&(null===(e=this._config)||void 0===e?void 0:e.entity)&&this.hass&&this.stateObj)if(this._isLocked){if(this._hasLockCode)return this.isLocking=!1,this.showDigicodeModal=!0,void(this.enteredCode="");this._isLockConfigured?this.hass.callService("versatile_thermostat","unlock",{entity_id:this._config.entity}):(this._isLocked=this.isUserLocked=!1,this.requestUpdate())}else{if(this._hasLockCode)return this.isLocking=!0,this.showDigicodeModal=!0,void(this.enteredCode="");this._isLockConfigured?this.hass.callService("versatile_thermostat","lock",{entity_id:this._config.entity}):(this._isLocked=this.isUserLocked=!0,this.requestUpdate())}}_handleKeypadPress(t){this.enteredCode.length<4&&(this.enteredCode+=t,this.codeError=!1,4===this.enteredCode.length&&this._handleValidate())}_handleKeypadClear(){this.enteredCode=this.enteredCode.slice(0,-1),this.codeError=!1}_handleModalClose(){this.showDigicodeModal=!1,this.enteredCode="",this.codeError=!1}async _handleValidate(){if(4===this.enteredCode.length){const t=this.isLocking?"lock":"unlock";try{await this.hass.callService("versatile_thermostat",t,{entity_id:this._config.entity,code:this.enteredCode}),this._handleModalClose()}catch(t){this.codeError=!0,this.enteredCode="",this._vibrate(200)}}else this.codeError=!0,this.enteredCode="",this._vibrate(200)}buildTitle(){var t,e,i;let o="";return this._hasWindow&&!(null===(t=this._config)||void 0===t?void 0:t.disable_window)&&(o+=_n({hass:this.hass,string:"extra_states.window_open"})+"\n"),this._hasWindowByPass&&(o+=_n({hass:this.hass,string:"extra_states.window_bypass"})+"\n"),this._hasOverpowering&&!(null===(e=this._config)||void 0===e?void 0:e.disable_overpowering)&&(o+=_n({hass:this.hass,string:"extra_states.overpowering"})+"\n"),this._hasPresence&&(o+=_n({hass:this.hass,string:"extra_states.presence"})+"\n"),this._hasAutoStartStop&&!(null===(i=this._config)||void 0===i?void 0:i.disable_autoStartStop)&&(o+=_n({hass:this.hass,string:"extra_states.auto_start_stop"})+"\n"),this._hasMotion&&(o+=_n({hass:this.hass,string:"extra_states.motion"})+"\n"),o}_renderTemperature(t,e,i,o,n){var a;let s=76,r=56,l=.2;const c=e?-2:-1,d=e?-5.5:-2;let h;h=t?Mn(t,this.hass.locale,{minimumFractionDigits:1,maximumFractionDigits:1}):this.hass.localize("extra_states.temp_unavailable"),n&&e&&(s=this.effectiveDisableCircle?30:35,r=56,l=.25);const u=e?"temp-main":"temp-secondary";return B`
@@ -2313,6 +2313,12 @@ const er=270;const ir=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
 
       .left-info-label input {
         width: 40px;
+      }
+
+      .clickable-info-label {
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
       }
 
       #vt-control-buttons {

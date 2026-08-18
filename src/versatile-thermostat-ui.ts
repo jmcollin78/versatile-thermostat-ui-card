@@ -990,6 +990,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         width: 40px;
       }
 
+      .clickable-info-label {
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
       #vt-control-buttons {
         z-index: 0;
         position: absolute;
@@ -3222,7 +3228,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           >
         </ha-icon-button>
         </span>
-        <span>${info.value} ${info.unit}</span>
+        <span class="clickable-info-label" @click=${this._handleClickAutoFanInfo}>${info.value} ${info.unit}</span>
       </div>
     `;
   }
@@ -3277,7 +3283,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           </select>
         </span>
         ` : html`
-        <span>${currentLabel}</span>
+        <span class="clickable-info-label" @click=${this._handleClickAutoStartStopIcon}>${currentLabel}</span>
         `}
       </div>
     `;
