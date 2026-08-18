@@ -36,6 +36,7 @@ const CLIMATE_LABELS = [
     "theme",
     "autoStartStopEnableEntity",
     "autoStartStopStopModeEntity",
+    "autoFanEnableEntity",
     "powerEntity",
     "section_all_themes",
     "section_classic_only",
@@ -79,6 +80,7 @@ const computeSchema = memoizeOne(
             schema: [
                 { name: "autoStartStopEnableEntity", selector: { entity: { domain: ["switch"] } } },
                 { name: "autoStartStopStopModeEntity", selector: { entity: { domain: ["select"] } } },
+                { name: "autoFanEnableEntity", selector: { entity: { domain: ["switch"] } } },
                 { name: "powerEntity", selector: { entity: { domain: ["sensor", "input_number"] } } },
             ]
         },

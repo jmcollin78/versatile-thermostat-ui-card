@@ -44,7 +44,8 @@
         "show_status_text": "Zobrazit aktuální stav textem",
         "show_background_gradient_on_active": "Zobrazit přechod pozadí posuvníku, když je entita aktivní",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

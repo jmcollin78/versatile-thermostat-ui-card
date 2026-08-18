@@ -44,7 +44,8 @@
         "show_status_text": "Aktuellen Status als Text anzeigen",
         "show_background_gradient_on_active": "Hintergrundverlauf des Schiebereglers anzeigen, wenn die Entität aktiv ist",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

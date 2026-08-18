@@ -44,7 +44,8 @@
         "show_status_text": "Показване на статуса като текст",
         "show_background_gradient_on_active": "Показване на фоновия градиент на плъзгача, когато обектът е активен",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

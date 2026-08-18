@@ -44,7 +44,8 @@
         "show_status_text": "Aktuális állapot megjelenítése szövegként",
         "show_background_gradient_on_active": "A csúszka háttérszínátmenetének megjelenítése, ha az entitás aktív",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

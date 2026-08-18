@@ -43,7 +43,8 @@
         "show_status_text": "Εμφάνιση τρέχουσας κατάστασης σε κείμενο",
         "show_background_gradient_on_active": "Εμφάνιση της διαβάθμισης φόντου του ρυθμιστικού όταν η οντότητα είναι ενεργή",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

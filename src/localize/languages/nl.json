@@ -43,7 +43,8 @@
         "show_status_text": "Toon huidige status als tekst",
         "show_background_gradient_on_active": "Toon achtergrondgradiënt van de schuifregelaar wanneer de entiteit actief is",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

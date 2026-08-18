@@ -146,7 +146,8 @@
         "show_status_text": "Visa aktuell status som text",
         "show_background_gradient_on_active": "Visa reglagets bakgrundsgradient när entiteten är aktiv",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   }

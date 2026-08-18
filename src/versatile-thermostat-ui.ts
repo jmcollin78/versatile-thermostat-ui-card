@@ -399,6 +399,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _isAutoStartStopConfigured: boolean = false;
   private _autoStartStopStopMode: string = autoStartStopStopModeOff;
   private _autoStartStopStopModeOptions: string[] = [];
+  private _isAutoFanPlugin: boolean = false;
+  private _isAutoFanEnabled: boolean = false;
+  private _autoFanSelectedMode: string = "";
   private _isLockConfigured: boolean = false;
   private _isLocked: boolean = false;
   private _hasLockCode: boolean = false;
@@ -2338,7 +2341,13 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
 
       const oldHass = changedProps.get("hass") as HomeAssistant | undefined;
 
-      if (!oldHass || oldHass.states[entity_id] !== stateObj) {
+      // The auto-fan (plugin mode) enabled state is driven by a separate switch entity: recompute
+      // when that switch changes even though the climate entity itself did not.
+      const autoFanSwitchId = this._config?.autoFanEnableEntity;
+      const autoFanSwitchChanged = !!autoFanSwitchId
+        && (!oldHass || oldHass.states[autoFanSwitchId] !== this.hass.states[autoFanSwitchId]);
+
+      if (!oldHass || oldHass.states[entity_id] !== stateObj || autoFanSwitchChanged) {
         if (!this._config || !this.hass || !this._config!.entity) {
           if (DEBUG) console.log(`No change return`);
           return;
@@ -2407,6 +2416,19 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.currentAutoFanMode = attributes?.vtherm_over_climate?.current_auto_fan_mode || null;
         this.autoFanMode = attributes?.vtherm_over_climate?.auto_fan_mode || null;
         this.fanMode = attributes?.fan_mode || null;
+        // Plugin auto-fan: a dedicated "auto_fan" attribute section is exposed by the optional
+        // auto-fan plugin. When present, it takes precedence over the legacy auto-fan mode.
+        const autoFan = attributes?.auto_fan;
+        this._isAutoFanPlugin = !!autoFan;
+        // Prefer the configured switch entity state as the source of truth for the enabled flag,
+        // falling back to the "enabled" attribute exposed by the plugin.
+        const autoFanSwitchState = this._config?.autoFanEnableEntity
+          ? this.hass?.states[this._config.autoFanEnableEntity]
+          : undefined;
+        this._isAutoFanEnabled = autoFanSwitchState
+          ? autoFanSwitchState.state === "on"
+          : autoFan?.enabled === true;
+        this._autoFanSelectedMode = autoFan?.selected_fan_mode || "";
         this.hvacOffReason = attributes?.specific_states?.hvac_off_reason || null;
         this.isRecalculateScheduled = attributes?.specific_states?.is_recalculate_scheduled || null;
         this.isOn = attributes?.specific_states?.is_on === true;
@@ -2635,23 +2657,37 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         // Build auto-fan infos
         this.autoFanInfos = [];
         if (!this?._config?.disable_auto_fan_infos && attributes?.is_over_climate && !hasValveRegulation) {
-          const name=this.currentAutoFanMode != auto_fan_none ? "auto_fan_mode" : "auto_fan_mode_off";
-          if (DEBUG) console.log(`VersatileThermostat UI : auto_fan icon name ${name}`);
-          
-          this.autoFanInfos.push({
-            name: name,
-            value: localize({ hass: this.hass, string: `extra_states.${this.currentAutoFanMode}` }),
-            unit: "",
-            class: "vt-label-color"
-          });
+          if (this._isAutoFanPlugin) {
+            // Plugin mode: the icon reflects the switch state (crossed-out fan when disabled)
+            // and the current value is the raw "selected_fan_mode" (displayed without translation).
+            const name=this._isAutoFanEnabled ? "auto_fan_mode" : "auto_fan_mode_off";
+            if (DEBUG) console.log(`VersatileThermostat UI : plugin auto_fan icon name ${name} selected=${this._autoFanSelectedMode}`);
 
-          if (this.fanMode) {
             this.autoFanInfos.push({
-              name: "fan_mode",
-              value: localize({ hass: this.hass, string: `extra_states.fan_${this.fanMode}` }), 
+              name: name,
+              value: this._autoFanSelectedMode,
               unit: "",
               class: "vt-label-color"
-            })
+            });
+          } else {
+            const name=this.currentAutoFanMode != auto_fan_none ? "auto_fan_mode" : "auto_fan_mode_off";
+            if (DEBUG) console.log(`VersatileThermostat UI : auto_fan icon name ${name}`);
+
+            this.autoFanInfos.push({
+              name: name,
+              value: localize({ hass: this.hass, string: `extra_states.${this.currentAutoFanMode}` }),
+              unit: "",
+              class: "vt-label-color"
+            });
+
+            if (this.fanMode) {
+              this.autoFanInfos.push({
+                name: "fan_mode",
+                value: localize({ hass: this.hass, string: `extra_states.fan_${this.fanMode}` }),
+                unit: "",
+                class: "vt-label-color"
+              })
+            }
           }
 
         }
@@ -2773,7 +2809,24 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     if (this.isUserLocked) {
       return;
     }
-    // Activate or deactivate the auto-fan mode
+
+    // Plugin mode: toggle the configured switch entity directly. When no switch entity is
+    // configured, the auto-fan info is displayed read-only (no toggle).
+    if (this._isAutoFanPlugin) {
+      const entity = this._config?.autoFanEnableEntity;
+      if (!entity) {
+        return;
+      }
+      if (DEBUG) console.info(
+        `VersatileThermostatUI-CARD toggling auto_fan switch ${entity}`
+      );
+      this.hass!.callService("switch", "toggle", {
+        entity_id: entity,
+      });
+      return;
+    }
+
+    // Legacy mode: activate or deactivate the auto-fan mode through the VTherm service.
     let newMode=auto_fan_none;
     if (this.currentAutoFanMode == auto_fan_none) {
       newMode = this.autoFanMode;
