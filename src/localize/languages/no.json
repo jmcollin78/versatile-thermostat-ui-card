@@ -43,7 +43,8 @@
         "show_status_text": "Vis gjeldende status som tekst",
         "show_background_gradient_on_active": "Vis glidebryterens bakgrunnsgradient når enheten er aktiv",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

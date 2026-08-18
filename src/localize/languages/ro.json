@@ -43,7 +43,8 @@
         "show_status_text": "Afișează starea curentă ca text",
         "show_background_gradient_on_active": "Afișează gradientul de fundal al glisorului când entitatea este activă",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

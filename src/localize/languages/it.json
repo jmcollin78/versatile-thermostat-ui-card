@@ -43,7 +43,8 @@
         "show_status_text": "Mostra lo stato attuale come testo",
         "show_background_gradient_on_active": "Mostra il gradiente di sfondo del cursore quando l'entità è attiva",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

@@ -43,7 +43,8 @@
         "show_status_text": "Показывать текущий статус в виде текста",
         "show_background_gradient_on_active": "Показывать фоновый градиент ползунка, когда сущность активна",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

@@ -43,7 +43,8 @@
         "show_status_text": "Показувати поточний статус у вигляді тексту",
         "show_background_gradient_on_active": "Показувати фоновий градієнт повзунка, коли сутність активна",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

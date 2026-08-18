@@ -43,7 +43,8 @@
         "show_status_text": "Vis aktuel status som tekst",
         "show_background_gradient_on_active": "Vis skyderens baggrundsgradient, når enheden er aktiv",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

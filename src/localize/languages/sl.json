@@ -43,7 +43,8 @@
         "show_status_text": "Prikaži trenutno stanje kot besedilo",
         "show_background_gradient_on_active": "Prikaži preliv ozadja drsnika, ko je entiteta aktivna",
         "show_regulation_chart": "Show regulation chart",
-        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity"
+        "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
+        "autoFanEnableEntity": "Auto-fan entity"
       }
     }
   },

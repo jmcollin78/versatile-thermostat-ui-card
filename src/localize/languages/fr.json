@@ -8,6 +8,7 @@
       "climate": {
         "autoStartStopEnableEntity": "Entité - auto-start/stop",
         "autoStartStopStopModeEntity": "Entité - mode d'arrêt auto-start/stop",
+        "autoFanEnableEntity": "Entité - auto-fan",
         "powerEntity": "Entité - puissance consommée",
         "theme": "Thème",
         "theme_classic": "Classique",
