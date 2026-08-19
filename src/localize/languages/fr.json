@@ -145,6 +145,8 @@
     "preset_row_heat_away": "Chauffe absent",
     "preset_row_cool": "Clim.",
     "preset_row_cool_away": "Clim. absent",
-    "regulation_chart_title": "Graphique de régulation"
+    "regulation_chart_title": "Graphique de régulation",
+    "hvac_fan_only_auto_start_stop": "Ventilation seule par auto-start/stop",
+    "hvac_dry_auto_start_stop": "Déshumidification par auto-start/stop"
   }
 }

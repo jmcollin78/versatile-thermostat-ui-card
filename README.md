@@ -564,7 +564,7 @@ More informations on the safety mode can be found [here](https://github.com/jmco
 |  ![window detected icon](assets/window-detected-icon.png) | The window is detected as open. Click on it to bypass the window detection  |
 |  ![window bypass icon](assets/window-bypass-icon.png) | The window bypass is active. Click on it to cancel the bypass |
 |  ![overpowering detected icon](assets/overpowering-detected-icon.png) | An overpowering detection has been done. The VTherm is in shedding mode |
-|  ![auto stop icon](assets/auto-start-stop-icon.png) | The VTherm has been turned off by the auto-start/stop feature. |
+|  ![auto stop icon](assets/auto-start-stop-icon.png) | The VTherm has been stopped by the auto-start/stop feature (turned off, or switched to fan-only or dry mode). |
 |  ![target temperature icon](assets/target-temp-icon.png) | The target temperature (setpoint)  |
 |  ![havc action cooling](assets/hvac-action-cool-cooling-icon.png)  | The underlying device is cooling (`hvac_action` is cooling)  |
 |  ![havc action idle in cool mode](assets/hvac-action-cool-idle-icon.png)  | The underlying device is idle and the mode is Cool (`hvac_action` is idle and the `hvac_mode` is Cool)  |
