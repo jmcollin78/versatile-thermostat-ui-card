@@ -152,7 +152,11 @@ const autoFanModeMapping={
   "auto_fan_turbo": "Turbo"
 };
 
-const hvacOffReasonAutoStartStop="hvac_off_auto_start_stop";
+const autoStartStopModeReasons=["hvac_off_auto_start_stop", "hvac_fan_only_auto_start_stop", "hvac_dry_auto_start_stop"];
+// Non-off auto-start/stop reasons (fan_only/dry). The backend pushes only
+// hvac_off_reason into specific_states.messages, so these are not exposed as
+// messages and must be added by the card to inform the user.
+const autoStartStopNonOffModeReasons=["hvac_fan_only_auto_start_stop", "hvac_dry_auto_start_stop"];
 const autoStartStopLevels=["auto_start_stop_slow", "auto_start_stop_medium", "auto_start_stop_fast"];
 
 // Value used in the unified auto-start/stop selector to disable the feature (turn off the enable switch).
@@ -261,7 +265,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: String }) public currentAutoFanMode: string = auto_fan_none;
   @property({ type: String }) public autoFanMode: string = auto_fan_none;
   @property({ type: String }) public fanMode: string = "";
-  @property({ type: String }) public hvacOffReason: string = "";
+  @property({ type: String }) public hvacModeReason: string = "";
   @property({ type: Boolean, reflect: true }) public dragging = false;
   @property({ type: String}) public name: string = "";
 
@@ -2435,7 +2439,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           ? autoFanSwitchState.state === "on"
           : autoFan?.enabled === true;
         this._autoFanSelectedMode = autoFan?.selected_fan_mode || "";
-        this.hvacOffReason = attributes?.specific_states?.hvac_off_reason || null;
+        this.hvacModeReason = attributes?.specific_states?.hvac_mode_reason || null;
         this.isRecalculateScheduled = attributes?.specific_states?.is_recalculate_scheduled || null;
         this.isOn = attributes?.specific_states?.is_on === true;
         
@@ -2578,6 +2582,13 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           this.messages.push(localize({ hass: this.hass, string: `extra_states.${msg}` }));
         }
 
+        // When auto-start/stop applies a non-off stop mode (fan_only/dry), the
+        // backend does not push it into messages (only hvac_off_reason is).
+        // Add the corresponding info message so the user knows why the mode changed.
+        if (autoStartStopNonOffModeReasons.includes(this.hvacModeReason) && !msgs.includes(this.hvacModeReason)) {
+          this.messages.push(localize({ hass: this.hass, string: `extra_states.${this.hvacModeReason}` }));
+        }
+
         const failureManager = attributes?.heating_failure_detection_manager;
         const isHeatingFailure = failureManager?.heating_failure_state === 'on';
         const isCoolingFailure = failureManager?.cooling_failure_state === 'on';
@@ -2699,7 +2710,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         }
 
         // Build autoStartStop infos
-        this._hasAutoStartStop = ( this.hvacOffReason=== hvacOffReasonAutoStartStop);
+        this._hasAutoStartStop = autoStartStopModeReasons.includes(this.hvacModeReason);
         // this._hasAutoStartStopEnable = autoStartStopLevels.includes(attributes?.auto_start_stop_level);
         this._isAutoStartStopConfigured = (attributes?.is_auto_start_stop_configured === true);
         this._isAutoStartStopEnabled = (attributes?.auto_start_stop_manager?.auto_start_stop_enable === true);
@@ -2710,7 +2721,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         const stopModeEntityId = this._config?.autoStartStopStopModeEntity;
         const stopModeState = stopModeEntityId ? this.hass?.states[stopModeEntityId] : undefined;
         this._autoStartStopStopModeOptions = stopModeState?.attributes?.options || [autoStartStopStopModeOff];
-        if (DEBUG) console.log(`_isAutoStartStopConfigured=${this._isAutoStartStopConfigured} _isAutoStartStopEnabled=${this._isAutoStartStopEnabled} hvac_off_reason=${this.hvacOffReason}`);
+        if (DEBUG) console.log(`_isAutoStartStopConfigured=${this._isAutoStartStopConfigured} _isAutoStartStopEnabled=${this._isAutoStartStopEnabled} hvac_mode_reason=${this.hvacModeReason}`);
 
         this._updateDisplay();
       }

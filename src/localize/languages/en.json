@@ -108,6 +108,8 @@
     "safety_warning_msg": "Temp. fault",
     "hvac_off_manual": "Turned off manually",
     "hvac_off_auto_start_stop": "Turned off by auto-start/stop",
+    "hvac_fan_only_auto_start_stop": "Set to fan-only by auto-start/stop",
+    "hvac_dry_auto_start_stop": "Set to dry by auto-start/stop",
     "hvac_off_window_detection": "Turned off by window detection",
     "hvac_off_sleep_mode": "Turned off by sleep mode",
     "hvac_off_safety_detection": "Turned off by safety mode",

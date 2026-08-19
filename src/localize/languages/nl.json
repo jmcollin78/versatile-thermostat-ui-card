@@ -144,7 +144,9 @@
     "auto_start_stop_mode_disabled": "Disabled",
     "auto_start_stop_mode_off": "Turn off",
     "auto_start_stop_mode_fan_only": "Fan only",
-    "auto_start_stop_mode_dry": "Dry"
+    "auto_start_stop_mode_dry": "Dry",
+    "hvac_fan_only_auto_start_stop": "Set to fan-only by auto-start/stop",
+    "hvac_dry_auto_start_stop": "Set to dry by auto-start/stop"
   },
   "theme": "Thema",
   "theme_classic": "Classic",

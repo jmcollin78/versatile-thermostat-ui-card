@@ -149,6 +149,8 @@
     "auto_start_stop_mode_disabled": "Disabled",
     "auto_start_stop_mode_off": "Turn off",
     "auto_start_stop_mode_fan_only": "Fan only",
-    "auto_start_stop_mode_dry": "Dry"
+    "auto_start_stop_mode_dry": "Dry",
+    "hvac_fan_only_auto_start_stop": "Ustawiony na tryb wentylatora przez autoSTART/autoSTOP",
+    "hvac_dry_auto_start_stop": "Ustawiony na tryb osuszania przez autoSTART/autoSTOP"
   }
 }
