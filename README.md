@@ -6,7 +6,7 @@
 
 ![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/icon.png?raw=true)
 
-- [Upgrading to v3](#upgrading-to-v3)
+- [Upgrading to v3.3 from v3.x](#upgrading-to-v33-from-v3x)
 - [UI Card for Versatile Thermostat](#ui-card-for-versatile-thermostat)
   - [Goals](#goals)
   - [Theme management](#theme-management)
@@ -24,11 +24,13 @@
     - [Common options (all themes)](#common-options-all-themes)
     - [Classical, VTherm and Uncolored themes only](#classical-vtherm-and-uncolored-themes-only)
 - [Actions](#actions)
-  - [Disable the auto-fan mode](#disable-the-auto-fan-mode)
+  - [Enable/disable the auto-fan mode](#enabledisable-the-auto-fan-mode)
+  - [Configure the auto-start/stop mode](#configure-the-auto-startstop-mode)
+    - [How to use](#how-to-use)
   - [By-pass the window detection](#by-pass-the-window-detection)
   - [Lock/Unlock the thermostat](#lockunlock-the-thermostat)
   - [Timed preset](#timed-preset)
-    - [How to use](#how-to-use)
+    - [How to use](#how-to-use-1)
     - [When a timed preset is active](#when-a-timed-preset-is-active)
     - [Configuration options](#configuration-options)
   - [Modify preset temperatures](#modify-preset-temperatures)
@@ -50,20 +52,21 @@
   - [Support me](#support-me)
 
 
-# Upgrading to v3
+# Upgrading to v3.3 from v3.x
 
-> **⚠️ Important:** Version 3 introduces breaking changes to the card configuration. After upgrading, please review and update your card options.
+> **⚠️ Important:** Version 3.3 introduces some breaking changes to the card configuration. After upgrading, please review and update your card options.
 
 **What changed:**
-- The **[Gunmalmg theme](#the-gunmalmg-theme)** has been **completely redesigned** with a new condensed layout, preset scrollable row, lock/timed preset controls, a detailed popup, and warning/safety visual indicators. See the [Gunmalmg theme section](#the-gunmalmg-theme) for full details.
-- **Configuration options have been reorganized** into two sections: [Common options (all themes)](#common-options-all-themes) and [Classical, VTherm and Uncolored themes only](#classical-vtherm-and-uncolored-themes-only). Some options that were previously available are no longer applicable to the Gunmalmg theme.
-- **Obsolete options removed:** `disable_circle` and `disable_background_color` are no longer supported (they are now enforced by the selected theme).
-- **Unused option removed:** `eco_temperature` has been removed.
+- The **[auto-start/stop control](#configure-the-auto-startstop-mode)** has been **redesigned**. Instead of a simple enable/disable checkbox, a unified selector now lets you choose the **stop mode** to apply when an auto-stop is detected: `Disabled`, `Turn off`, `Fan only` or `Dry`. This requires the new `autoStartStopStopModeEntity` option and **Versatile Thermostat v7.x or above** exposing the auto-start/stop stop mode `select` entity.
+- The **[auto-fan control](#enabledisable-the-auto-fan-mode)** now supports the new **plugin mode**. When your VTherm exposes the auto-fan plugin, the card reads its state and can toggle it through the new `autoFanEnableEntity` switch option. The label (not only the icon) is now clickable to toggle the feature.
+- **Two new configuration options** have been added: `autoStartStopStopModeEntity` (the auto-start/stop stop mode `select` entity) and `autoFanEnableEntity` (the auto-fan `switch` entity). See the [Options](#options) section.
 
 **What you should do:**
 1. Open each card configuration that uses this card.
 2. Check that your options are still valid — unused or obsolete options will be silently ignored but should be cleaned up to be able to use the UI configuration window.
-3. If you use the Gunmalmg theme, review the [applicable options](#applicable-options) to see which settings are supported.
+3. If you use the auto-start/stop feature, add the new `autoStartStopStopModeEntity` option (and keep `autoStartStopEnableEntity`) to benefit from the new stop mode selector.
+4. If you use the auto-fan feature in plugin mode, add the new `autoFanEnableEntity` option.
+5. If you use the Gunmalmg theme, review the [applicable options](#applicable-options) to see which settings are supported.
 
 # UI Card for Versatile Thermostat 
 
@@ -72,7 +75,7 @@
 > This card is based on the beautiful [Better Thermostat UI Card](https://github.com/KartoffelToby/better-thermostat-ui-card). It adds some feature so that you can use Versatile Thermostat directly from the card. A big thanks to @KartoffelToby for this Better Thermostat UI Card.
 
 Notes:
-1. The VTherm should be in V8.x or above to work well with this version.
+1. The VTherm should be in V10.x or above to work well with this version.
 2. Only VTherm climate entities will have a correct display with this card. Other climate should work rougthly
 
 When presence is detected:
@@ -230,7 +233,9 @@ These options are **not applicable** to the Gunmalmg theme.
 | disable_auto_fan_infos | boolean  | **Optional** | Turn off the auto-fan informations                                                                  |
 | disable_target_icon | boolean  | **Optional** | Hide the target icon for the setpoint temperature (which can be confusing with the room temperature) |
 | disable_presets           | boolean | **Optional** | true to hide all the preset icons and timed preset controls. |
-| autoStartStopEnableEntity               | string  | **Optional** | The entity id of auto-start/stop entity (must be a switch entity). Example: `switch.clim_salon_auto_start_stop`          |
+| autoStartStopEnableEntity               | string  | **Optional** | The entity id of the auto-start/stop enable entity (must be a switch entity). Example: `switch.clim_salon_enable_auto_start_stop`          |
+| autoStartStopStopModeEntity             | string  | **Optional** | The entity id of the auto-start/stop stop mode entity (must be a select entity). Enables the stop mode selector (`Disabled`, `Turn off`, `Fan only`, `Dry`). Example: `select.clim_salon_auto_start_stop_stop_mode`          |
+| autoFanEnableEntity                     | string  | **Optional** | The entity id of the auto-fan enable entity (must be a switch entity), used when the auto-fan plugin mode is available. Example: `switch.clim_salon_enable_auto_fan`          |
 | powerEntity               | string  | **Optional** | The entity id of sensor entity which gives the real power consumed by the VTherm. Example: `sensor.clim_salon_power`          |
 
 Example:
@@ -240,8 +245,10 @@ entity: climate.multi_climate
 set_current_as_main: true
 disable_menu: true
 autoStartStopEnableEntity: switch.multi_climate_enable_auto_start_stop
+autoStartStopStopModeEntity: select.multi_climate_auto_start_stop_stop_mode
+autoFanEnableEntity: switch.multi_climate_enable_auto_fan
 powerEntity: sensor.multi_climate_power
-theme: gunmalmg
+theme: vtherm
 ```
 
 ![configuration window](assets/configuration-window.png)
@@ -249,13 +256,55 @@ theme: gunmalmg
 # Actions
 Some actions are available directly on the card when the theme allows it.
 
-## Disable the auto-fan mode
+## Enable/disable the auto-fan mode
 For `over_climate` you have the possibility to configure the `auto-fan` mode feature. See [versatile_thermostat README](https://github.com/jmcollin78/versatile_thermostat/blob/main/README.md#auto-fan-mode).
 
-If the `auto-fan` mode is configured, you can toggle between the configured `auto_fan_mode` configured for the VTherm and the None mode (which disable the auto-fan mode).
+When the `auto-fan` mode is configured, the card displays an `Auto-fan` icon and label at the left of the thermostat, showing the current fan mode. You can toggle the feature by clicking either the **icon** or the **label**.
 
-To toggle the auto-fan mode you must:
-1. click on the `Auto-fan` icon at the left of the Thermostat.
+Two modes are supported:
+
+- **Legacy mode:** the card toggles between the `auto_fan_mode` configured in the VTherm and the `None` mode (which disables the auto-fan) through the VTherm service. No extra configuration is required.
+- **Plugin mode (new in v3.3):** when your VTherm exposes the auto-fan plugin (see: [auto-fan-extended plugin](https://www.versatile-thermostat.org/en/plugins/)), the card reads its state directly. If you set the `autoFanEnableEntity` option to the auto-fan `switch` entity, clicking the icon or the label toggles that switch. If no switch entity is configured, the auto-fan information is displayed **read-only** (no toggle).
+
+Example with the auto-fan plugin switch:
+```yaml
+type: custom:versatile-thermostat-ui-card
+entity: climate.clim_salon
+autoFanEnableEntity: switch.clim_salon_enable_auto_fan
+```
+
+## Configure the auto-start/stop mode
+
+For `over_climate` and `over_switch` VTherms you can enable the auto-start/stop feature, which automatically stops (and restarts) the thermostat to save energy. See the [versatile_thermostat documentation](https://github.com/jmcollin78/versatile_thermostat/blob/main/documentation/en/feature-auto-start-stop.md).
+
+Up to v3.2 the card only offered a simple enable/disable checkbox. Starting with **v3.3**, a **unified stop mode selector** replaces the checkbox. It lets you choose, directly from the card, which HVAC mode is applied when an auto-stop is detected:
+
+| Value | Meaning |
+|-------|---------|
+| Disabled | The auto-start/stop feature is turned off. |
+| Turn off | When an auto-stop is detected, the thermostat is turned off. |
+| Fan only | When an auto-stop is detected, the thermostat switches to `fan_only` (only if the underlying device supports it). |
+| Dry | When an auto-stop is detected, the thermostat switches to `dry` (only if the underlying device supports it). |
+
+The `Fan only` and `Dry` options only appear if the underlying device supports these HVAC modes (the available values come from the VTherm `select` entity).
+
+### How to use
+
+1. Configure both the `autoStartStopEnableEntity` (switch) and the `autoStartStopStopModeEntity` (select) options.
+2. Click the auto-start/stop icon or its label to open the selector.
+3. Choose a value:
+   - Selecting **Disabled** turns off the enable switch.
+   - Selecting a **stop mode** enables the feature (if needed) and applies the chosen stop mode.
+
+Example:
+```yaml
+type: custom:versatile-thermostat-ui-card
+entity: climate.clim_salon
+autoStartStopEnableEntity: switch.clim_salon_enable_auto_start_stop
+autoStartStopStopModeEntity: select.clim_salon_auto_start_stop_stop_mode
+```
+
+> **Note:** When the thermostat has been stopped by the auto-start/stop feature, an ![auto stop icon](assets/auto-start-stop-icon.png) icon is displayed and an information message explains why (see [Display some messages](#display-some-messages)).
 
 ## By-pass the window detection
 
