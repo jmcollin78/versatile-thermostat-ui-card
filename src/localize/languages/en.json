@@ -44,7 +44,8 @@
         "allow_preset_modification": "Allow preset temperature modification",
         "show_status_text": "Show current HVAC action text",
         "show_background_gradient_on_active": "Show the slider background gradient when the entity is active",
-        "show_regulation_chart": "Show regulation chart"
+        "show_regulation_chart": "Show regulation chart",
+        "show_humidity": "Show humidity"
       }
     }
   },
