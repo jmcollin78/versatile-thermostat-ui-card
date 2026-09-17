@@ -233,6 +233,7 @@ These options are **not applicable** to the Gunmalmg theme.
 | disable_auto_fan_infos | boolean  | **Optional** | Turn off the auto-fan informations                                                                  |
 | disable_target_icon | boolean  | **Optional** | Hide the target icon for the setpoint temperature (which can be confusing with the room temperature) |
 | disable_presets           | boolean | **Optional** | true to hide all the preset icons and timed preset controls. |
+| show_humidity | boolean | **Optional** | true to show the `current_humidity` value reported by VTherm in the left information area, with a water-drop icon. The value is hidden when unavailable and is not displayed with the Gunmalmg theme. |
 | autoStartStopEnableEntity               | string  | **Optional** | The entity id of the auto-start/stop enable entity (must be a switch entity). Example: `switch.clim_salon_enable_auto_start_stop`          |
 | autoStartStopStopModeEntity             | string  | **Optional** | The entity id of the auto-start/stop stop mode entity (must be a select entity). Enables the stop mode selector (`Disabled`, `Turn off`, `Fan only`, `Dry`). Example: `select.clim_salon_auto_start_stop_stop_mode`          |
 | autoFanEnableEntity                     | string  | **Optional** | The entity id of the auto-fan enable entity (must be a switch entity), used when the auto-fan plugin mode is available. Example: `switch.clim_salon_enable_auto_fan`          |

@@ -44,7 +44,8 @@
         "allow_preset_modification": "Allow preset temperature modification",
         "show_regulation_chart": "Show regulation chart",
         "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
-        "autoFanEnableEntity": "Auto-fan entity"
+        "autoFanEnableEntity": "Auto-fan entity",
+        "show_humidity": "Mostrar humedad"
       }
     }
   },

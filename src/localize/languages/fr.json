@@ -44,7 +44,8 @@
         "disable_menu": "Désactiver le menu",
         "show_status_text": "Afficher l'état du HVAC en texte",
         "show_background_gradient_on_active": "Afficher le dégradé de fond du slider lorsque l'entité est active",
-        "show_regulation_chart": "Afficher le graphique de régulation"
+        "show_regulation_chart": "Afficher le graphique de régulation",
+        "show_humidity": "Afficher l’humidité"
       }
     }
   },

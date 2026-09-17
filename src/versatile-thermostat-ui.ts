@@ -231,7 +231,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   @property({ type: Number }) public value: Partial<Record<Target, number>> = {};
   @state() private _selectTargetTemperature: Target = "low";
   @property({ type: Number }) public current: number = 0;
-  @property({ type: Number }) public humidity: number = 0;
+  @property({ type: Number }) public humidity: number | null = null;
   @property({ type: Number }) public temperature: number = 0;
   @property({ type: Number }) public min = 7;
   @property({ type: Number }) public max = 35;
@@ -2105,6 +2105,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           return this._renderAutoFanInfo(infos);
         })}
       `}
+      ${this._renderHumidityInfo()}
     </div>
 
     <div id="right-lock">
@@ -2150,6 +2151,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     }
     try {
       if (this._isLocked) {
+        if (this._hasLockCode) {
+          this.isLocking = false;
+          this.showDigicodeModal = true;
+          this.enteredCode = "";
+          return;
+        }
         if (this._isLockConfigured) {
           await this.hass.callService("versatile_thermostat", "unlock", { entity_id: this._config!.entity });
         } else {
@@ -2157,6 +2164,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           this.requestUpdate();
         }
       } else {
+        if (this._hasLockCode) {
+          this.isLocking = true;
+          this.showDigicodeModal = true;
+          this.enteredCode = "";
+          return;
+        }
         if (this._isLockConfigured) {
           await this.hass.callService("versatile_thermostat", "lock", { entity_id: this._config!.entity });
         } else {
@@ -2397,7 +2410,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.isSleeping = (attributes?.specific_states?.is_sleeping === true);
         this.powerPercent = attributes?.vtherm_over_switch?.power_percent || attributes?.vtherm_over_climate?.valve_regulation?.power_percent || 0;
         if (attributes?.specific_states?.is_device_active === undefined) {
-           // for non Vtherm is_device_active will be undefined and then only hvac action will handle the hvac_action display
+           // for non VTherm is_device_active will be undefined and then only hvac action will handle the hvac_action display
           this.isDeviceActive = (this.hvacAction == hvacAction_heating || this.hvacAction == hvacAction_cooling);
           if (DEBUG) console.log(`is_device_active not found value=${this.isDeviceActive}`);
         } else {
@@ -2409,9 +2422,12 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.min = attributes?.min_temp || 7;
         this.max = attributes?.max_temp || 35;
         this.current = attributes?.current_temperature || 0;
+        const humidity = attributes?.current_humidity;
+        this.humidity = humidity !== undefined && humidity !== null && Number.isFinite(Number(humidity))
+          ? Number(humidity)
+          : null;
         this.windowState = attributes?.window_manager?.window_state
         this.windowAutoState = attributes?.window_manager?.window_auto_state
-        this.humidity = attributes?.humidity ? parseFloat(attributes.humidity) : 0;
         this.overpoweringState = attributes?.power_manager?.overpowering_state || "off";
         this.presenceState = attributes?.presence_manager?.presence_state || "off";
         this.motionState = attributes?.motion_manager?.motion_state || "off";
@@ -3244,6 +3260,33 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     `;
   }
 
+  private _renderHumidityInfo(): TemplateResult {
+    if (
+      !this._config?.show_humidity ||
+      this._config.theme === THEMES.GUNMALMG ||
+      this.humidity === null
+    ) {
+      return html``;
+    }
+
+    const localizeInfo = this.hass!.localize("component.climate.state._.humidity") || "Humidity";
+    return html`
+      <div class="left-info-label">
+        <span>
+          <ha-icon-button
+            title="${localizeInfo}"
+            class="humidity"
+            .name=${"humidity"}
+            tabindex="0"
+            .path=${modeIcons.humidity}
+            .label=${localizeInfo}
+          ></ha-icon-button>
+        </span>
+        <span>${this.humidity} %</span>
+      </div>
+    `;
+  }
+
   private _renderAutoStartStopEnable(): TemplateResult {
     const localizeInfo =
       localize({ hass: this.hass, string: `extra_states.auto_start_stop_enable` }),
@@ -3317,7 +3360,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     });
   }
 
-  private _handleLockToggle(): void {
+  private async _handleLockToggle(): Promise<void> {
     if (!this._config?.allow_lock_toggle) {
       return;
     }
@@ -3336,8 +3379,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.hass.callService("versatile_thermostat", "unlock", {
           entity_id: this._config.entity,
         });
-      }
-      else {
+      } else {
         this._isLocked = this.isUserLocked = false;
         this.requestUpdate();
       }
@@ -3349,11 +3391,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         return;
       }
       if (this._isLockConfigured) {
-        this.hass.callService("versatile_thermostat", "lock", {
+        await this.hass.callService("versatile_thermostat", "lock", {
           entity_id: this._config.entity,
         });
-      }
-      else {
+      } else {
         this._isLocked = this.isUserLocked = true;
         this.requestUpdate();
         // this._updateDisplay();

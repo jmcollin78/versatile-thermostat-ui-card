@@ -64,6 +64,7 @@ export type ClimateCardConfig = LovelaceCardConfig &
         show_status_text?: boolean;
         show_background_gradient_on_active?: boolean;
         show_regulation_chart?: boolean;
+        show_humidity?: boolean;
     };
 
 export const climateCardConfigStruct = assign(
@@ -98,6 +99,7 @@ export const climateCardConfigStruct = assign(
         allow_preset_modification: optional(boolean()),
         show_status_text: optional(boolean()),
         show_background_gradient_on_active: optional(boolean()),
-        show_regulation_chart: optional(boolean())
+        show_regulation_chart: optional(boolean()),
+        show_humidity: optional(boolean())
     })
 );

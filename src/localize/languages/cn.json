@@ -44,7 +44,8 @@
         "show_background_gradient_on_active": "当实体处于活动状态时显示滑块背景渐变",
         "show_regulation_chart": "Show regulation chart",
         "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
-        "autoFanEnableEntity": "Auto-fan entity"
+        "autoFanEnableEntity": "Auto-fan entity",
+        "show_humidity": "显示湿度"
       }
     }
   },

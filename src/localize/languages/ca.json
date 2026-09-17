@@ -44,7 +44,8 @@
         "show_background_gradient_on_active": "Mostra el degradat de fons del control lliscant quan l'entitat està activa",
         "show_regulation_chart": "Show regulation chart",
         "autoStartStopStopModeEntity": "Auto-start/stop stop mode entity",
-        "autoFanEnableEntity": "Auto-fan entity"
+        "autoFanEnableEntity": "Auto-fan entity",
+        "show_humidity": "Mostra la humitat"
       }
     }
   },
