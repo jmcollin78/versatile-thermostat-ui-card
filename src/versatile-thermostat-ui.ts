@@ -91,7 +91,7 @@ import { vthermStyles, renderVtherm } from './themes/vtherm-theme';
 import './regulation-chart';
 
 const UNAVAILABLE = "unavailable";
-const DEBUG=true;
+const DEBUG=false;
 const modeIcons: {
   [mode in any]: string
 } = {
