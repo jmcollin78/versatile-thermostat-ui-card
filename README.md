@@ -28,7 +28,9 @@
   - [Configure the auto-start/stop mode](#configure-the-auto-startstop-mode)
     - [How to use](#how-to-use)
   - [By-pass the window detection](#by-pass-the-window-detection)
-    - [Inhibition and bypass](#inhibition-and-bypass)
+  - [VTherm inhibition](#vtherm-inhibition)
+    - [Display](#display)
+    - [Bypass control](#bypass-control)
   - [Lock/Unlock the thermostat](#lockunlock-the-thermostat)
   - [Timed preset](#timed-preset)
     - [How to use](#how-to-use-1)
@@ -217,29 +219,29 @@ Then you can add the new card into your dashboard.
 
 These options are **not applicable** to the Gunmalmg theme.
 
-| Name                        | Type    | Default      | Description                                                                                                                                                                                                         |
-| --------------------------- | ------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| disable_window              | boolean | **Optional** | Turn off the window open indicator                                                                                                                                                                                  |
-| disable_overpowering        | boolean | **Optional** | Turn off the overpowering indicator                                                                                                                                                                                 |
-| disable_heat                | boolean | **Optional** | Turn off the on/heat button                                                                                                                                                                                         |
-| disable_cool                | boolean | **Optional** | Turn off the on/cool button                                                                                                                                                                                         |
-| disable_heat_cool           | boolean | **Optional** | Turn off the on/heat_cool button                                                                                                                                                                                    |
-| disable_auto                | boolean | **Optional** | Turn off the on/auto button                                                                                                                                                                                         |
-| disable_dry                 | boolean | **Optional** | Turn off the on/dry button                                                                                                                                                                                          |
-| disable_fan_only            | boolean | **Optional** | Turn off the on/fan_only button                                                                                                                                                                                     |
-| disable_off                 | boolean | **Optional** | Turn off the off button                                                                                                                                                                                             |
-| disable_sleep_mode          | boolean | **Optional** | Turn off the sleep mode button                                                                                                                                                                                      |
-| disable_buttons             | boolean | **Optional** | Turn off the plus/minus buttons                                                                                                                                                                                     |
-| disable_power_infos         | boolean | **Optional** | Turn off the power informations                                                                                                                                                                                     |
-| disable_auto_fan_infos      | boolean | **Optional** | Turn off the auto-fan informations                                                                                                                                                                                  |
-| disable_target_icon         | boolean | **Optional** | Hide the target icon for the setpoint temperature (which can be confusing with the room temperature)                                                                                                                |
-| disable_presets             | boolean | **Optional** | true to hide all the preset icons and timed preset controls.                                                                                                                                                        |
-| show_humidity               | boolean | **Optional** | true to show the `current_humidity` value reported by VTherm in the left information area, with a water-drop icon. The value is hidden when unavailable and is not displayed with the Gunmalmg theme.               |
-| autoStartStopEnableEntity   | string  | **Optional** | The entity id of the auto-start/stop enable entity (must be a switch entity). Example: `switch.clim_salon_enable_auto_start_stop`                                                                                   |
-| autoStartStopStopModeEntity | string  | **Optional** | The entity id of the auto-start/stop stop mode entity (must be a select entity). Enables the stop mode selector (`Disabled`, `Turn off`, `Fan only`, `Dry`). Example: `select.clim_salon_auto_start_stop_stop_mode` |
-| autoFanEnableEntity         | string  | **Optional** | The entity id of the auto-fan enable entity (must be a switch entity), used when the auto-fan plugin mode is available. Example: `switch.clim_salon_enable_auto_fan`                                                |
-| inhibitionBypassEntity      | string  | **Optional** | The inhibition plugin's bypass switch, for Classic, VTherm and Uncolored themes. Example: `switch.clim_salon_inhibition_bypass`. Enables bypass control from the inhibition icon.                                   |
-| powerEntity                 | string  | **Optional** | The entity id of sensor entity which gives the real power consumed by the VTherm. Example: `sensor.clim_salon_power`                                                                                                |
+| Name                        | Type    | Default      | Description                                                                                                                                                                                                           |
+| --------------------------- | ------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| disable_window              | boolean | **Optional** | Turn off the window open indicator                                                                                                                                                                                    |
+| disable_overpowering        | boolean | **Optional** | Turn off the overpowering indicator                                                                                                                                                                                   |
+| disable_heat                | boolean | **Optional** | Turn off the on/heat button                                                                                                                                                                                           |
+| disable_cool                | boolean | **Optional** | Turn off the on/cool button                                                                                                                                                                                           |
+| disable_heat_cool           | boolean | **Optional** | Turn off the on/heat_cool button                                                                                                                                                                                      |
+| disable_auto                | boolean | **Optional** | Turn off the on/auto button                                                                                                                                                                                           |
+| disable_dry                 | boolean | **Optional** | Turn off the on/dry button                                                                                                                                                                                            |
+| disable_fan_only            | boolean | **Optional** | Turn off the on/fan_only button                                                                                                                                                                                       |
+| disable_off                 | boolean | **Optional** | Turn off the off button                                                                                                                                                                                               |
+| disable_sleep_mode          | boolean | **Optional** | Turn off the sleep mode button                                                                                                                                                                                        |
+| disable_buttons             | boolean | **Optional** | Turn off the plus/minus buttons                                                                                                                                                                                       |
+| disable_power_infos         | boolean | **Optional** | Turn off the power informations                                                                                                                                                                                       |
+| disable_auto_fan_infos      | boolean | **Optional** | Turn off the auto-fan informations                                                                                                                                                                                    |
+| disable_target_icon         | boolean | **Optional** | Hide the target icon for the setpoint temperature (which can be confusing with the room temperature)                                                                                                                  |
+| disable_presets             | boolean | **Optional** | true to hide all the preset icons and timed preset controls.                                                                                                                                                          |
+| show_humidity               | boolean | **Optional** | true to show the `current_humidity` value reported by VTherm in the left information area, with a water-drop icon. The value is hidden when unavailable and is not displayed with the Gunmalmg theme.                 |
+| autoStartStopEnableEntity   | string  | **Optional** | The entity id of the auto-start/stop enable entity (must be a switch entity). Example: `switch.clim_salon_enable_auto_start_stop`                                                                                     |
+| autoStartStopStopModeEntity | string  | **Optional** | The entity id of the auto-start/stop stop mode entity (must be a select entity). Enables the stop mode selector (`Disabled`, `Turn off`, `Fan only`, `Dry`). Example: `select.clim_salon_auto_start_stop_stop_mode`   |
+| autoFanEnableEntity         | string  | **Optional** | The entity id of the auto-fan enable entity (must be a switch entity), used when the auto-fan plugin mode is available. Example: `switch.clim_salon_enable_auto_fan`                                                  |
+| inhibitionBypassEntity      | string  | **Optional** | The VTherm Inhibition plugin's bypass switch. This option is available with every theme; the clickable inhibition icon is supported in Classic, VTherm and Uncolored. Example: `switch.clim_salon_inhibition_bypass`. |
+| powerEntity                 | string  | **Optional** | The entity id of sensor entity which gives the real power consumed by the VTherm. Example: `sensor.clim_salon_power`                                                                                                  |
 
 Example:
 ```
@@ -313,15 +315,30 @@ autoStartStopStopModeEntity: select.clim_salon_auto_start_stop_stop_mode
 
 If an open window has been detected, you want to bypass it by clicking on the window icon (above the temperatures). This will enable the window by-pass and then disable the window detection impact. Notice that the icon change to this one when the by-pass is set: ![window bypass icon](assets/window-bypass-icon.png)
 
-### Inhibition and bypass
+## VTherm inhibition
 
-With VTherm inhibition support (10.6.0 or later), the Classic, VTherm and Uncolored themes show a pause-circle icon when VTherm reports `specific_states.inhibition.inhibited: true`. This operational attribute, not the HVAC reason or message, determines the icon's state. Inhibition suspends VTherm's control of its devices; it does not necessarily mean the physical devices are off.
+The card displays VTherm's inhibition state; it does not detect inhibition sources or inhibit the thermostat itself. These functions belong to VTherm and, when used, the separate **VTherm Inhibition** plugin. The card requires a VTherm version that publishes the `specific_states.inhibition` custom attribute and an installed/configured plugin if you want to operate its bypass switch.
 
-To avoid overcrowding, the inhibition icon replaces the secondary status icons while inhibition or its bypass is active. The information button remains available and explains the state. Gunmalmg, including its Classic popup, keeps its existing icon layout.
+### Display
 
-Optionally select the plugin's **Inhibition bypass switch** in the entity selector section of the visual editor (available with every theme), or set `inhibitionBypassEntity` to its entity ID. Clicking the inhibition icon turns this switch on and requests that the plugin release the inhibition. The icon then changes to a bypass symbol and remains visible; click it again to turn the bypass off. Sources are evaluated again using the plugin's configured delays, so inhibition may not resume immediately.
+In the Classic, VTherm and Uncolored themes, the card reads `specific_states.inhibition.inhibited` from the climate entity. When it is `true`, a pause icon replaces the secondary status icons. The card uses this native inhibition flag rather than inferring the state from `hvac_mode_reason` or the message list. Inhibition means VTherm has withdrawn control of its underlying devices; it does not by itself guarantee that those devices are physically off.
 
-The bypass state comes from the configured switch (`on` means bypassed); VTherm's inhibition attributes do not expose it. Without a configured, available switch, the icon is read-only. User locking also prevents bypass changes. The card waits for Home Assistant's reported states rather than assuming the inhibition was released when a command was sent.
+The information button remains available. It shows the localized `hvac_off_inhibition` explanation, including when the backend message is missing. The icon layout and inhibition message are not added to the Gunmalmg theme or its Classic popup.
+
+### Bypass control
+
+The bypass is optional. Select the plugin's bypass switch in the entity selector area of the visual editor (available with every theme), or set `inhibitionBypassEntity` in YAML:
+
+```yaml
+type: custom:versatile-thermostat-ui-card
+entity: climate.clim_salon
+theme: vtherm
+inhibitionBypassEntity: switch.clim_salon_inhibition_bypass
+```
+
+When the switch is configured and available, clicking the pause icon turns bypass on. The plugin then ignores its inhibition sources and releases the VTherm. The icon changes to a bypass symbol and stays visible; click it again to turn bypass off. The card reads bypass state from this switch (`on` means bypass active), since it is not part of the VTherm inhibition custom attributes. Turning bypass off re-evaluates the plugin's sources and configured delays, so inhibition may resume after a delay.
+
+If no available switch is configured, the icon is informational and cannot be clicked. User controls being locked also prevents changing bypass. The card waits for Home Assistant's reported entity states and does not optimistically assume that a bypass command succeeded.
 
 ## Lock/Unlock the thermostat
 
