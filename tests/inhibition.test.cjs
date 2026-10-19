@@ -233,6 +233,75 @@ test("card config accepts valid grid options and rejects invalid option values",
     };
 
     assert.equal(is(config, climateCardConfigStruct), true);
+    for (const gridOptions of [
+        { columns: "full" },
+        { columns: "full", rows: "auto" },
+    ]) {
+        const fullConfig = { ...config, grid_options: gridOptions };
+        assert.equal(is(fullConfig, climateCardConfigStruct), true);
+
+        const editorPath = path.join(
+            __dirname,
+            "../src/versatile-thermostat-ui-card-editor.ts",
+        );
+        const editorSource = ts.createSourceFile(
+            editorPath,
+            fs.readFileSync(editorPath, "utf8"),
+            ts.ScriptTarget.Latest,
+            true,
+            ts.ScriptKind.TS,
+        );
+        const editorClass = editorSource.statements.find(
+            (node) =>
+                ts.isClassDeclaration(node) &&
+                node.name?.text === "ClimateCardEditor",
+        );
+        assert.ok(editorClass);
+        const editorMembers = ["setConfig", "_valueChanged"].map((name) => {
+            const member = editorClass.members.find(
+                (node) => node.name?.getText(editorSource) === name,
+            );
+            assert.ok(member, `Actual editor member ${name} must exist`);
+            return member.getText(editorSource);
+        });
+        const events = [];
+        const editorContext = {
+            assert: require("superstruct").assert,
+            climateCardConfigStruct,
+            fireEvent: (_editor, event, detail) =>
+                events.push({ event, detail }),
+        };
+        const compiledEditor = ts.transpileModule(
+            `class TestEditor { ${editorMembers.join("\n")} }\nglobalThis.TestEditor = TestEditor;`,
+            {
+                compilerOptions: {
+                    target: ts.ScriptTarget.ES2022,
+                    module: ts.ModuleKind.None,
+                },
+            },
+        );
+        vm.runInNewContext(compiledEditor.outputText, editorContext, {
+            filename: editorPath,
+            timeout: 1000,
+        });
+        const editor = new editorContext.TestEditor();
+        assert.doesNotThrow(() => editor.setConfig(fullConfig));
+        editor._valueChanged({
+            detail: {
+                value: {
+                    type: config.type,
+                    name: "Updated thermostat",
+                    section_all_themes: { show_humidity: true },
+                },
+            },
+        });
+        const updated = events.find(({ event }) => event === "config-changed")
+            .detail.config;
+        assert.equal(updated.grid_options, gridOptions);
+        assert.equal(updated.name, "Updated thermostat");
+        assert.equal(updated.show_humidity, true);
+        assert.equal(is(updated, climateCardConfigStruct), true);
+    }
     assert.equal(
         is(
             { ...config, grid_options: { columns: "wide" } },
