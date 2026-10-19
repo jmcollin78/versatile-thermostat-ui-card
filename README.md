@@ -6,7 +6,6 @@
 
 ![Tip](https://github.com/jmcollin78/versatile_thermostat/blob/main/images/icon.png?raw=true)
 
-- [Upgrading to v3.3 from v3.x](#upgrading-to-v33-from-v3x)
 - [UI Card for Versatile Thermostat](#ui-card-for-versatile-thermostat)
   - [Goals](#goals)
   - [Theme management](#theme-management)
@@ -54,22 +53,6 @@
   - [Translations](#translations)
   - [Support me](#support-me)
 
-
-# Upgrading to v3.3 from v3.x
-
-> **⚠️ Important:** Version 3.3 introduces some breaking changes to the card configuration. After upgrading, please review and update your card options.
-
-**What changed:**
-- The **[auto-start/stop control](#configure-the-auto-startstop-mode)** has been **redesigned**. Instead of a simple enable/disable checkbox, a unified selector now lets you choose the **stop mode** to apply when an auto-stop is detected: `Disabled`, `Turn off`, `Fan only` or `Dry`. This requires the new `autoStartStopStopModeEntity` option and **Versatile Thermostat v7.x or above** exposing the auto-start/stop stop mode `select` entity.
-- The **[auto-fan control](#enabledisable-the-auto-fan-mode)** now supports the new **plugin mode**. When your VTherm exposes the auto-fan plugin, the card reads its state and can toggle it through the new `autoFanEnableEntity` switch option. The label (not only the icon) is now clickable to toggle the feature.
-- **Two new configuration options** have been added: `autoStartStopStopModeEntity` (the auto-start/stop stop mode `select` entity) and `autoFanEnableEntity` (the auto-fan `switch` entity). See the [Options](#options) section.
-
-**What you should do:**
-1. Open each card configuration that uses this card.
-2. Check that your options are still valid — unused or obsolete options will be silently ignored but should be cleaned up to be able to use the UI configuration window.
-3. If you use the auto-start/stop feature, add the new `autoStartStopStopModeEntity` option (and keep `autoStartStopEnableEntity`) to benefit from the new stop mode selector.
-4. If you use the auto-fan feature in plugin mode, add the new `autoFanEnableEntity` option.
-5. If you use the Gunmalmg theme, review the [applicable options](#applicable-options) to see which settings are supported.
 
 # UI Card for Versatile Thermostat 
 
