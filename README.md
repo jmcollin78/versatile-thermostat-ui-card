@@ -28,6 +28,7 @@
   - [Configure the auto-start/stop mode](#configure-the-auto-startstop-mode)
     - [How to use](#how-to-use)
   - [By-pass the window detection](#by-pass-the-window-detection)
+    - [Inhibition and bypass](#inhibition-and-bypass)
   - [Lock/Unlock the thermostat](#lockunlock-the-thermostat)
   - [Timed preset](#timed-preset)
     - [How to use](#how-to-use-1)
@@ -196,48 +197,49 @@ Then you can add the new card into your dashboard.
 
 ### Common options (all themes)
 
-| Name                 | Type    | Default      | Description                                                                                            |
-| -------------------- | ------- | ------------ | ------------------------------------------------------------------------------------------------------ |
-| type                 | string  | **Required** | `custom:versatile-thermostat-ui-card`                                                                     |
-| entity               | string  | **Required** | The entity id of climate entity (must be a versatile_thermostat entity). Example: `climate.hvac`          |
-| name                | string/boolean  | **Optional** | Override the default entity name |
-| theme                | string  | **Optional** | The default theme that will be applied when the card loads |
-| disable_name        | boolean  | **Optional** | true to hide the name                                                                     |
-| disable_safety_warning     | boolean  | **Optional** | Turn off the security warning (when a temperature sensor is out)                              |
-| set_current_as_main | boolean | **Optional** | Exchange target temperature and room temperature |
-| allow_lock_toggle         | boolean | **Optional** | true to display a lock icon to lock/unlock the thermostat. If a code is configured in VTherm, a keypad will be displayed. |
-| lock_relock_delay         | number  | **Optional** | Delay in seconds after which the card will automatically re-lock after being unlocked. Set to 0 or omit to disable auto-relock. |
-| disable_timed_preset      | boolean | **Optional** | true to hide the timed preset duration selector next to preset icons. |
-| use_manual_duration_input | boolean | **Optional** | true to use a manual input field instead of the preset duration selector (15min, 30min, 1h, 4h, 8h, 24h). |
-| allow_preset_modification | boolean | **Optional** | true to show a collapsible panel at the bottom of the card allowing direct editing of preset temperatures (Frost, Eco, Comfort, Boost) for each HVAC mode and away/present combination. |
-| show_regulation_chart | boolean | **Optional** | true to show a collapsible regulation chart panel at the bottom of the card. See [Regulation chart](#regulation-chart) for details. |
+| Name                      | Type           | Default      | Description                                                                                                                                                                             |
+| ------------------------- | -------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| type                      | string         | **Required** | `custom:versatile-thermostat-ui-card`                                                                                                                                                   |
+| entity                    | string         | **Required** | The entity id of climate entity (must be a versatile_thermostat entity). Example: `climate.hvac`                                                                                        |
+| name                      | string/boolean | **Optional** | Override the default entity name                                                                                                                                                        |
+| theme                     | string         | **Optional** | The default theme that will be applied when the card loads                                                                                                                              |
+| disable_name              | boolean        | **Optional** | true to hide the name                                                                                                                                                                   |
+| disable_safety_warning    | boolean        | **Optional** | Turn off the security warning (when a temperature sensor is out)                                                                                                                        |
+| set_current_as_main       | boolean        | **Optional** | Exchange target temperature and room temperature                                                                                                                                        |
+| allow_lock_toggle         | boolean        | **Optional** | true to display a lock icon to lock/unlock the thermostat. If a code is configured in VTherm, a keypad will be displayed.                                                               |
+| lock_relock_delay         | number         | **Optional** | Delay in seconds after which the card will automatically re-lock after being unlocked. Set to 0 or omit to disable auto-relock.                                                         |
+| disable_timed_preset      | boolean        | **Optional** | true to hide the timed preset duration selector next to preset icons.                                                                                                                   |
+| use_manual_duration_input | boolean        | **Optional** | true to use a manual input field instead of the preset duration selector (15min, 30min, 1h, 4h, 8h, 24h).                                                                               |
+| allow_preset_modification | boolean        | **Optional** | true to show a collapsible panel at the bottom of the card allowing direct editing of preset temperatures (Frost, Eco, Comfort, Boost) for each HVAC mode and away/present combination. |
+| show_regulation_chart     | boolean        | **Optional** | true to show a collapsible regulation chart panel at the bottom of the card. See [Regulation chart](#regulation-chart) for details.                                                     |
 
 ### Classical, VTherm and Uncolored themes only
 
 These options are **not applicable** to the Gunmalmg theme.
 
-| Name                 | Type    | Default      | Description                                                                                            |
-| -------------------- | ------- | ------------ | ------------------------------------------------------------------------------------------------------ |
-| disable_window       | boolean  | **Optional** | Turn off the window open indicator                                                                     |
-| disable_overpowering | boolean  | **Optional** | Turn off the overpowering indicator                                                                |
-| disable_heat        | boolean  | **Optional** | Turn off the on/heat button                                                                          |
-| disable_cool        | boolean  | **Optional** | Turn off the on/cool button                                                                          |
-| disable_heat_cool   | boolean  | **Optional** | Turn off the on/heat_cool button                                                                     |
-| disable_auto        | boolean  | **Optional** | Turn off the on/auto button                                                                          |
-| disable_dry         | boolean  | **Optional** | Turn off the on/dry button                                                                           |
-| disable_fan_only    | boolean  | **Optional** | Turn off the on/fan_only button                                                                      |
-| disable_off         | boolean  | **Optional** | Turn off the off button                                                                         |
-| disable_sleep_mode     | boolean  | **Optional** | Turn off the sleep mode button                                                                        |
-| disable_buttons     | boolean  | **Optional** | Turn off the plus/minus buttons                                                                        |
-| disable_power_infos | boolean  | **Optional** | Turn off the power informations                                                                        |
-| disable_auto_fan_infos | boolean  | **Optional** | Turn off the auto-fan informations                                                                  |
-| disable_target_icon | boolean  | **Optional** | Hide the target icon for the setpoint temperature (which can be confusing with the room temperature) |
-| disable_presets           | boolean | **Optional** | true to hide all the preset icons and timed preset controls. |
-| show_humidity | boolean | **Optional** | true to show the `current_humidity` value reported by VTherm in the left information area, with a water-drop icon. The value is hidden when unavailable and is not displayed with the Gunmalmg theme. |
-| autoStartStopEnableEntity               | string  | **Optional** | The entity id of the auto-start/stop enable entity (must be a switch entity). Example: `switch.clim_salon_enable_auto_start_stop`          |
-| autoStartStopStopModeEntity             | string  | **Optional** | The entity id of the auto-start/stop stop mode entity (must be a select entity). Enables the stop mode selector (`Disabled`, `Turn off`, `Fan only`, `Dry`). Example: `select.clim_salon_auto_start_stop_stop_mode`          |
-| autoFanEnableEntity                     | string  | **Optional** | The entity id of the auto-fan enable entity (must be a switch entity), used when the auto-fan plugin mode is available. Example: `switch.clim_salon_enable_auto_fan`          |
-| powerEntity               | string  | **Optional** | The entity id of sensor entity which gives the real power consumed by the VTherm. Example: `sensor.clim_salon_power`          |
+| Name                        | Type    | Default      | Description                                                                                                                                                                                                         |
+| --------------------------- | ------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| disable_window              | boolean | **Optional** | Turn off the window open indicator                                                                                                                                                                                  |
+| disable_overpowering        | boolean | **Optional** | Turn off the overpowering indicator                                                                                                                                                                                 |
+| disable_heat                | boolean | **Optional** | Turn off the on/heat button                                                                                                                                                                                         |
+| disable_cool                | boolean | **Optional** | Turn off the on/cool button                                                                                                                                                                                         |
+| disable_heat_cool           | boolean | **Optional** | Turn off the on/heat_cool button                                                                                                                                                                                    |
+| disable_auto                | boolean | **Optional** | Turn off the on/auto button                                                                                                                                                                                         |
+| disable_dry                 | boolean | **Optional** | Turn off the on/dry button                                                                                                                                                                                          |
+| disable_fan_only            | boolean | **Optional** | Turn off the on/fan_only button                                                                                                                                                                                     |
+| disable_off                 | boolean | **Optional** | Turn off the off button                                                                                                                                                                                             |
+| disable_sleep_mode          | boolean | **Optional** | Turn off the sleep mode button                                                                                                                                                                                      |
+| disable_buttons             | boolean | **Optional** | Turn off the plus/minus buttons                                                                                                                                                                                     |
+| disable_power_infos         | boolean | **Optional** | Turn off the power informations                                                                                                                                                                                     |
+| disable_auto_fan_infos      | boolean | **Optional** | Turn off the auto-fan informations                                                                                                                                                                                  |
+| disable_target_icon         | boolean | **Optional** | Hide the target icon for the setpoint temperature (which can be confusing with the room temperature)                                                                                                                |
+| disable_presets             | boolean | **Optional** | true to hide all the preset icons and timed preset controls.                                                                                                                                                        |
+| show_humidity               | boolean | **Optional** | true to show the `current_humidity` value reported by VTherm in the left information area, with a water-drop icon. The value is hidden when unavailable and is not displayed with the Gunmalmg theme.               |
+| autoStartStopEnableEntity   | string  | **Optional** | The entity id of the auto-start/stop enable entity (must be a switch entity). Example: `switch.clim_salon_enable_auto_start_stop`                                                                                   |
+| autoStartStopStopModeEntity | string  | **Optional** | The entity id of the auto-start/stop stop mode entity (must be a select entity). Enables the stop mode selector (`Disabled`, `Turn off`, `Fan only`, `Dry`). Example: `select.clim_salon_auto_start_stop_stop_mode` |
+| autoFanEnableEntity         | string  | **Optional** | The entity id of the auto-fan enable entity (must be a switch entity), used when the auto-fan plugin mode is available. Example: `switch.clim_salon_enable_auto_fan`                                                |
+| inhibitionBypassEntity      | string  | **Optional** | The inhibition plugin's bypass switch, for Classic, VTherm and Uncolored themes. Example: `switch.clim_salon_inhibition_bypass`. Enables bypass control from the inhibition icon.                                   |
+| powerEntity                 | string  | **Optional** | The entity id of sensor entity which gives the real power consumed by the VTherm. Example: `sensor.clim_salon_power`                                                                                                |
 
 Example:
 ```
@@ -280,12 +282,12 @@ For `over_climate` and `over_switch` VTherms you can enable the auto-start/stop 
 
 Up to v3.2 the card only offered a simple enable/disable checkbox. Starting with **v3.3**, a **unified stop mode selector** replaces the checkbox. It lets you choose, directly from the card, which HVAC mode is applied when an auto-stop is detected:
 
-| Value | Meaning |
-|-------|---------|
-| Disabled | The auto-start/stop feature is turned off. |
-| Turn off | When an auto-stop is detected, the thermostat is turned off. |
+| Value    | Meaning                                                                                                           |
+| -------- | ----------------------------------------------------------------------------------------------------------------- |
+| Disabled | The auto-start/stop feature is turned off.                                                                        |
+| Turn off | When an auto-stop is detected, the thermostat is turned off.                                                      |
 | Fan only | When an auto-stop is detected, the thermostat switches to `fan_only` (only if the underlying device supports it). |
-| Dry | When an auto-stop is detected, the thermostat switches to `dry` (only if the underlying device supports it). |
+| Dry      | When an auto-stop is detected, the thermostat switches to `dry` (only if the underlying device supports it).      |
 
 The `Fan only` and `Dry` options only appear if the underlying device supports these HVAC modes (the available values come from the VTherm `select` entity).
 
@@ -310,6 +312,16 @@ autoStartStopStopModeEntity: select.clim_salon_auto_start_stop_stop_mode
 ## By-pass the window detection
 
 If an open window has been detected, you want to bypass it by clicking on the window icon (above the temperatures). This will enable the window by-pass and then disable the window detection impact. Notice that the icon change to this one when the by-pass is set: ![window bypass icon](assets/window-bypass-icon.png)
+
+### Inhibition and bypass
+
+With VTherm inhibition support (10.6.0 or later), the Classic, VTherm and Uncolored themes show a pause-circle icon when VTherm reports `specific_states.inhibition.inhibited: true`. This operational attribute, not the HVAC reason or message, determines the icon's state. Inhibition suspends VTherm's control of its devices; it does not necessarily mean the physical devices are off.
+
+To avoid overcrowding, the inhibition icon replaces the secondary status icons while inhibition or its bypass is active. The information button remains available and explains the state. Gunmalmg, including its Classic popup, keeps its existing icon layout.
+
+Optionally select the plugin's **Inhibition bypass switch** in the entity selector section of the visual editor (available with every theme), or set `inhibitionBypassEntity` to its entity ID. Clicking the inhibition icon turns this switch on and requests that the plugin release the inhibition. The icon then changes to a bypass symbol and remains visible; click it again to turn the bypass off. Sources are evaluated again using the plugin's configured delays, so inhibition may not resume immediately.
+
+The bypass state comes from the configured switch (`on` means bypassed); VTherm's inhibition attributes do not expose it. Without a configured, available switch, the icon is read-only. User locking also prevents bypass changes. The card waits for Home Assistant's reported states rather than assuming the inhibition was released when a command was sent.
 
 ## Lock/Unlock the thermostat
 
@@ -412,20 +424,20 @@ Click the header to toggle the panel open or closed.
 When open, the panel shows a table with up to **4 rows** and **4 columns**:
 
 **Columns** — one per preset, color-coded for quick identification:
-| Column | Color |
-|--------|-------|
-| Frost  | 🔵 Blue |
-| Eco    | 🟢 Green |
+| Column  | Color    |
+| ------- | -------- |
+| Frost   | 🔵 Blue   |
+| Eco     | 🟢 Green  |
 | Comfort | 🟠 Orange |
-| Boost  | 🔴 Red |
+| Boost   | 🔴 Red    |
 
 **Rows** — one per HVAC mode × presence combination (only rows that have at least one matching entity are displayed):
-| Row | Description |
-|-----|-------------|
-| Heat | Target temperature when heating and occupant is present |
-| Heat away | Target temperature when heating and occupant is absent |
-| Cool | Target temperature when cooling and occupant is present |
-| Cool away | Target temperature when cooling and occupant is absent |
+| Row       | Description                                             |
+| --------- | ------------------------------------------------------- |
+| Heat      | Target temperature when heating and occupant is present |
+| Heat away | Target temperature when heating and occupant is absent  |
+| Cool      | Target temperature when cooling and occupant is present |
+| Cool away | Target temperature when cooling and occupant is absent  |
 
 > The Cool and Cool away rows are shown only if the thermostat supports cooling mode (entities named `*_ac_temp` or `*_ac_away_temp` are detected automatically).
 
@@ -471,13 +483,13 @@ A collapsible panel labelled **"Graphique de régulation"** appears at the botto
 
 The chart shows up to 5 curves over the last 24 hours. Curves are automatically hidden if their data is not available for the entity:
 
-| Curve | Colour | Y axis | Description |
-|-------|--------|--------|-------------|
-| Consigne | 🟠 Orange | Left (°) | Target temperature (`temperature`) |
-| Pièce | 🔵 Blue | Left (°) | Room temperature (`current_temperature`) |
-| Régulée | 🟢 Green dashed | Left (°) | Regulated target temperature (over-climate TPI only) |
-| Ext. | 🟣 Purple dashed | Left (°) | Outdoor temperature (`specific_states.ext_current_temperature`) |
-| Puissance % | 🔴 Red filled | Right (%) | Heating power percentage (`power_percent`) |
+| Curve       | Colour          | Y axis    | Description                                                     |
+| ----------- | --------------- | --------- | --------------------------------------------------------------- |
+| Consigne    | 🟠 Orange        | Left (°)  | Target temperature (`temperature`)                              |
+| Pièce       | 🔵 Blue          | Left (°)  | Room temperature (`current_temperature`)                        |
+| Régulée     | 🟢 Green dashed  | Left (°)  | Regulated target temperature (over-climate TPI only)            |
+| Ext.        | 🟣 Purple dashed | Left (°)  | Outdoor temperature (`specific_states.ext_current_temperature`) |
+| Puissance % | 🔴 Red filled    | Right (%) | Heating power percentage (`power_percent`)                      |
 
 The chart loads the full **24 hours** of history from the Home Assistant history API on first open. Live data points are then appended automatically as the thermostat state changes.
 
@@ -485,10 +497,10 @@ The chart loads the full **24 hours** of history from the Home Assistant history
 
 The chart opens by default zoomed on the **last 2 hours**. Two buttons are available at the top-right of the chart:
 
-| Button | Action |
-|--------|--------|
+| Button | Action                                       |
+| ------ | -------------------------------------------- |
 | **2h** | Zoom back to the last 2 hours (default view) |
-| **1d** | Show the full 24-hour history |
+| **1d** | Show the full 24-hour history                |
 
 You can also:
 - **Scroll** the mouse wheel to zoom in/out on the time axis
@@ -497,8 +509,8 @@ You can also:
 
 ### Configuration
 
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
+| Name                  | Type    | Default      | Description                                 |
+| --------------------- | ------- | ------------ | ------------------------------------------- |
 | show_regulation_chart | boolean | **Optional** | `true` to enable the regulation chart panel |
 
 > **Note:** The regulation chart is available in all themes. For the Gunmalmg theme, it appears inside the popup.
@@ -555,22 +567,22 @@ More informations on the safety mode can be found [here](https://github.com/jmco
 
 ## Icons used
 
-| Icon  | Meaning  |
-|---|---|
-|  ![information icon](assets/information-icon.png) | Some information messages are available. Click on it to see it  |
-|  ![warning icon](assets/warning-icon.png) | Some warning informations messages are available. Click on it to see it  |
-|  ![underlying update delayed icon](assets/under-update-delayed-icon.png) | The underlying device's update has been delayed. See temporal filter on VTherm documentation  |
-|  ![presence detected icon](assets/presence-detected-icon.png) | The presence is detected  |
-|  ![motion detected icon](assets/activity-detected-icon.png) | The activity (ie motion) is detected  |
-|  ![window detected icon](assets/window-detected-icon.png) | The window is detected as open. Click on it to bypass the window detection  |
-|  ![window bypass icon](assets/window-bypass-icon.png) | The window bypass is active. Click on it to cancel the bypass |
-|  ![overpowering detected icon](assets/overpowering-detected-icon.png) | An overpowering detection has been done. The VTherm is in shedding mode |
-|  ![auto stop icon](assets/auto-start-stop-icon.png) | The VTherm has been stopped by the auto-start/stop feature (turned off, or switched to fan-only or dry mode). |
-|  ![target temperature icon](assets/target-temp-icon.png) | The target temperature (setpoint)  |
-|  ![havc action cooling](assets/hvac-action-cool-cooling-icon.png)  | The underlying device is cooling (`hvac_action` is cooling)  |
-|  ![havc action idle in cool mode](assets/hvac-action-cool-idle-icon.png)  | The underlying device is idle and the mode is Cool (`hvac_action` is idle and the `hvac_mode` is Cool)  |
-|  ![havc action heating](assets/hvac-action-heat-heating-icon.png)  | The underlying device is heating (`hvac_action` is heating)  |
-|  ![havc action idle in heat mode](assets/hvac-action-heat-idle-icon.png)  | The underlying device is idle and the mode is Heat (`hvac_action` is idle and the `hvac_mode` is Heat)  |
+| Icon                                                                    | Meaning                                                                                                       |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| ![information icon](assets/information-icon.png)                        | Some information messages are available. Click on it to see it                                                |
+| ![warning icon](assets/warning-icon.png)                                | Some warning informations messages are available. Click on it to see it                                       |
+| ![underlying update delayed icon](assets/under-update-delayed-icon.png) | The underlying device's update has been delayed. See temporal filter on VTherm documentation                  |
+| ![presence detected icon](assets/presence-detected-icon.png)            | The presence is detected                                                                                      |
+| ![motion detected icon](assets/activity-detected-icon.png)              | The activity (ie motion) is detected                                                                          |
+| ![window detected icon](assets/window-detected-icon.png)                | The window is detected as open. Click on it to bypass the window detection                                    |
+| ![window bypass icon](assets/window-bypass-icon.png)                    | The window bypass is active. Click on it to cancel the bypass                                                 |
+| ![overpowering detected icon](assets/overpowering-detected-icon.png)    | An overpowering detection has been done. The VTherm is in shedding mode                                       |
+| ![auto stop icon](assets/auto-start-stop-icon.png)                      | The VTherm has been stopped by the auto-start/stop feature (turned off, or switched to fan-only or dry mode). |
+| ![target temperature icon](assets/target-temp-icon.png)                 | The target temperature (setpoint)                                                                             |
+| ![havc action cooling](assets/hvac-action-cool-cooling-icon.png)        | The underlying device is cooling (`hvac_action` is cooling)                                                   |
+| ![havc action idle in cool mode](assets/hvac-action-cool-idle-icon.png) | The underlying device is idle and the mode is Cool (`hvac_action` is idle and the `hvac_mode` is Cool)        |
+| ![havc action heating](assets/hvac-action-heat-heating-icon.png)        | The underlying device is heating (`hvac_action` is heating)                                                   |
+| ![havc action idle in heat mode](assets/hvac-action-heat-idle-icon.png) | The underlying device is idle and the mode is Heat (`hvac_action` is idle and the `hvac_mode` is Heat)        |
 
 Example:
 
