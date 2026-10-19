@@ -6,6 +6,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "抑制旁路开关",
         "allow_lock_toggle": "Allow lock/unlock from card",
         "autoStartStopEnableEntity": "Auto-start/stop entity",
         "powerEntity": "Power consumption entity",
@@ -50,6 +51,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "温控器已被抑制：设备控制已暂停",
+    "inhibition_bypass": "抑制旁路已启用",
+    "inhibition_bypass_enable": "启用抑制旁路",
+    "inhibition_bypass_disable": "禁用抑制旁路",
     "window_open": "窗户打开",
     "night_mode": "夜间模式",
     "eco": "节能",

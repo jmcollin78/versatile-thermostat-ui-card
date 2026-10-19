@@ -6,6 +6,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "Interruttore di bypass dell’inibizione",
         "autoStartStopEnableEntity": "Entità di avvio/arresto automatico",
         "powerEntity": "Entità di consumo energetico",
         "theme": "Tema",
@@ -50,6 +51,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "Termostato inibito: controllo dei dispositivi sospeso",
+    "inhibition_bypass": "Bypass dell’inibizione attivato",
+    "inhibition_bypass_enable": "Attiva il bypass dell’inibizione",
+    "inhibition_bypass_disable": "Disattiva il bypass dell’inibizione",
     "window_open": "Finestra aperta",
     "window_bypass": "Bypass finestra Attivo",
     "eco": "Eco",

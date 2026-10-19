@@ -6,6 +6,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "Schalter zur Überbrückung der Sperre",
         "autoStartStopEnableEntity": "Auto-Start/Stop-Entität",
         "powerEntity": "Entität für den Stromverbrauch",
         "theme": "Thema",
@@ -51,6 +52,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "Thermostat gesperrt: Gerätesteuerung ausgesetzt",
+    "inhibition_bypass": "Überbrückung der Sperre aktiviert",
+    "inhibition_bypass_enable": "Überbrückung der Sperre aktivieren",
+    "inhibition_bypass_disable": "Überbrückung der Sperre deaktivieren",
     "window_open": "Fenster offen",
     "window_bypass": "Fenster-Bypass aktiviert",
     "night_mode": "Nachtmodus",

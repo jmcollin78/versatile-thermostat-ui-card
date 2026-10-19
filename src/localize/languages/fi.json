@@ -6,6 +6,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "Eston ohituskytkin",
         "allow_lock_toggle": "Allow lock/unlock from card",
         "autoStartStopEnableEntity": "Auto-start/stop entity",
         "powerEntity": "Power consumption entity",
@@ -50,6 +51,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "Termostaatin toiminta estetty: laitteiden ohjaus keskeytetty",
+    "inhibition_bypass": "Eston ohitus käytössä",
+    "inhibition_bypass_enable": "Ota eston ohitus käyttöön",
+    "inhibition_bypass_disable": "Poista eston ohitus käytöstä",
     "window_open": "Ikkuna auki",
     "night_mode": "Yötila",
     "eco": "Eco",

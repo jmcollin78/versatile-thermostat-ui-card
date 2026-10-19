@@ -50,6 +50,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "Thermostaat geblokkeerd: aansturing van apparaten onderbroken",
+    "inhibition_bypass": "Omzeiling van de blokkering ingeschakeld",
+    "inhibition_bypass_enable": "Omzeiling van de blokkering inschakelen",
+    "inhibition_bypass_disable": "Omzeiling van de blokkering uitschakelen",
     "window_open": "Raam open",
     "night_mode": "Nacht modus",
     "eco": "Eco",

@@ -4,6 +4,10 @@
     "current": "Nuvarande"
   },
   "extra_states": {
+    "hvac_off_inhibition": "Termostaten är spärrad: styrningen av enheter är pausad",
+    "inhibition_bypass": "Förbikoppling av spärr aktiverad",
+    "inhibition_bypass_enable": "Aktivera förbikoppling av spärr",
+    "inhibition_bypass_disable": "Inaktivera förbikoppling av spärr",
     "window_open": "Fönster öppet",
     "night_mode": "Nattläge",
     "eco": "Eco",
@@ -120,6 +124,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "Brytare för förbikoppling av spärr",
         "autoStartStopEnableEntity": "Auto-start/stop entity",
         "powerEntity": "Power consumption entity",
         "theme": "Theme",

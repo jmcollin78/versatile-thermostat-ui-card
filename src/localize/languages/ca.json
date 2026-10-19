@@ -6,6 +6,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "Interruptor d’anul·lació de la inhibició",
         "allow_lock_toggle": "Allow lock/unlock from card",
         "autoStartStopEnableEntity": "Auto-start/stop entity",
         "powerEntity": "Power consumption entity",
@@ -50,6 +51,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "Termòstat inhibit: control dels dispositius suspès",
+    "inhibition_bypass": "Anul·lació de la inhibició activada",
+    "inhibition_bypass_enable": "Activa l’anul·lació de la inhibició",
+    "inhibition_bypass_disable": "Desactiva l’anul·lació de la inhibició",
     "window_open": "Finestra oberta",
     "night_mode": "Mode nocturn",
     "eco": "Eco",
