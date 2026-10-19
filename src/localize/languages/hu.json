@@ -6,6 +6,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "Tiltás felülbírálásának kapcsolója",
         "disable_window": "Ablak kikapcsolás",
         "disable_overpowering": "Nyár kikapcsolás",
         "disable_heat": "Fűtés kikacsolás",
@@ -51,6 +52,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "A termosztát le van tiltva: az eszközök vezérlése szünetel",
+    "inhibition_bypass": "A tiltás felülbírálása bekapcsolva",
+    "inhibition_bypass_enable": "Tiltás felülbírálásának bekapcsolása",
+    "inhibition_bypass_disable": "Tiltás felülbírálásának kikapcsolása",
     "window_open": "Ablak nyitva",
     "night_mode": "Éjszakai mód",
     "eco": "Eco",

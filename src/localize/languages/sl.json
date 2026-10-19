@@ -6,6 +6,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "Stikalo za obhod blokade",
         "allow_lock_toggle": "Dovoli zaklepanje/odklepanje iz kartice",
         "autoStartStopEnableEntity": "Auto-start/stop entity",
         "powerEntity": "Power consumption entity",
@@ -50,6 +51,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "Termostat je blokiran: upravljanje naprav je začasno ustavljeno",
+    "inhibition_bypass": "Obhod blokade je omogočen",
+    "inhibition_bypass_enable": "Omogoči obhod blokade",
+    "inhibition_bypass_disable": "Onemogoči obhod blokade",
     "window_open": "Okno odprto",
     "night_mode": "Nočni način",
     "eco": "Eko",

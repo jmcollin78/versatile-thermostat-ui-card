@@ -6,6 +6,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "Interruptor de bypass da inibição",
         "disable_window": "Desactivar Janela",
         "disable_overpowering": "Desactivar Verão",
         "disable_heat": "Desactivar Aquecimento",
@@ -51,6 +52,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "Termóstato inibido: controlo dos dispositivos suspenso",
+    "inhibition_bypass": "Bypass da inibição ativado",
+    "inhibition_bypass_enable": "Ativar o bypass da inibição",
+    "inhibition_bypass_disable": "Desativar o bypass da inibição",
     "window_open": "Janela Aberta",
     "night_mode": "Modo Noturno",
     "eco": "Eco",

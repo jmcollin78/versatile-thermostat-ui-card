@@ -7,6 +7,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "Превключвател за заобикаляне на блокирането",
         "allow_lock_toggle": "Allow lock/unlock from card",
         "autoStartStopEnableEntity": "Auto-start/stop entity",
         "powerEntity": "Power consumption entity",
@@ -51,6 +52,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "Термостатът е блокиран: управлението на устройствата е преустановено",
+    "inhibition_bypass": "Заобикалянето на блокирането е включено",
+    "inhibition_bypass_enable": "Включване на заобикалянето на блокирането",
+    "inhibition_bypass_disable": "Изключване на заобикалянето на блокирането",
     "window_open": "Отворен прозорец",
     "night_mode": "Нощен режим",
     "eco": "Екологичен режим",

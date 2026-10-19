@@ -6,6 +6,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "Bryter for overstyring av sperring",
         "allow_lock_toggle": "Allow lock/unlock from card",
         "autoStartStopEnableEntity": "Auto-start/stop entity",
         "powerEntity": "Power consumption entity",
@@ -50,6 +51,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "Termostat sperret: styring av enheter er satt på pause",
+    "inhibition_bypass": "Overstyring av sperring aktivert",
+    "inhibition_bypass_enable": "Aktiver overstyring av sperring",
+    "inhibition_bypass_disable": "Deaktiver overstyring av sperring",
     "window_open": "Vindu åpent",
     "night_mode": "Nattmodus",
     "eco": "Eco",

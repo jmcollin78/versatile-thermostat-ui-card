@@ -15,6 +15,7 @@ const entitySharedConfigStruct = object({
     autoStartStopEnableEntity: optional(string()),
     autoStartStopStopModeEntity: optional(string()),
     autoFanEnableEntity: optional(string()),
+    inhibitionBypassEntity: optional(string()),
     powerEntity: optional(string()),
     visibility: optional(any()),
 });
