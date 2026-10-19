@@ -502,6 +502,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
     return 1;
   }
 
+  getGridOptions() {
+    return {
+      columns: 12,
+      rows: 4,
+      min_columns: 3,
+      min_rows: 2,
+    };
+  }
+
     public static styles: CSSResultGroup = [css `
       :host {
           display: block;

@@ -5,6 +5,14 @@ const lovelaceCardConfigStruct = object({
     index: optional(number()),
     view_index: optional(number()),
     view_layout: any(),
+    grid_options: optional(object({
+        columns: optional(union([number(), literal("full")])),
+        rows: optional(union([number(), literal("auto")])),
+        min_columns: optional(number()),
+        max_columns: optional(number()),
+        min_rows: optional(number()),
+        max_rows: optional(number()),
+    })),
     type: string(),
 });
 
