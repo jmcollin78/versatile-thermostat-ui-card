@@ -6,6 +6,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "Engellemeyi geçersiz kılma anahtarı",
         "allow_lock_toggle": "Allow lock/unlock from card",
         "autoStartStopEnableEntity": "Auto-start/stop entity",
         "powerEntity": "Power consumption entity",
@@ -50,6 +51,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "Termostat engellendi: cihaz kontrolü askıya alındı",
+    "inhibition_bypass": "Engellemeyi geçersiz kılma etkin",
+    "inhibition_bypass_enable": "Engellemeyi geçersiz kılmayı etkinleştir",
+    "inhibition_bypass_disable": "Engellemeyi geçersiz kılmayı devre dışı bırak",
     "window_open": "Pencere açık",
     "night_mode": "Gece modu",
     "eco": "Eco",

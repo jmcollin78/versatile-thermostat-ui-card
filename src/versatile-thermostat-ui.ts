@@ -52,6 +52,8 @@ import {
   mdiFanAuto,
   mdiFanOff,
   mdiPowerSleep,
+  mdiPauseCircleOutline,
+  mdiDebugStepOver,
   mdiPowerCycle,
   mdiBullseyeArrow,
   mdiSleep,
@@ -395,6 +397,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
   private _ignore: boolean = false;
   private _hasWindow: boolean = false;
   private _hasWindowByPass: boolean = false;
+  private _isInhibited: boolean = false;
+  private _isInhibitionBypassed: boolean = false;
   private _hasPresence: boolean = false;
   private _hasMotion: boolean = false;
   private _hasOverpowering: boolean = false;
@@ -1095,6 +1099,22 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       .icon-group {
         cursor: pointer;
         pointer-events: auto;
+      }
+
+      .inhibition-icon {
+        fill: var(--warning-color);
+      }
+
+      .inhibition-icon.bypassed {
+        fill: var(--accent-color);
+      }
+
+      .inhibition-icon[aria-disabled="true"] {
+        cursor: default;
+      }
+
+      .inhibition-icon:focus-visible {
+        outline: 2px solid var(--primary-color);
       }
 
       .window {
@@ -1943,6 +1963,9 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
           <div class="content${this._config?.disable_presets ? ' no-presets' : ''} ${this.name.length == 0 ? ' noname':''} ${this.safety_state !== null || this.displayMessages ? ' security_msg': ''} ${this._hasWindow ? ' window_open': ''}  ${this.overpowering ? ' overpowering': ''} ${this.presence ? ' presence': ''} ${this.motion ? ' motion': ''}  ${this._hasWindowByPass ? ' windowByPass': ''} " >
             <svg id="main" viewbox="0 0 125 100">
               <g transform="translate(57.5,37) scale(0.35)">
+                ${this._config?.theme !== 'gunmalmg' && (this._isInhibited || this._isInhibitionBypassed) ? svg`
+                  ${this._renderInhibitionIcon()}
+                ` : svg`
                 ${(this._hasWindowByPass) ? svg`
                   <g transform="${(this._hasWindowByPass) ? 'translate(-50.25,0)' :''}" @click=${this._handleToggleWindowByPass} class="icon-group">
                     <rect width="24" height="24" fill="transparent" style="cursor: pointer;"/>
@@ -1967,6 +1990,7 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
                 ${(this._hasMotion) ? svg`
                   <path class="motion ${this.motion ? 'active': ''}" transform="${(this._hasMotion) ? 'translate(50.25,0)' :''}" id="motion" d=${mdiMotionSensor} />
                 `: ``}
+                `}
               </g>
 
               ${
@@ -2198,6 +2222,8 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this._hasOverpowering = false;
         this._hasWindow = false;
         this._hasWindowByPass = false;
+        this._isInhibited = false;
+        this._isInhibitionBypassed = false;
         this._hasMotion = false;
         this._hasPresence = false;
         this._hasAutoStartStop = false;
@@ -2370,7 +2396,11 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
       const autoFanSwitchChanged = !!autoFanSwitchId
         && (!oldHass || oldHass.states[autoFanSwitchId] !== this.hass.states[autoFanSwitchId]);
 
-      if (!oldHass || oldHass.states[entity_id] !== stateObj || autoFanSwitchChanged) {
+      const inhibitionSwitchId = this._config?.inhibitionBypassEntity;
+      const inhibitionSwitchChanged = !!inhibitionSwitchId
+        && (!oldHass || oldHass.states[inhibitionSwitchId] !== this.hass.states[inhibitionSwitchId]);
+
+      if (changedProps.has('_config') || !oldHass || oldHass.states[entity_id] !== stateObj || autoFanSwitchChanged || inhibitionSwitchChanged) {
         if (!this._config || !this.hass || !this._config!.entity) {
           if (DEBUG) console.log(`No change return`);
           return;
@@ -2432,6 +2462,10 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         this.presenceState = attributes?.presence_manager?.presence_state || "off";
         this.motionState = attributes?.motion_manager?.motion_state || "off";
         this._hasWindowByPass = (attributes?.window_manager?.is_window_bypass === true);
+        // Operational state comes from VTherm, never from its explanatory messages.
+        this._isInhibited = attributes?.specific_states?.inhibition?.inhibited === true;
+        this._isInhibitionBypassed = !!inhibitionSwitchId
+          && this.hass.states[inhibitionSwitchId]?.state === 'on';
         this.safetyState = attributes?.safety_manager?.safety_state || "off";
         this.meanCyclePower = attributes?.power_manager?.mean_cycle_power || 0;
         this.valveOpenPercent = attributes?.vtherm_over_valve?.valve_open_percent || attributes?.vtherm_over_climate_valve?.valve_regulation?.valve_open_percent || 0;
@@ -2596,6 +2630,15 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         // Add existing messages from the attribute
         for (const msg of msgs) {
           this.messages.push(localize({ hass: this.hass, string: `extra_states.${msg}` }));
+        }
+
+        if (this._config?.theme !== 'gunmalmg') {
+          if (this._isInhibited && !msgs.includes('hvac_off_inhibition')) {
+            this.messages.push(localize({ hass: this.hass, string: 'extra_states.hvac_off_inhibition' }));
+          }
+          if (this._isInhibitionBypassed && !msgs.includes('inhibition_bypass')) {
+            this.messages.push(localize({ hass: this.hass, string: 'extra_states.inhibition_bypass' }));
+          }
         }
 
         // When auto-start/stop applies a non-off stop mode (fan_only/dry), the
@@ -2917,6 +2960,48 @@ export class VersatileThermostatUi extends LitElement implements LovelaceCard {
         option: value,
       });
     }
+  }
+
+  private _canToggleInhibitionBypass(): boolean {
+    const entityId = this._config?.inhibitionBypassEntity;
+    const switchState = entityId && entityId.startsWith('switch.')
+      ? this.hass?.states[entityId]?.state
+      : undefined;
+    return !this.isUserLocked && (switchState === 'on' || switchState === 'off');
+  }
+
+  private _handleToggleInhibitionBypass(event?: Event): void {
+    event?.stopPropagation();
+    if (!this._canToggleInhibitionBypass()) return;
+    const entityId = this._config!.inhibitionBypassEntity!;
+    // Read the live switch state; do not optimistically hide a still-inhibited VTherm.
+    const service = this.hass.states[entityId].state === 'on' ? 'turn_off' : 'turn_on';
+    this.hass.callService('switch', service, { entity_id: entityId }).catch(console.error);
+  }
+
+  private _renderInhibitionIcon(): TemplateResult {
+    const canToggle = this._canToggleInhibitionBypass();
+    const stateLabel = localize({ hass: this.hass, string: this._isInhibited
+      ? 'extra_states.hvac_off_inhibition' : 'extra_states.inhibition_bypass' });
+    const actionLabel = localize({ hass: this.hass, string: this._isInhibitionBypassed
+      ? 'extra_states.inhibition_bypass_disable' : 'extra_states.inhibition_bypass_enable' });
+    const label = canToggle ? `${stateLabel}. ${actionLabel}` : stateLabel;
+    return svg`
+      <g class="icon-group inhibition-icon ${this._isInhibitionBypassed ? 'bypassed' : ''}"
+        role=${canToggle ? 'button' : 'img'} tabindex=${canToggle ? '0' : '-1'}
+        aria-label=${label} aria-disabled=${String(!canToggle)}
+        @click=${this._handleToggleInhibitionBypass}
+        @keydown=${(event: KeyboardEvent) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            this._handleToggleInhibitionBypass(event);
+          }
+        }}>
+        <title>${label}</title>
+        <rect width="24" height="24" fill="transparent" />
+        <path d=${this._isInhibitionBypassed ? mdiDebugStepOver : mdiPauseCircleOutline} />
+      </g>
+    `;
   }
 
   private _handleToggleWindowByPass(/*e: MouseEvent*/): void {
