@@ -6,6 +6,7 @@
   "editor": {
     "card": {
       "climate": {
+        "inhibitionBypassEntity": "Prepínač obídenia blokovania",
         "disable_window": "Zakázať okno",
         "disable_overpowering": "Zakázať leto",
         "disable_heat": "Zakázať kúrenie",
@@ -51,6 +52,10 @@
     }
   },
   "extra_states": {
+    "hvac_off_inhibition": "Termostat je zablokovaný: ovládanie zariadení je pozastavené",
+    "inhibition_bypass": "Obídenie blokovania je zapnuté",
+    "inhibition_bypass_enable": "Zapnúť obídenie blokovania",
+    "inhibition_bypass_disable": "Vypnúť obídenie blokovania",
     "window_open": "Okno otvorené",
     "night_mode": "Nočný mód",
     "eco": "Eco",
