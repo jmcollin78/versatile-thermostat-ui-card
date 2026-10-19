@@ -196,6 +196,7 @@ export class ClimateCardEditor extends LitElement implements LovelaceCardEditor 
 
         // Build nested data matching the expandable section structure
         const formData: any = { ...this._config };
+        delete formData.grid_options;
         const allThemesData: any = {};
         for (const key of ClimateCardEditor.ALL_THEMES_KEYS) {
             if ((this._config as any)[key] !== undefined) {
@@ -236,6 +237,10 @@ export class ClimateCardEditor extends LitElement implements LovelaceCardEditor 
             ...(section_all_themes || {}),
             ...(section_classic_only || {}),
         } as ClimateCardConfig;
+
+        if (this._config?.grid_options !== undefined) {
+            cfg.grid_options = this._config.grid_options;
+        }
 
         // Default theme to classic if not explicitly set
         if (!cfg.theme) {

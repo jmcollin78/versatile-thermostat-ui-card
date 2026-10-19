@@ -49,17 +49,28 @@ export class VtRegulationChart extends LitElement {
   private _destroyed = false;
   private _lastEntityId = '';
   private _initialViewSet = false;
+  private _chartGeneration = 0;
 
   // ─── Lifecycle ────────────────────────────────────────────────────────────
 
   connectedCallback() {
     super.connectedCallback();
     this._destroyed = false;
+    if (this.hasUpdated) {
+      void this._initChart().then(() => {
+        if (!this._destroyed && this.visible && this._chartReady) {
+          this._chart?.resize();
+          this._updateChart();
+          this._applyInitialView();
+        }
+      });
+    }
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this._destroyed = true;
+    this._chartGeneration++;
     this._destroyChart();
   }
 
@@ -198,7 +209,8 @@ export class VtRegulationChart extends LitElement {
   }
 
   private async _initChart() {
-    if (this._destroyed) return;
+    if (this._destroyed || this._chart) return;
+    const generation = ++this._chartGeneration;
     this._canvas = this.shadowRoot?.querySelector('canvas') ?? null;
     if (!this._canvas) return;
 
@@ -212,7 +224,7 @@ export class VtRegulationChart extends LitElement {
       ]);
       await import('chartjs-adapter-date-fns');
 
-      if (this._destroyed) return;
+      if (this._destroyed || generation !== this._chartGeneration) return;
       Chart.register(...registerables, zoomPlugin);
 
       // Resolve HA theme colours — works in both dark and light mode
@@ -424,6 +436,7 @@ export class VtRegulationChart extends LitElement {
       this._chart.destroy();
       this._chart = null;
       this._chartReady = false;
+      this._initialViewSet = false;
     }
   }
 
