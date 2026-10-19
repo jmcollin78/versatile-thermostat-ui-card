@@ -10,6 +10,7 @@
 
 import { LitElement, html, css, CSSResultGroup, PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { localize } from './localize/localize';
 
 /** A single data point stored in the chart history */
 export interface RegulationDataPoint {
@@ -224,7 +225,7 @@ export class VtRegulationChart extends LitElement {
         data: {
           datasets: [
             {
-              label: 'Consigne',
+              label: localize({ hass: this.hass, string: 'extra_states.regulation_chart_setpoint' }),
               data: [],
               borderColor: '#f9a21f',
               backgroundColor: 'rgba(249,162,31,0.08)',
@@ -235,7 +236,7 @@ export class VtRegulationChart extends LitElement {
               yAxisID: 'yTemp',
             },
             {
-              label: 'Pièce',
+              label: localize({ hass: this.hass, string: 'extra_states.regulation_chart_room' }),
               data: [],
               borderColor: '#3a9ff2',
               backgroundColor: 'rgba(58,159,242,0.08)',
@@ -246,7 +247,7 @@ export class VtRegulationChart extends LitElement {
               yAxisID: 'yTemp',
             },
             {
-              label: 'Régulée',
+              label: localize({ hass: this.hass, string: 'extra_states.regulation_chart_regulated' }),
               data: [],
               borderColor: '#5dd461',
               backgroundColor: 'rgba(93,212,97,0.08)',
@@ -259,7 +260,7 @@ export class VtRegulationChart extends LitElement {
               hidden: true,   // shown only when data exists
             },
             {
-              label: 'Ext.',
+              label: localize({ hass: this.hass, string: 'extra_states.regulation_chart_outdoor' }),
               data: [],
               borderColor: '#a78bfa',
               backgroundColor: 'rgba(167,139,250,0.08)',
@@ -272,7 +273,7 @@ export class VtRegulationChart extends LitElement {
               hidden: true,   // shown only when data exists
             },
             {
-              label: 'Puissance %',
+              label: localize({ hass: this.hass, string: 'extra_states.regulation_chart_power' }),
               data: [],
               borderColor: '#f75252',
               backgroundColor: 'rgba(247,82,82,0.12)',
@@ -434,8 +435,8 @@ export class VtRegulationChart extends LitElement {
         ${this._loading ? html`<div class="chart-loading"></div>` : ''}
         <canvas></canvas>
         <div class="zoom-btns">
-          <button class="reset-zoom-btn" @click=${() => this._zoomTo2h()} title="Vue 2 heures">2h</button>
-          <button class="reset-zoom-btn" @click=${() => this.resetZoom()} title="Vue 24 heures">1d</button>
+          <button class="reset-zoom-btn" @click=${() => this._zoomTo2h()} title="${localize({ hass: this.hass, string: 'extra_states.regulation_chart_2h_title' })}">${localize({ hass: this.hass, string: 'extra_states.regulation_chart_2h' })}</button>
+          <button class="reset-zoom-btn" @click=${() => this.resetZoom()} title="${localize({ hass: this.hass, string: 'extra_states.regulation_chart_1d_title' })}">${localize({ hass: this.hass, string: 'extra_states.regulation_chart_1d' })}</button>
         </div>
       </div>
     `;

@@ -52,7 +52,7 @@ function _t(t,e){return(e,i,o)=>((t,e,i)=>(i.configurable=!0,i.enumerable=!0,Ref
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
- */const ft=1;class gt{constructor(t){}get _$AU(){return this._$AM._$AU}_$AT(t,e,i){this._$Ct=t,this._$AM=e,this._$Ci=i}_$AS(t,e){return this.update(t,e)}update(t,e){return this.render(...e)}}
+ */const gt=1;class ft{constructor(t){}get _$AU(){return this._$AM._$AU}_$AT(t,e,i){this._$Ct=t,this._$AM=e,this._$Ci=i}_$AS(t,e){return this.update(t,e)}update(t,e){return this.render(...e)}}
 /**
  * @license
  * Copyright 2018 Google LLC
@@ -1221,8 +1221,8 @@ const er=270;const ir=new Set(["ArrowRight","ArrowUp","ArrowLeft","ArrowDown","P
         ${this._loading?j`<div class="chart-loading"></div>`:""}
         <canvas></canvas>
         <div class="zoom-btns">
-          <button class="reset-zoom-btn" @click=${()=>this._zoomTo2h()} title="Vue 2 heures">2h</button>
-          <button class="reset-zoom-btn" @click=${()=>this.resetZoom()} title="Vue 24 heures">1d</button>
+          <button class="reset-zoom-btn" @click=${()=>this._zoomTo2h()} title="${ma({hass:this.hass,string:"extra_states.regulation_chart_2h_title"})}">${ma({hass:this.hass,string:"extra_states.regulation_chart_2h"})}</button>
+          <button class="reset-zoom-btn" @click=${()=>this.resetZoom()} title="${ma({hass:this.hass,string:"extra_states.regulation_chart_1d_title"})}">${ma({hass:this.hass,string:"extra_states.regulation_chart_1d"})}</button>
         </div>
       </div>
     `}static get styles(){return s`
